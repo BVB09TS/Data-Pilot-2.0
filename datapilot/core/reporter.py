@@ -28,7 +28,6 @@ RECOMMENDED_ACTIONS = {
     "logic_drift": "Consolidate with the canonical model and deprecate the duplicate.",
     "duplicate_metric": "Standardize the metric definition across all models using a single source of truth.",
     "redundant_model": "Remove this model and migrate consumers to the canonical version.",
-    "cost_anomaly": "Review model usage and consider optimization or deprecation.",
 }
 
 SEVERITY_MAP = {
@@ -41,7 +40,6 @@ SEVERITY_MAP = {
     "logic_drift": "medium",
     "duplicate_metric": "high",
     "redundant_model": "medium",
-    "cost_anomaly": "medium",
 }
 
 
@@ -80,7 +78,6 @@ def build_report(
     _add(findings.get("deprecated"), "deprecated_source")
     _add(findings.get("missing_tests"), "missing_tests")
     _add(findings.get("logic_drift"), "logic_drift")
-    _add(findings.get("anomalies"), "cost_anomaly")
 
     for item in findings.get("duplicate_metrics") or []:
         if not isinstance(item, dict):

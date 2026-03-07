@@ -68,12 +68,6 @@ class PipelineConfig(BaseModel):
 
     parallel_analysis: bool = Field(default=True, description="Run analysis tasks in parallel")
     max_workers: int = Field(default=4)
-    enable_anomaly_detection: bool = Field(
-        default=True, description="Run rule-based anomaly detection (cost spikes, zero usage)"
-    )
-    anomaly_cost_threshold_usd: float = Field(
-        default=20.0, description="Flag models with monthly cost above this as anomaly"
-    )
     retry_attempts: int = Field(default=3)
     retry_delay: float = Field(default=2.0, description="Base delay between retries in seconds")
     cache_ttl: int = Field(default=3600, description="Cache TTL in seconds")

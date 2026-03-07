@@ -132,22 +132,6 @@ class AuditPipeline:
                 progress,
             )
 
-        # Optional: rule-based anomaly detection
-        if self.config.pipeline.enable_anomaly_detection:
-            from datapilot.agents.anomaly import detect_anomalies
-
-            anomalies = detect_anomalies(
-                project,
-                dead_list,
-                cost_waste,
-                cost_threshold_usd=self.config.pipeline.anomaly_cost_threshold_usd,
-            )
-            findings["anomalies"] = anomalies
-            if anomalies:
-                self._emit(
-                    PipelineEvent("stage_complete", "anomalies", {"count": len(anomalies)})
-                )
-
         duration = (time.monotonic() - start) * 1000
         total_issues = sum(len(v) for v in findings.values())
 

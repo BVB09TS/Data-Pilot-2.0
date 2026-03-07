@@ -68,7 +68,6 @@ def _default_action(ftype: str) -> str:
         "logic_drift": "Consolidate with the canonical model and deprecate the duplicate.",
         "duplicate_metric": "Standardize the metric definition across all models using a single source of truth.",
         "redundant_model": "Remove this model and migrate consumers to the canonical version.",
-        "cost_anomaly": "Review model usage and consider optimization or deprecation.",
     }
     return actions.get(ftype, "Review and address.")
 
