@@ -1,0 +1,32 @@
+version: 2
+models:
+  - name: raw_email_events
+    description: "Raw email engagement events (opens, clicks, bounces)."
+    config:
+      tags: ["raw", "email_tool"]
+    columns:
+      - name: event_id
+        description: "Event PK"
+        tests:
+          - unique
+          - not_null
+      - name: campaign_id
+        description: "FK to campaigns"
+        tests:
+
+      - name: customer_email
+        description: "Recipient email"
+        tests:
+
+      - name: event_type
+        description: "sent/opened/clicked/bounced/unsubscribed"
+        tests:
+
+      - name: event_at
+        description: "Event timestamp"
+        tests:
+
+      - name: url_clicked
+        description: "URL if clicked"
+        tests:
+

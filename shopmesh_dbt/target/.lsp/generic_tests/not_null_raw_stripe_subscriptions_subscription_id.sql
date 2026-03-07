@@ -1,0 +1,1 @@
+{{ test_not_null(column_name="subscription_id", model=get_where_subquery(ref('raw_stripe_subscriptions'))) }}

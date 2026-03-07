@@ -1,0 +1,32 @@
+version: 2
+models:
+  - name: raw_stripe_refunds
+    description: "Raw Stripe refund transactions."
+    config:
+      tags: ["raw", "stripe"]
+    columns:
+      - name: refund_id
+        description: "Refund PK"
+        tests:
+          - unique
+          - not_null
+      - name: payment_id
+        description: "FK to payments"
+        tests:
+
+      - name: amount_cents
+        description: "Refund cents"
+        tests:
+
+      - name: reason
+        description: "duplicate/fraudulent/requested_by_customer"
+        tests:
+
+      - name: created_at
+        description: "Refund timestamp"
+        tests:
+
+      - name: status
+        description: "succeeded/pending/failed"
+        tests:
+

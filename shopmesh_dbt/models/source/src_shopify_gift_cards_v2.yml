@@ -1,0 +1,11 @@
+version: 2
+models:
+  - name: src_shopify_gift_cards_v2
+    description: "BROKEN LINEAGE: Refs raw_shopify_gift_cards which refs shopify.gift_cards source that was never configured."
+    config:
+      tags: ["source"]
+    columns:
+      - name: gift_card_id
+        description: "BROKEN: upstream source missing"
+      - name: balance_amount
+        description: "Remaining balance USD"

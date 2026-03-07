@@ -1,0 +1,11 @@
+version: 2
+models:
+  - name: analytics_channel_roi
+    description: "Channel ROI — paid vs organic attribution."
+    config:
+      tags: ["analytics"]
+    columns:
+      - name: channel
+        description: "Traffic channel"
+      - name: attributed_revenue
+        description: "Sum of order revenue for channel"

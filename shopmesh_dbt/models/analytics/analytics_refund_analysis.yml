@@ -1,0 +1,13 @@
+version: 2
+models:
+  - name: analytics_refund_analysis
+    description: "Refund analysis by date, reason and timing for finance and ops."
+    config:
+      tags: ["analytics"]
+    columns:
+      - name: refund_date
+        description: "Date of refunds"
+      - name: total_refunded
+        description: "Total refund value"
+      - name: avg_refund_rate
+        description: "Average refund / original order ratio"

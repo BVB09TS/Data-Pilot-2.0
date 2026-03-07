@@ -1,0 +1,9 @@
+version: 2
+models:
+  - name: analytics_seller_dashboard_v2
+    description: "DEAD MODEL: Seller dashboard v2. Never used — seller feature killed before launch. Zero production queries ever."
+    config:
+      tags: ["analytics"]
+    columns:
+      - name: seller_id
+        description: "DEAD — never used in production"

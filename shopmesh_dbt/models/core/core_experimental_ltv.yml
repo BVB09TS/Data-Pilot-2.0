@@ -1,0 +1,11 @@
+version: 2
+models:
+  - name: core_experimental_ltv
+    description: "ORPHANED: Experimental LTV from hackathon. Superseded by core_customers.estimated_ltv."
+    config:
+      tags: ["core"]
+    columns:
+      - name: customer_id
+        description: "Customer reference"
+      - name: experimental_ltv
+        description: "DO NOT USE — use core_customers.estimated_ltv"

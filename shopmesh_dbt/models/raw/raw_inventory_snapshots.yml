@@ -1,0 +1,36 @@
+version: 2
+models:
+  - name: raw_inventory_snapshots
+    description: "Daily warehouse inventory snapshots."
+    config:
+      tags: ["raw", "warehouse_ops"]
+    columns:
+      - name: snapshot_id
+        description: "Snapshot PK"
+        tests:
+          - unique
+          - not_null
+      - name: variant_id
+        description: "FK to variants"
+        tests:
+
+      - name: snapshot_date
+        description: "Date of snapshot"
+        tests:
+
+      - name: quantity
+        description: "Units on hand"
+        tests:
+
+      - name: warehouse_id
+        description: "Warehouse ID"
+        tests:
+
+      - name: reorder_point
+        description: "Reorder threshold"
+        tests:
+
+      - name: units_on_order
+        description: "Units in transit"
+        tests:
+

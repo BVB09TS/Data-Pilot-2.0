@@ -1,0 +1,18 @@
+version: 2
+models:
+  - name: core_refunds
+    description: "Refunds enriched with original order context."
+    config:
+      tags: ["core"]
+    columns:
+      - name: refund_id
+        description: "Refund PK"
+        tests:
+          - unique
+          - not_null
+      - name: refund_amount
+        description: "Refund value USD"
+      - name: days_to_refund
+        description: "Days between order and refund"
+      - name: refund_timing
+        description: "immediate/standard/late"

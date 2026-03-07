@@ -1,0 +1,23 @@
+version: 2
+models:
+  - name: raw_erp_warehouses
+    description: "DEPRECATED: Legacy ERP warehouses. Source decommissioned 2024-01-01."
+    config:
+      tags: ["raw", "legacy_erp"]
+    columns:
+      - name: warehouse_id
+        description: "Warehouse ID"
+        tests:
+
+      - name: warehouse_name
+        description: "Warehouse name"
+        tests:
+
+      - name: location_code
+        description: "Location code"
+        tests:
+
+      - name: capacity
+        description: "Max capacity"
+        tests:
+

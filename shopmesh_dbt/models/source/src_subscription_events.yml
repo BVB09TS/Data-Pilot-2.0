@@ -1,0 +1,13 @@
+version: 2
+models:
+  - name: src_subscription_events
+    description: "Subscription lifecycle events derived from stripe subscriptions."
+    config:
+      tags: ["source"]
+    columns:
+      - name: subscription_id
+        description: "Subscription reference"
+      - name: event_type
+        description: "subscription_started/subscription_cancelled"
+      - name: event_at
+        description: "Event timestamp"

@@ -1,0 +1,99 @@
+# DataPilot GitLab CI/CD Pipeline
+# Supports: lint, test, security scan, Docker build, audit report
+
+stages:
+  - lint
+  - test
+  - security
+  - build
+  - audit
+
+variables:
+  PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
+  PYTHON_VERSION: "3.12"
+
+cache:
+  paths:
+    - .cache/pip
+
+# ── Lint ─────────────────────────────────────────────────────────────
+ruff-lint:
+  stage: lint
+  image: python:${PYTHON_VERSION}-slim
+  script:
+    - pip install -e ".[dev]"
+    - ruff check datapilot/ tests/
+    - ruff format --check datapilot/ tests/
+
+mypy-check:
+  stage: lint
+  image: python:${PYTHON_VERSION}-slim
+  script:
+    - pip install -e ".[dev]"
+    - mypy datapilot/ --ignore-missing-imports
+  allow_failure: true
+
+# ── Test ─────────────────────────────────────────────────────────────
+test:
+  stage: test
+  image: python:${PYTHON_VERSION}-slim
+  script:
+    - pip install -e ".[dev]"
+    - pytest tests/ -v --tb=short --cov=datapilot --cov-report=xml --cov-report=html
+  coverage: '/(?i)total.*? (100(?:\.0+)?\%|[1-9]?\d(?:\.\d+)?\%)$/'
+  artifacts:
+    reports:
+      coverage_report:
+        coverage_format: cobertura
+        path: coverage.xml
+    paths:
+      - htmlcov/
+    expire_in: 7 days
+
+# ── Security ─────────────────────────────────────────────────────────
+security-scan:
+  stage: security
+  image: python:${PYTHON_VERSION}-slim
+  script:
+    - pip install -e ".[dev]" safety
+    - safety check --full-report || true
+    - ruff check datapilot/ --select S
+  allow_failure: true
+
+# ── Docker Build ─────────────────────────────────────────────────────
+docker-build:
+  stage: build
+  image: docker:24-dind
+  services:
+    - docker:24-dind
+  variables:
+    DOCKER_TLS_CERTDIR: "/certs"
+  script:
+    - docker build -t $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA .
+    - docker tag $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA $CI_REGISTRY_IMAGE:latest
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
+    - docker push $CI_REGISTRY_IMAGE:latest
+  only:
+    - main
+
+# ── Audit Report ─────────────────────────────────────────────────────
+datapilot-audit:
+  stage: audit
+  image: python:${PYTHON_VERSION}-slim
+  script:
+    - pip install -e .
+    - datapilot audit --project shopmesh_dbt --format json --format sarif --format csv --no-score || true
+  artifacts:
+    paths:
+      - datapilot_report.json
+      - datapilot_report.sarif
+      - datapilot_findings.csv
+    reports:
+      sast: datapilot_report.sarif
+    expire_in: 30 days
+  only:
+    - merge_requests
+    - main
+  variables:
+    GROQ_API_KEY: $GROQ_API_KEY

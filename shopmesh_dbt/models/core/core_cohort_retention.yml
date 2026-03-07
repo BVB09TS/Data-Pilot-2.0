@@ -1,0 +1,13 @@
+version: 2
+models:
+  - name: core_cohort_retention
+    description: "Customer cohort retention. Grain: cohort_month + months_since_cohort."
+    config:
+      tags: ["core"]
+    columns:
+      - name: cohort_month
+        description: "Customer cohort (month of first order)"
+      - name: months_since_cohort
+        description: "0=acquisition month"
+      - name: active_customers
+        description: "Customers who purchased in period"

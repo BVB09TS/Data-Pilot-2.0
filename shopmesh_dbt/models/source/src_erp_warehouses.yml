@@ -1,0 +1,9 @@
+version: 2
+models:
+  - name: src_erp_warehouses
+    description: "DEPRECATED: Light transform of deprecated ERP warehouse data."
+    config:
+      tags: ["source"]
+    columns:
+      - name: warehouse_id
+        description: "DEPRECATED: Legacy warehouse ID"

@@ -1,0 +1,18 @@
+version: 2
+models:
+  - name: core_revenue_daily
+    description: "Daily order revenue aggregation. Grain: DAILY — one row per calendar day."
+    config:
+      tags: ["core"]
+    columns:
+      - name: revenue_date
+        description: "DAILY grain — one row per calendar day"
+        tests:
+          - unique
+          - not_null
+      - name: gross_revenue
+        description: "Sum of order_total_amount"
+      - name: net_revenue
+        description: "Sum of net_payment_amount"
+      - name: completed_orders
+        description: "Orders not cancelled"

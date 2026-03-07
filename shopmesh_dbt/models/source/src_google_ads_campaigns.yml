@@ -1,0 +1,16 @@
+version: 2
+models:
+  - name: src_google_ads_campaigns
+    description: "Google Ads campaigns with budget in dollars."
+    config:
+      tags: ["source"]
+    columns:
+      - name: campaign_id
+        description: "Campaign PK"
+        tests:
+          - unique
+          - not_null
+      - name: campaign_status
+        description: "ENABLED/PAUSED/REMOVED"
+      - name: daily_budget
+        description: "Daily budget USD"

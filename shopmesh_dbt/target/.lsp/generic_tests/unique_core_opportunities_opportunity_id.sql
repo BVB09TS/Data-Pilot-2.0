@@ -1,0 +1,1 @@
+{{ test_unique(column_name="opportunity_id", model=get_where_subquery(ref('core_opportunities'))) }}

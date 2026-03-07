@@ -1,0 +1,31 @@
+version: 2
+models:
+  - name: raw_google_ads_performance
+    description: "Raw Google Ads daily performance. Grain: campaign_id + date."
+    config:
+      tags: ["raw", "google_ads"]
+    columns:
+      - name: campaign_id
+        description: "FK to campaigns"
+        tests:
+
+      - name: report_date
+        description: "Performance date"
+        tests:
+
+      - name: impressions
+        description: "Total impressions"
+        tests:
+
+      - name: clicks
+        description: "Total clicks"
+        tests:
+
+      - name: cost_cents
+        description: "Spend in cents"
+        tests:
+
+      - name: conversions
+        description: "Tracked conversions"
+        tests:
+

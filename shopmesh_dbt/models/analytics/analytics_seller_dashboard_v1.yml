@@ -1,0 +1,9 @@
+version: 2
+models:
+  - name: analytics_seller_dashboard_v1
+    description: "DEAD MODEL: Seller dashboard v1. Replaced by v2 Oct 2023, feature killed Q4 2023. Refs broken core_seller_metrics. No queries since 2023-10-03."
+    config:
+      tags: ["analytics"]
+    columns:
+      - name: seller_id
+        description: "BROKEN upstream"

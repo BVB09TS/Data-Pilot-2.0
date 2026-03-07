@@ -1,0 +1,1 @@
+{{ test_unique(column_name="payment_id", model=get_where_subquery(ref('src_stripe_payments'))) }}

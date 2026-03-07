@@ -1,0 +1,11 @@
+version: 2
+models:
+  - name: core_seller_metrics
+    description: "BROKEN LINEAGE: refs src_shopify_sellers which does not exist. Seller feature planned but source model never built."
+    config:
+      tags: ["core"]
+    columns:
+      - name: seller_id
+        description: "BROKEN: upstream model missing"
+      - name: gross_gmv
+        description: "Total GMV for seller"

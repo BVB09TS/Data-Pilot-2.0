@@ -1,0 +1,14 @@
+version: 2
+models:
+  - name: core_revenue_monthly
+    description: "Monthly subscription MRR aggregation. Grain: MONTHLY — one row per month."
+    config:
+      tags: ["core"]
+    columns:
+      - name: revenue_month
+        description: "MONTHLY grain — one row per month"
+        tests:
+          - unique
+          - not_null
+      - name: monthly_recurring_revenue
+        description: "Total MRR for active subscriptions"

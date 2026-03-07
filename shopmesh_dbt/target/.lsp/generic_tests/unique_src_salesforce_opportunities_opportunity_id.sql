@@ -1,0 +1,1 @@
+{{ test_unique(column_name="opportunity_id", model=get_where_subquery(ref('src_salesforce_opportunities'))) }}

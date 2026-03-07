@@ -1,0 +1,1 @@
+{{ test_not_null(column_name="line_item_id", model=get_where_subquery(ref('src_shopify_order_items'))) }}

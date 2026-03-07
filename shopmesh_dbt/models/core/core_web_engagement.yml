@@ -1,0 +1,15 @@
+version: 2
+models:
+  - name: core_web_engagement
+    description: "Web session engagement by source, device, and date."
+    config:
+      tags: ["core"]
+    columns:
+      - name: session_date
+        description: "Date of sessions"
+      - name: traffic_source
+        description: "Traffic source grouping"
+      - name: session_count
+        description: "Total sessions"
+      - name: engaged_sessions
+        description: "Sessions > 60 seconds"

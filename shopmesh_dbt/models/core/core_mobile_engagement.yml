@@ -1,0 +1,15 @@
+version: 2
+models:
+  - name: core_mobile_engagement
+    description: "Mobile app engagement per user aggregated from events."
+    config:
+      tags: ["core"]
+    columns:
+      - name: user_id
+        description: "App user identifier"
+      - name: platform
+        description: "ios/android/web"
+      - name: total_sessions
+        description: "Lifetime session count"
+      - name: active_days
+        description: "Days with at least one session"

@@ -1,0 +1,15 @@
+version: 2
+models:
+  - name: analytics_subscription_mrr_trend
+    description: "Monthly MRR trend with period-over-period change."
+    config:
+      tags: ["analytics"]
+    columns:
+      - name: revenue_month
+        description: "Monthly grain"
+      - name: monthly_recurring_revenue
+        description: "Total MRR"
+      - name: arr
+        description: "Annualised recurring revenue MRR * 12"
+      - name: mrr_change
+        description: "Month-over-month MRR delta"

@@ -1,0 +1,182 @@
+# DataPilot v2.0 — Kubernetes Deployment Manifests
+# Deploy as a CronJob for scheduled audits + a Service for the dashboard
+
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: data-platform
+  labels:
+    app: datapilot
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: datapilot-config
+  namespace: data-platform
+data:
+  datapilot.yaml: |
+    project_root: /data/dbt-project
+    output_dir: /output
+    log_level: INFO
+    pipeline:
+      parallel_analysis: true
+      max_workers: 4
+      retry_attempts: 3
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: datapilot-secrets
+  namespace: data-platform
+type: Opaque
+stringData:
+  GROQ_API_KEY: "your-groq-api-key"
+  # ANTHROPIC_API_KEY: "your-anthropic-key"
+  # OPENAI_API_KEY: "your-openai-key"
+
+---
+# CronJob: Scheduled daily audit
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: datapilot-audit
+  namespace: data-platform
+  labels:
+    app: datapilot
+    component: audit
+spec:
+  schedule: "0 6 * * *"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 7
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          labels:
+            app: datapilot
+            component: audit
+        spec:
+          restartPolicy: OnFailure
+          containers:
+            - name: datapilot
+              image: datapilot:2.0.0
+              command: ["datapilot", "audit", "--config", "/config/datapilot.yaml", "--format", "json", "--format", "sarif"]
+              envFrom:
+                - secretRef:
+                    name: datapilot-secrets
+              volumeMounts:
+                - name: config
+                  mountPath: /config
+                - name: output
+                  mountPath: /output
+                - name: dbt-project
+                  mountPath: /data/dbt-project
+                  readOnly: true
+              resources:
+                requests:
+                  cpu: 500m
+                  memory: 512Mi
+                limits:
+                  cpu: "2"
+                  memory: 2Gi
+          volumes:
+            - name: config
+              configMap:
+                name: datapilot-config
+            - name: output
+              persistentVolumeClaim:
+                claimName: datapilot-output
+            - name: dbt-project
+              persistentVolumeClaim:
+                claimName: dbt-project-data
+
+---
+# Deployment: Web Dashboard (always running)
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: datapilot-dashboard
+  namespace: data-platform
+  labels:
+    app: datapilot
+    component: dashboard
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: datapilot
+      component: dashboard
+  template:
+    metadata:
+      labels:
+        app: datapilot
+        component: dashboard
+    spec:
+      containers:
+        - name: dashboard
+          image: datapilot:2.0.0
+          command: ["datapilot", "serve", "--port", "5000"]
+          ports:
+            - containerPort: 5000
+          volumeMounts:
+            - name: output
+              mountPath: /output
+              readOnly: true
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          livenessProbe:
+            httpGet:
+              path: /api/health
+              port: 5000
+            initialDelaySeconds: 5
+            periodSeconds: 30
+          readinessProbe:
+            httpGet:
+              path: /api/health
+              port: 5000
+            initialDelaySeconds: 3
+            periodSeconds: 10
+      volumes:
+        - name: output
+          persistentVolumeClaim:
+            claimName: datapilot-output
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: datapilot-dashboard
+  namespace: data-platform
+  labels:
+    app: datapilot
+spec:
+  selector:
+    app: datapilot
+    component: dashboard
+  ports:
+    - port: 80
+      targetPort: 5000
+      protocol: TCP
+  type: ClusterIP
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: datapilot-output
+  namespace: data-platform
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi

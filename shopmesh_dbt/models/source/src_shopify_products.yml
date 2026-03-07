@@ -1,0 +1,16 @@
+version: 2
+models:
+  - name: src_shopify_products
+    description: "Shopify products with typed dates."
+    config:
+      tags: ["source"]
+    columns:
+      - name: product_id
+        description: "Product PK"
+        tests:
+          - unique
+          - not_null
+      - name: product_name
+        description: "Cleaned product name"
+      - name: product_status
+        description: "active/draft/archived"

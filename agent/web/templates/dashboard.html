@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>DataPilot - dbt Audit Dashboard</title>
+<style>
+/* ── Reset & Base ──────────────────────────────────────── */
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg-primary:#0a0e1a;--bg-card:#111827;--bg-card-hover:#1a2235;
+  --bg-header:#0d1321;--border:#1e293b;--border-active:#334155;
+  --text-primary:#f1f5f9;--text-secondary:#94a3b8;--text-muted:#64748b;
+  --accent:#3b82f6;--accent-glow:rgba(59,130,246,0.15);
+  --red:#ef4444;--orange:#f97316;--yellow:#eab308;--green:#22c55e;
+  --purple:#8b5cf6;--cyan:#06b6d4;
+  --font:-apple-system,BlinkMacSystemFont,'Inter','Segoe UI',sans-serif;
+  --mono:'JetBrains Mono','Fira Code',monospace;
+}
+html{font-size:14px}
+body{font-family:var(--font);background:var(--bg-primary);color:var(--text-primary);
+  min-height:100vh;overflow-x:hidden}
+a{color:var(--accent);text-decoration:none}
+a:hover{text-decoration:underline}
+
+/* ── Layout ────────────────────────────────────────────── */
+.app{display:flex;flex-direction:column;min-height:100vh}
+header{background:var(--bg-header);border-bottom:1px solid var(--border);
+  padding:16px 32px;display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:100;backdrop-filter:blur(12px)}
+header .logo{display:flex;align-items:center;gap:12px}
+header .logo h1{font-size:20px;font-weight:700;letter-spacing:-0.5px}
+header .logo .badge{font-size:11px;padding:2px 8px;border-radius:99px;
+  background:var(--accent-glow);color:var(--accent);font-weight:600;border:1px solid rgba(59,130,246,0.3)}
+header .meta{font-size:12px;color:var(--text-muted)}
+.main{flex:1;padding:24px 32px;max-width:1440px;margin:0 auto;width:100%}
+
+/* ── Score Cards ───────────────────────────────────────── */
+.cards{display:grid;grid-template-columns:repeat(5,1fr);gap:16px;margin-bottom:28px}
+.card{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;
+  padding:20px;transition:all .2s}
+.card:hover{border-color:var(--border-active);background:var(--bg-card-hover)}
+.card .value{font-size:32px;font-weight:800;line-height:1.1}
+.card .label{font-size:12px;color:var(--text-muted);margin-top:6px;text-transform:uppercase;
+  letter-spacing:0.5px}
+.card.accent .value{color:var(--accent)}
+.card.red .value{color:var(--red)}
+.card.green .value{color:var(--green)}
+.card.orange .value{color:var(--orange)}
+
+/* ── Tabs ──────────────────────────────────────────────── */
+.tabs{display:flex;gap:4px;margin-bottom:20px;border-bottom:1px solid var(--border);padding-bottom:0}
+.tab{padding:10px 20px;font-size:13px;font-weight:500;color:var(--text-muted);
+  cursor:pointer;border-bottom:2px solid transparent;transition:all .15s;
+  background:none;border-top:none;border-left:none;border-right:none}
+.tab:hover{color:var(--text-primary)}
+.tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+.tab-content{display:none}
+.tab-content.active{display:block}
+
+/* ── Findings Table ────────────────────────────────────── */
+.filters{display:flex;gap:12px;margin-bottom:16px;flex-wrap:wrap;align-items:center}
+.filter-chip{padding:6px 14px;font-size:12px;border-radius:99px;cursor:pointer;
+  border:1px solid var(--border);background:var(--bg-card);color:var(--text-secondary);
+  transition:all .15s;font-family:var(--font)}
+.filter-chip:hover,.filter-chip.active{border-color:var(--accent);color:var(--accent);
+  background:var(--accent-glow)}
+.filter-chip .count{margin-left:4px;opacity:0.6}
+.search-box{flex:1;min-width:200px;padding:8px 14px;border-radius:8px;border:1px solid var(--border);
+  background:var(--bg-card);color:var(--text-primary);font-size:13px;font-family:var(--font)}
+.search-box:focus{outline:none;border-color:var(--accent)}
+
+table.findings{width:100%;border-collapse:collapse;font-size:13px}
+table.findings thead{position:sticky;top:60px;z-index:10}
+table.findings th{padding:10px 14px;text-align:left;font-weight:500;color:var(--text-muted);
+  font-size:11px;text-transform:uppercase;letter-spacing:0.5px;
+  background:var(--bg-header);border-bottom:1px solid var(--border)}
+table.findings td{padding:12px 14px;border-bottom:1px solid var(--border);
+  vertical-align:top}
+table.findings tr{transition:background .1s}
+table.findings tr:hover{background:var(--bg-card-hover)}
+.model-name{font-family:var(--mono);font-size:12px;color:var(--cyan);font-weight:500}
+.type-badge{display:inline-block;padding:2px 10px;border-radius:99px;font-size:11px;
+  font-weight:600;letter-spacing:0.3px}
+.severity-badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:10px;
+  font-weight:700;text-transform:uppercase;letter-spacing:0.5px}
+.severity-critical{background:rgba(239,68,68,0.15);color:var(--red)}
+.severity-high{background:rgba(249,115,22,0.15);color:var(--orange)}
+.severity-medium{background:rgba(234,179,8,0.15);color:var(--yellow)}
+.severity-low{background:rgba(99,102,241,0.15);color:#818cf8}
+.cost{font-weight:600;color:var(--red);font-family:var(--mono);font-size:12px}
+.evidence{color:var(--text-secondary);font-size:12px;max-width:360px}
+.action{color:var(--green);font-size:12px;font-style:italic}
+
+/* ── Lineage Graph ─────────────────────────────────────── */
+#graph-container{width:100%;height:600px;background:var(--bg-card);
+  border:1px solid var(--border);border-radius:12px;position:relative;overflow:hidden}
+#graph-canvas{width:100%;height:100%}
+.graph-legend{position:absolute;top:16px;right:16px;background:rgba(17,24,39,0.9);
+  border:1px solid var(--border);border-radius:8px;padding:12px 16px;font-size:12px}
+.graph-legend .item{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.graph-legend .dot{width:10px;height:10px;border-radius:50%}
+.graph-controls{position:absolute;bottom:16px;left:16px;display:flex;gap:8px}
+.graph-controls button{padding:6px 12px;border-radius:6px;border:1px solid var(--border);
+  background:var(--bg-card);color:var(--text-primary);cursor:pointer;font-size:12px;
+  font-family:var(--font)}
+.graph-controls button:hover{border-color:var(--accent);color:var(--accent)}
+
+/* ── Tooltip ───────────────────────────────────────────── */
+.tooltip{position:fixed;padding:12px 16px;background:rgba(17,24,39,0.95);
+  border:1px solid var(--border-active);border-radius:8px;font-size:12px;
+  pointer-events:none;z-index:200;max-width:320px;box-shadow:0 8px 32px rgba(0,0,0,0.5)}
+.tooltip .tt-title{font-weight:700;color:var(--cyan);font-family:var(--mono);margin-bottom:4px}
+.tooltip .tt-row{color:var(--text-secondary);margin-top:2px}
+
+/* ── Score Section ─────────────────────────────────────── */
+.score-bar{height:8px;background:var(--border);border-radius:99px;overflow:hidden;margin:12px 0}
+.score-bar .fill{height:100%;border-radius:99px;transition:width 1s ease}
+.score-detail{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:16px}
+.score-detail .item{background:var(--bg-card);border:1px solid var(--border);
+  border-radius:8px;padding:14px}
+.score-detail .item .num{font-size:24px;font-weight:700}
+.score-detail .item .lbl{font-size:11px;color:var(--text-muted);margin-top:4px}
+.found-list,.missed-list{margin-top:12px;display:flex;flex-wrap:wrap;gap:6px}
+.id-chip{padding:3px 10px;border-radius:99px;font-size:11px;font-family:var(--mono)}
+.id-chip.found{background:rgba(34,197,94,0.12);color:var(--green);border:1px solid rgba(34,197,94,0.3)}
+.id-chip.missed{background:rgba(239,68,68,0.12);color:var(--red);border:1px solid rgba(239,68,68,0.3)}
+
+/* ── Loading ───────────────────────────────────────────── */
+.loading{display:flex;align-items:center;justify-content:center;height:400px;
+  color:var(--text-muted);font-size:15px}
+.spinner{width:24px;height:24px;border:3px solid var(--border);border-top-color:var(--accent);
+  border-radius:50%;animation:spin .8s linear infinite;margin-right:12px}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ── Responsive ────────────────────────────────────────── */
+@media(max-width:900px){
+  .cards{grid-template-columns:repeat(2,1fr)}
+  .main{padding:16px}
+  header{padding:12px 16px}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div class="logo">
+      <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><circle cx="14" cy="14" r="13" stroke="#3b82f6" stroke-width="2"/><path d="M9 14l3 3 7-7" stroke="#3b82f6" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <h1>DataPilot</h1>
+      <span class="badge">v1.0</span>
+    </div>
+    <div class="meta" id="report-meta">Loading...</div>
+  </header>
+
+  <div class="main">
+    <!-- Score Cards -->
+    <div class="cards" id="score-cards">
+      <div class="card"><div class="value" id="c-findings">-</div><div class="label">Total Findings</div></div>
+      <div class="card red"><div class="value" id="c-waste">-</div><div class="label">Monthly Waste</div></div>
+      <div class="card orange"><div class="value" id="c-critical">-</div><div class="label">Critical Issues</div></div>
+      <div class="card accent"><div class="value" id="c-score">-</div><div class="label">Detection Score</div></div>
+      <div class="card green"><div class="value" id="c-result">-</div><div class="label">Result</div></div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs">
+      <button class="tab active" data-tab="findings">Findings</button>
+      <button class="tab" data-tab="lineage">Lineage Graph</button>
+      <button class="tab" data-tab="scoring">Scoring</button>
+    </div>
+
+    <!-- Findings Tab -->
+    <div class="tab-content active" id="tab-findings">
+      <div class="filters">
+        <button class="filter-chip active" data-filter="all">All</button>
+        <input class="search-box" id="search" placeholder="Search models, evidence...">
+      </div>
+      <table class="findings">
+        <thead>
+          <tr>
+            <th>Severity</th>
+            <th>Type</th>
+            <th>Model</th>
+            <th>Evidence</th>
+            <th>Action</th>
+            <th style="text-align:right">Cost</th>
+          </tr>
+        </thead>
+        <tbody id="findings-body"></tbody>
+      </table>
+    </div>
+
+    <!-- Lineage Tab -->
+    <div class="tab-content" id="tab-lineage">
+      <div id="graph-container">
+        <canvas id="graph-canvas"></canvas>
+        <div class="graph-legend">
+          <div class="item"><div class="dot" style="background:#3b82f6"></div> raw</div>
+          <div class="item"><div class="dot" style="background:#8b5cf6"></div> source</div>
+          <div class="item"><div class="dot" style="background:#06b6d4"></div> core</div>
+          <div class="item"><div class="dot" style="background:#22c55e"></div> analytics</div>
+          <div class="item"><div class="dot" style="background:#ef4444"></div> has problem</div>
+        </div>
+        <div class="graph-controls">
+          <button onclick="graphZoom(1.2)">Zoom +</button>
+          <button onclick="graphZoom(0.8)">Zoom -</button>
+          <button onclick="graphReset()">Reset</button>
+          <button onclick="toggleLabels()">Labels</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Scoring Tab -->
+    <div class="tab-content" id="tab-scoring">
+      <div id="scoring-content"><div class="loading"><div class="spinner"></div>Loading...</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- Tooltip -->
+<div class="tooltip" id="tooltip" style="display:none"></div>
+
+<script>
+/* ══════════════════════════════════════════════════════════
+   DataPilot Dashboard — Interactive UI
+   ══════════════════════════════════════════════════════════ */
+let REPORT={}, GRAPH={}, SCORE={};
+const TYPE_COLORS={
+  dead_model:'#ef4444',orphaned_model:'#818cf8',broken_lineage:'#ef4444',
+  wrong_grain_join:'#f97316',deprecated_source:'#eab308',missing_tests:'#f97316',
+  logic_drift:'#8b5cf6',duplicate_metric:'#06b6d4',redundant_model:'#8b5cf6'
+};
+const TYPE_ICONS={
+  dead_model:'\u{1F480}',orphaned_model:'\u{1F47B}',broken_lineage:'\u{1F517}',
+  wrong_grain_join:'\u{2696}\uFE0F',deprecated_source:'\u{26A0}\uFE0F',missing_tests:'\u{1F9EA}',
+  logic_drift:'\u{1F500}',duplicate_metric:'\u{264A}',redundant_model:'\u{264A}'
+};
+const SEVERITY_ORDER={critical:0,high:1,medium:2,low:3};
+const LAYER_COLORS={raw:'#3b82f6',source:'#8b5cf6',core:'#06b6d4',analytics:'#22c55e'};
+
+// ── Fetch Data ──────────────────────────────────────────
+async function init(){
+  try{
+    const[rResp,gResp]=await Promise.all([fetch('/api/report'),fetch('/api/graph')]);
+    const rData=await rResp.json();
+    REPORT=rData.report||{};SCORE=rData.score||{};GRAPH=await gResp.json();
+    render();
+  }catch(e){document.querySelector('.main').innerHTML='<div class="loading">Error loading data: '+e.message+'</div>'}
+}
+
+function render(){
+  renderMeta();renderCards();renderFilters();renderFindings();renderScoring();initGraph();
+}
+
+// ── Meta ────────────────────────────────────────────────
+function renderMeta(){
+  const d=REPORT.generated_at||'';
+  document.getElementById('report-meta').textContent='Generated '+d.slice(0,19).replace('T',' ')+' \u00b7 '+REPORT.total_findings+' findings';
+}
+
+// ── Cards ───────────────────────────────────────────────
+function renderCards(){
+  document.getElementById('c-findings').textContent=REPORT.total_findings||0;
+  document.getElementById('c-waste').textContent='$'+(REPORT.total_monthly_waste_usd||0)+'/mo';
+  const critical=(REPORT.findings||[]).filter(f=>f.severity==='critical').length;
+  document.getElementById('c-critical').textContent=critical;
+  if(SCORE){
+    document.getElementById('c-score').textContent=(SCORE.score_pct||0)+'%';
+    document.getElementById('c-result').textContent=SCORE.passed?'\u2713 PASS':'\u2717 FAIL';
+    document.getElementById('c-result').closest('.card').className=SCORE.passed?'card green':'card red';
+  }
+}
+
+// ── Filters ─────────────────────────────────────────────
+function renderFilters(){
+  const cont=document.querySelector('.filters');
+  const types={};
+  (REPORT.findings||[]).forEach(f=>{types[f.type]=(types[f.type]||0)+1});
+  Object.entries(types).sort((a,b)=>b[1]-a[1]).forEach(([t,c])=>{
+    const btn=document.createElement('button');
+    btn.className='filter-chip';btn.dataset.filter=t;
+    btn.innerHTML=(TYPE_ICONS[t]||'\u2022')+' '+t.replace(/_/g,' ')+'<span class="count">('+c+')</span>';
+    cont.insertBefore(btn,document.getElementById('search'));
+  });
+  cont.addEventListener('click',e=>{
+    const chip=e.target.closest('.filter-chip');
+    if(!chip)return;
+    cont.querySelectorAll('.filter-chip').forEach(c=>c.classList.remove('active'));
+    chip.classList.add('active');
+    filterFindings();
+  });
+  document.getElementById('search').addEventListener('input',filterFindings);
+}
+
+// ── Findings Table ──────────────────────────────────────
+function renderFindings(list){
+  const findings=list||(REPORT.findings||[]).sort((a,b)=>(SEVERITY_ORDER[a.severity]||9)-(SEVERITY_ORDER[b.severity]||9));
+  const tbody=document.getElementById('findings-body');
+  tbody.innerHTML=findings.map(f=>`
+    <tr>
+      <td><span class="severity-badge severity-${f.severity||'medium'}">${f.severity||'medium'}</span></td>
+      <td><span class="type-badge" style="background:${TYPE_COLORS[f.type]||'#6b7280'}22;color:${TYPE_COLORS[f.type]||'#6b7280'}">${(TYPE_ICONS[f.type]||'')+' '+f.type.replace(/_/g,' ')}</span></td>
+      <td class="model-name">${esc(f.model)}</td>
+      <td class="evidence">${esc(f.evidence||'')}</td>
+      <td class="action">${esc(f.action||'')}</td>
+      <td style="text-align:right">${f.cost_usd?'<span class="cost">$'+f.cost_usd+'/mo</span>':''}</td>
+    </tr>`).join('');
+}
+
+function filterFindings(){
+  const active=document.querySelector('.filter-chip.active');
+  const filter=active?active.dataset.filter:'all';
+  const search=(document.getElementById('search').value||'').toLowerCase();
+  const list=(REPORT.findings||[]).filter(f=>{
+    if(filter!=='all'&&f.type!==filter)return false;
+    if(search&&!JSON.stringify(f).toLowerCase().includes(search))return false;
+    return true;
+  }).sort((a,b)=>(SEVERITY_ORDER[a.severity]||9)-(SEVERITY_ORDER[b.severity]||9));
+  renderFindings(list);
+}
+
+// ── Scoring Tab ─────────────────────────────────────────
+function renderScoring(){
+  if(!SCORE||!SCORE.planted_total){document.getElementById('scoring-content').innerHTML='<p style="color:var(--text-muted)">No scoring data (run with answer key).</p>';return}
+  const pct=SCORE.score_pct||0;
+  const col=SCORE.passed?'var(--green)':'var(--red)';
+  let html=`
+    <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:24px">
+      <div style="display:flex;align-items:baseline;gap:12px;margin-bottom:4px">
+        <span style="font-size:48px;font-weight:800;color:${col}">${pct}%</span>
+        <span style="font-size:18px;font-weight:600;color:${col}">${SCORE.passed?'\u2713 PASS':'\u2717 FAIL'}</span>
+      </div>
+      <div style="font-size:13px;color:var(--text-muted)">Threshold: ${SCORE.pass_threshold} of ${SCORE.planted_total} (70%)</div>
+      <div class="score-bar"><div class="fill" style="width:${pct}%;background:${col}"></div></div>
+      <div class="score-detail">
+        <div class="item"><div class="num" style="color:var(--text-primary)">${SCORE.planted_total}</div><div class="lbl">Planted</div></div>
+        <div class="item"><div class="num" style="color:var(--green)">${SCORE.problems_found}</div><div class="lbl">Found</div></div>
+        <div class="item"><div class="num" style="color:var(--red)">${SCORE.problems_missed}</div><div class="lbl">Missed</div></div>
+      </div>
+      <h3 style="margin-top:20px;font-size:14px;font-weight:600;color:var(--green)">Found (${(SCORE.found_ids||[]).length})</h3>
+      <div class="found-list">${(SCORE.found_ids||[]).map(id=>'<span class="id-chip found">'+id+'</span>').join('')}</div>
+      ${SCORE.missed_ids&&SCORE.missed_ids.length?`
+      <h3 style="margin-top:16px;font-size:14px;font-weight:600;color:var(--red)">Missed (${SCORE.missed_ids.length})</h3>
+      <div class="missed-list">${SCORE.missed_ids.map(id=>'<span class="id-chip missed">'+id+'</span>').join('')}</div>`:''}
+    </div>`;
+  document.getElementById('scoring-content').innerHTML=html;
+}
+
+// ── Tabs ────────────────────────────────────────────────
+document.querySelectorAll('.tab').forEach(tab=>{
+  tab.addEventListener('click',()=>{
+    document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById('tab-'+tab.dataset.tab).classList.add('active');
+    if(tab.dataset.tab==='lineage')drawGraph();
+  });
+});
+
+// ── Lineage Graph (Canvas) ──────────────────────────────
+let gNodes=[],gEdges=[],gScale=1,gOffX=0,gOffY=0,showLabels=true,gDrag=null,gHover=null;
+
+function initGraph(){
+  if(!GRAPH.nodes)return;
+  const layers={raw:0,source:1,core:2,analytics:3};
+  const layerCounts={};
+  GRAPH.nodes.forEach(n=>{
+    const li=layers[n.layer]||0;
+    layerCounts[li]=(layerCounts[li]||0)+1;
+  });
+  const layerIdx={};
+  GRAPH.nodes.forEach(n=>{
+    const li=layers[n.layer]||0;
+    layerIdx[li]=(layerIdx[li]||0)+1;
+    const total=layerCounts[li]||1;
+    n.x=120+li*300;
+    n.y=40+(layerIdx[li]-1)*(560/total);
+    n.vx=0;n.vy=0;
+  });
+  gNodes=GRAPH.nodes;gEdges=GRAPH.edges||[];
+  // Force layout iterations
+  for(let iter=0;iter<120;iter++)forceStep();
+}
+
+function forceStep(){
+  const k=0.02,repulse=8000,damping=0.85;
+  // Repulsion
+  for(let i=0;i<gNodes.length;i++){
+    for(let j=i+1;j<gNodes.length;j++){
+      let dx=gNodes[i].x-gNodes[j].x,dy=gNodes[i].y-gNodes[j].y;
+      let d2=dx*dx+dy*dy+1;
+      let f=repulse/d2;
+      gNodes[i].vx+=dx*f;gNodes[i].vy+=dy*f;
+      gNodes[j].vx-=dx*f;gNodes[j].vy-=dy*f;
+    }
+  }
+  // Attraction (edges)
+  const nodeMap={};gNodes.forEach(n=>nodeMap[n.id]=n);
+  gEdges.forEach(e=>{
+    const s=nodeMap[e.source],t=nodeMap[e.target];
+    if(!s||!t)return;
+    let dx=t.x-s.x,dy=t.y-s.y;
+    s.vx+=dx*k;s.vy+=dy*k;
+    t.vx-=dx*k;t.vy-=dy*k;
+  });
+  // Layer constraint
+  const layers={raw:150,source:420,core:690,analytics:960};
+  gNodes.forEach(n=>{
+    const target=layers[n.layer]||400;
+    n.vx+=(target-n.x)*0.05;
+  });
+  // Apply
+  gNodes.forEach(n=>{
+    n.vx*=damping;n.vy*=damping;
+    n.x+=Math.max(-5,Math.min(5,n.vx));
+    n.y+=Math.max(-5,Math.min(5,n.vy));
+    n.y=Math.max(20,Math.min(580,n.y));
+  });
+}
+
+function drawGraph(){
+  const canvas=document.getElementById('graph-canvas');
+  const rect=canvas.parentElement.getBoundingClientRect();
+  canvas.width=rect.width*2;canvas.height=rect.height*2;
+  canvas.style.width=rect.width+'px';canvas.style.height=rect.height+'px';
+  const ctx=canvas.getContext('2d');
+  ctx.setTransform(2,0,0,2,0,0);
+  ctx.clearRect(0,0,rect.width,rect.height);
+  ctx.save();
+  ctx.translate(gOffX+rect.width/2-550,gOffY+rect.height/2-300);
+  ctx.scale(gScale,gScale);
+
+  const nodeMap={};gNodes.forEach(n=>nodeMap[n.id]=n);
+
+  // Draw edges
+  ctx.strokeStyle='rgba(59,130,246,0.12)';ctx.lineWidth=1;
+  gEdges.forEach(e=>{
+    const s=nodeMap[e.source],t=nodeMap[e.target];
+    if(!s||!t)return;
+    ctx.beginPath();
+    const cp1x=s.x+(t.x-s.x)*0.5,cp1y=s.y,cp2x=s.x+(t.x-s.x)*0.5,cp2y=t.y;
+    ctx.moveTo(s.x,s.y);ctx.bezierCurveTo(cp1x,cp1y,cp2x,cp2y,t.x,t.y);
+    ctx.stroke();
+  });
+
+  // Draw nodes
+  gNodes.forEach(n=>{
+    const col=n.has_problem?'#ef4444':(LAYER_COLORS[n.layer]||'#6b7280');
+    const r=n.has_problem?5:3.5;
+    ctx.beginPath();ctx.arc(n.x,n.y,r,0,Math.PI*2);
+    ctx.fillStyle=col;ctx.fill();
+    if(n.has_problem){ctx.strokeStyle='rgba(239,68,68,0.4)';ctx.lineWidth=3;ctx.stroke();ctx.lineWidth=1}
+    if(showLabels&&gScale>0.6){
+      ctx.font='9px -apple-system,sans-serif';ctx.fillStyle='rgba(148,163,184,0.7)';
+      ctx.fillText(n.id,n.x+8,n.y+3);
+    }
+    if(gHover===n.id){
+      ctx.beginPath();ctx.arc(n.x,n.y,r+4,0,Math.PI*2);
+      ctx.strokeStyle=col;ctx.lineWidth=2;ctx.stroke();ctx.lineWidth=1;
+      ctx.font='bold 11px -apple-system,sans-serif';ctx.fillStyle='#f1f5f9';
+      ctx.fillText(n.id,n.x+10,n.y+4);
+    }
+  });
+  ctx.restore();
+}
+
+function graphZoom(f){gScale*=f;drawGraph()}
+function graphReset(){gScale=1;gOffX=0;gOffY=0;drawGraph()}
+function toggleLabels(){showLabels=!showLabels;drawGraph()}
+
+// Graph mouse events
+(function(){
+  const canvas=document.getElementById('graph-canvas');
+  let dragging=false,lastX,lastY;
+  canvas.addEventListener('mousedown',e=>{dragging=true;lastX=e.clientX;lastY=e.clientY});
+  canvas.addEventListener('mousemove',e=>{
+    if(dragging){gOffX+=e.clientX-lastX;gOffY+=e.clientY-lastY;lastX=e.clientX;lastY=e.clientY;drawGraph();return}
+    // Hover
+    const rect=canvas.getBoundingClientRect();
+    const mx=(e.clientX-rect.left-gOffX-rect.width/2+550)/gScale;
+    const my=(e.clientY-rect.top-gOffY-rect.height/2+300)/gScale;
+    let found=null;
+    gNodes.forEach(n=>{if(Math.hypot(n.x-mx,n.y-my)<8)found=n});
+    gHover=found?found.id:null;
+    const tt=document.getElementById('tooltip');
+    if(found){
+      tt.style.display='block';tt.style.left=(e.clientX+16)+'px';tt.style.top=(e.clientY+16)+'px';
+      tt.innerHTML=`<div class="tt-title">${found.id}</div>
+        <div class="tt-row">Layer: ${found.layer}</div>
+        <div class="tt-row">Queries (30d): ${found.q30!=null?found.q30:'N/A'}</div>
+        <div class="tt-row">Queries (90d): ${found.q90!=null?found.q90:'N/A'}</div>
+        ${found.has_problem?'<div class="tt-row" style="color:#ef4444;font-weight:600">Has issues</div>':''}`;
+    }else{tt.style.display='none'}
+    drawGraph();
+  });
+  canvas.addEventListener('mouseup',()=>dragging=false);
+  canvas.addEventListener('mouseleave',()=>{dragging=false;gHover=null;document.getElementById('tooltip').style.display='none';drawGraph()});
+  canvas.addEventListener('wheel',e=>{e.preventDefault();graphZoom(e.deltaY>0?0.9:1.1)});
+})();
+
+function esc(s){const d=document.createElement('div');d.textContent=s;return d.innerHTML}
+
+init();
+</script>
+</body>
+</html>

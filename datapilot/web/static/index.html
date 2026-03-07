@@ -1,0 +1,1222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DataPilot — AI-Powered dbt Docs</title>
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<style>
+/* ========== CSS Variables ========== */
+:root {
+  --bg: #ffffff; --bg2: #f8f9fa; --bg3: #e9ecef; --surface: #ffffff;
+  --border: #dee2e6; --border2: #ced4da; --text: #212529; --text2: #6c757d;
+  --text3: #adb5bd; --accent: #0d6efd; --accent-light: #e7f1ff;
+  --green: #198754; --green-bg: #d1e7dd; --red: #dc3545; --red-bg: #f8d7da;
+  --orange: #fd7e14; --orange-bg: #fff3cd; --yellow: #ffc107;
+  --purple: #6f42c1; --sidebar-w: 280px; --header-h: 52px;
+  --raw-color: #6f42c1; --source-color: #0d6efd; --core-color: #198754; --analytics-color: #fd7e14;
+  --shadow: 0 1px 3px rgba(0,0,0,0.08); --shadow-lg: 0 4px 12px rgba(0,0,0,0.12);
+  --radius: 6px; --radius-lg: 10px;
+  --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+  --mono: 'SF Mono', SFMono-Regular, 'Consolas', 'Liberation Mono', Menlo, monospace;
+}
+
+[data-theme="dark"] {
+  --bg: #1a1a2e; --bg2: #16213e; --bg3: #0f3460; --surface: #1a1a2e;
+  --border: #2a2a4a; --border2: #3a3a5a; --text: #e0e0e0; --text2: #a0a0b0;
+  --text3: #707080; --accent: #4dabf7; --accent-light: #1a3352;
+  --green: #51cf66; --green-bg: #1a3328; --red: #ff6b6b; --red-bg: #3d1f1f;
+  --orange: #ffa94d; --orange-bg: #3d2e1a; --yellow: #ffd43b;
+  --raw-color: #b197fc; --source-color: #74c0fc; --core-color: #69db7c; --analytics-color: #ffa94d;
+  --shadow: 0 1px 3px rgba(0,0,0,0.3); --shadow-lg: 0 4px 12px rgba(0,0,0,0.4);
+}
+
+/* ========== Reset & Base ========== */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { height: 100%; font-family: var(--font); font-size: 14px; color: var(--text); background: var(--bg); }
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+button { cursor: pointer; font-family: var(--font); }
+
+/* ========== Layout ========== */
+.app { display: flex; flex-direction: column; height: 100vh; }
+
+/* --- Header --- */
+.header {
+  height: var(--header-h); display: flex; align-items: center; justify-content: space-between;
+  padding: 0 20px; background: var(--surface); border-bottom: 1px solid var(--border);
+  position: sticky; top: 0; z-index: 100; flex-shrink: 0;
+}
+.header-left { display: flex; align-items: center; gap: 20px; }
+.logo { font-size: 20px; font-weight: 700; letter-spacing: -0.5px; color: var(--text); }
+.logo span { color: var(--accent); }
+.ai-badge {
+  font-size: 10px; background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  color: white; padding: 3px 8px; border-radius: 4px; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.05em;
+}
+.version-badge { font-size: 11px; background: var(--accent-light); color: var(--accent); padding: 2px 8px; border-radius: 10px; font-weight: 600; }
+.header-right { display: flex; align-items: center; gap: 12px; }
+
+/* Navigation tabs */
+.nav-tabs { display: flex; gap: 0; height: 100%; align-items: stretch; }
+.nav-tab {
+  display: flex; align-items: center; gap: 6px; padding: 0 16px; font-size: 13px; font-weight: 500;
+  color: var(--text2); border: none; background: none; border-bottom: 2px solid transparent;
+  transition: all 0.15s;
+}
+.nav-tab:hover { color: var(--text); background: var(--bg2); }
+.nav-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+.nav-tab svg { width: 16px; height: 16px; }
+
+/* Search box */
+.search-box {
+  display: flex; align-items: center; gap: 6px; background: var(--bg2);
+  border: 1px solid var(--border); border-radius: var(--radius); padding: 6px 12px; width: 240px;
+}
+.search-box input {
+  border: none; background: none; outline: none; font-size: 13px; color: var(--text);
+  width: 100%; font-family: var(--font);
+}
+.search-box input::placeholder { color: var(--text3); }
+.search-box { width: 280px; }
+.search-box svg { width: 14px; height: 14px; color: var(--text3); flex-shrink: 0; }
+
+/* Theme toggle */
+.theme-toggle {
+  width: 32px; height: 32px; border-radius: var(--radius); border: 1px solid var(--border);
+  background: var(--bg2); display: flex; align-items: center; justify-content: center; color: var(--text2);
+}
+.theme-toggle:hover { background: var(--bg3); color: var(--text); }
+
+/* --- Main content area --- */
+.main { display: flex; flex: 1; overflow: hidden; }
+
+/* --- Sidebar --- */
+.sidebar {
+  width: var(--sidebar-w); background: var(--bg2); border-right: 1px solid var(--border);
+  overflow-y: auto; flex-shrink: 0; display: flex; flex-direction: column;
+}
+.sidebar-tabs { display: flex; border-bottom: 1px solid var(--border); }
+.sidebar-tab {
+  flex: 1; padding: 10px 12px; font-size: 12px; font-weight: 600; color: var(--text2);
+  border: none; background: none; cursor: pointer; border-bottom: 2px solid transparent;
+}
+.sidebar-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+.sidebar-header {
+  padding: 12px 16px; font-size: 11px; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.05em; color: var(--text2); border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.sidebar-header .count { background: var(--bg3); padding: 1px 6px; border-radius: 8px; font-size: 10px; }
+.sidebar-content { flex: 1; overflow-y: auto; padding: 4px 0; }
+
+/* Tree */
+.tree-group { margin-bottom: 2px; }
+.tree-group-header {
+  display: flex; align-items: center; gap: 8px; padding: 6px 16px; font-size: 12px;
+  font-weight: 600; cursor: pointer; color: var(--text2); user-select: none;
+}
+.tree-group-header:hover { background: var(--bg3); color: var(--text); }
+.tree-group-header .arrow { font-size: 10px; transition: transform 0.15s; width: 12px; text-align: center; }
+.tree-group-header .arrow.open { transform: rotate(90deg); }
+.tree-group-header .layer-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.tree-group-header .layer-count { margin-left: auto; font-size: 10px; color: var(--text3); font-weight: 400; }
+
+.tree-items { display: none; }
+.tree-items.open { display: block; }
+.tree-item {
+  display: flex; align-items: center; gap: 8px; padding: 6px 16px 6px 28px; font-size: 13px;
+  cursor: pointer; color: var(--text2); border-left: 2px solid transparent; transition: all 0.1s;
+}
+.tree-item:hover { background: var(--bg3); color: var(--text); }
+.tree-item.active { background: var(--accent-light); color: var(--accent); border-left-color: var(--accent); font-weight: 500; }
+.tree-item .problem-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--red); flex-shrink: 0; }
+.tree-item .model-icon { font-size: 11px; color: var(--text3); width: 14px; text-align: center; }
+
+/* --- Content area --- */
+.content { flex: 1; overflow-y: auto; background: var(--bg); }
+
+/* ========== Overview Tab ========== */
+.overview { padding: 24px; max-width: 1400px; }
+.overview h2 { font-size: 20px; font-weight: 700; margin-bottom: 20px; }
+
+.stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px; }
+.stat-card {
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg);
+  padding: 20px; box-shadow: var(--shadow);
+}
+.stat-card .label { font-size: 12px; color: var(--text2); text-transform: uppercase; letter-spacing: 0.04em; font-weight: 500; margin-bottom: 8px; }
+.stat-card .value { font-size: 28px; font-weight: 700; letter-spacing: -1px; }
+.stat-card .sub { font-size: 12px; color: var(--text2); margin-top: 4px; }
+
+.severity-cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 24px; }
+.sev-card {
+  border-radius: var(--radius); padding: 16px; text-align: center;
+  border: 1px solid var(--border); background: var(--surface);
+}
+.sev-card .sev-count { font-size: 32px; font-weight: 700; }
+.sev-card .sev-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; margin-top: 4px; font-weight: 600; }
+.sev-critical .sev-count { color: var(--red); }
+.sev-high .sev-count { color: var(--orange); }
+.sev-medium .sev-count { color: var(--yellow); }
+.sev-low .sev-count { color: var(--green); }
+
+/* Score card */
+.score-section {
+  display: flex; gap: 20px; margin-bottom: 24px; align-items: stretch;
+}
+.score-ring-card {
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg);
+  padding: 24px; box-shadow: var(--shadow); display: flex; flex-direction: column; align-items: center;
+  min-width: 180px;
+}
+.score-ring { position: relative; width: 120px; height: 120px; }
+.score-ring svg { transform: rotate(-90deg); }
+.score-ring .score-text {
+  position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+  font-size: 28px; font-weight: 700;
+}
+.score-ring .score-subtitle { font-size: 12px; color: var(--text2); margin-top: 8px; }
+
+.findings-breakdown {
+  flex: 1; background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); padding: 20px; box-shadow: var(--shadow);
+}
+.breakdown-title { font-size: 14px; font-weight: 600; margin-bottom: 16px; }
+.breakdown-bar-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+.breakdown-bar-label { font-size: 12px; width: 140px; color: var(--text2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.breakdown-bar-track { flex: 1; height: 20px; background: var(--bg2); border-radius: 4px; overflow: hidden; }
+.breakdown-bar-fill { height: 100%; border-radius: 4px; transition: width 0.5s ease; display: flex; align-items: center; padding-left: 8px; font-size: 11px; font-weight: 600; color: white; min-width: 24px; }
+.breakdown-bar-count { font-size: 12px; font-weight: 600; width: 30px; text-align: right; }
+
+/* ========== Findings Tab ========== */
+.findings-page { padding: 24px; max-width: 1400px; }
+.findings-page h2 { font-size: 20px; font-weight: 700; margin-bottom: 16px; }
+
+.findings-filters { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+.filter-chip {
+  padding: 5px 14px; border-radius: 20px; border: 1px solid var(--border); background: var(--surface);
+  font-size: 12px; color: var(--text2); font-weight: 500; transition: all 0.15s;
+}
+.filter-chip:hover { border-color: var(--accent); color: var(--accent); }
+.filter-chip.active { background: var(--accent); color: white; border-color: var(--accent); }
+
+.findings-table { width: 100%; border-collapse: collapse; }
+.findings-table th {
+  text-align: left; padding: 10px 12px; font-size: 11px; text-transform: uppercase;
+  letter-spacing: 0.04em; color: var(--text2); border-bottom: 2px solid var(--border);
+  font-weight: 600; position: sticky; top: 0; background: var(--bg);
+}
+.findings-table td { padding: 10px 12px; border-bottom: 1px solid var(--border); font-size: 13px; vertical-align: top; }
+.findings-table tr { cursor: pointer; transition: background 0.1s; }
+.findings-table tbody tr:hover { background: var(--bg2); }
+
+.sev-badge {
+  display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px;
+  font-weight: 600; text-transform: uppercase;
+}
+.sev-badge.critical { background: var(--red-bg); color: var(--red); }
+.sev-badge.high { background: var(--orange-bg); color: var(--orange); }
+.sev-badge.medium { background: #fff3cd; color: #997a00; }
+[data-theme="dark"] .sev-badge.medium { background: #3d3520; color: var(--yellow); }
+.sev-badge.low { background: var(--green-bg); color: var(--green); }
+
+.type-badge {
+  display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px;
+  background: var(--bg2); color: var(--text2); font-weight: 500;
+}
+
+/* ========== Model Detail ========== */
+.model-detail { padding: 24px; max-width: 1200px; }
+.model-header { margin-bottom: 20px; }
+.model-header h2 { font-size: 22px; font-weight: 700; display: flex; align-items: center; gap: 10px; }
+.model-header .layer-badge {
+  font-size: 11px; padding: 3px 10px; border-radius: 12px; font-weight: 600; text-transform: uppercase;
+}
+.layer-raw { background: #f3f0ff; color: var(--raw-color); }
+.layer-source { background: #e7f1ff; color: var(--source-color); }
+.layer-core { background: #d1e7dd; color: var(--core-color); }
+.layer-analytics { background: #fff3cd; color: var(--analytics-color); }
+[data-theme="dark"] .layer-raw { background: #2a1f4e; }
+[data-theme="dark"] .layer-source { background: #1a3352; }
+[data-theme="dark"] .layer-core { background: #1a3328; }
+[data-theme="dark"] .layer-analytics { background: #3d2e1a; }
+
+.model-description { font-size: 14px; color: var(--text2); margin-top: 8px; line-height: 1.5; }
+.model-stats { display: flex; gap: 20px; margin-top: 12px; }
+.model-stat { font-size: 12px; color: var(--text2); }
+.model-stat strong { color: var(--text); }
+
+.model-tabs { display: flex; border-bottom: 1px solid var(--border); margin-bottom: 16px; }
+.model-tab {
+  padding: 10px 20px; font-size: 13px; font-weight: 500; color: var(--text2);
+  border: none; background: none; border-bottom: 2px solid transparent;
+}
+.model-tab:hover { color: var(--text); }
+.model-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+.model-tab-content { display: none; }
+.model-tab-content.active { display: block; }
+
+/* SQL code */
+.sql-block {
+  background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 16px; overflow-x: auto; font-family: var(--mono); font-size: 13px;
+  line-height: 1.6; white-space: pre-wrap; word-break: break-word; color: var(--text);
+}
+.sql-block .kw { color: var(--accent); font-weight: 600; }
+.sql-block .fn { color: var(--purple); }
+.sql-block .str { color: var(--green); }
+.sql-block .cm { color: var(--text3); font-style: italic; }
+.sql-block .ref { color: var(--orange); font-weight: 500; }
+
+/* Columns table */
+.columns-table { width: 100%; border-collapse: collapse; }
+.columns-table th {
+  text-align: left; padding: 8px 12px; font-size: 11px; text-transform: uppercase;
+  color: var(--text2); border-bottom: 2px solid var(--border); font-weight: 600;
+}
+.columns-table td { padding: 8px 12px; border-bottom: 1px solid var(--border); font-size: 13px; }
+.columns-table .col-name { font-family: var(--mono); font-weight: 500; }
+.columns-table .test-badge {
+  display: inline-block; padding: 1px 6px; border-radius: 3px; font-size: 10px;
+  background: var(--green-bg); color: var(--green); margin: 1px 2px; font-weight: 500;
+}
+.columns-table .no-tests { color: var(--text3); font-style: italic; font-size: 12px; }
+
+/* Lineage mini */
+.lineage-mini { display: flex; gap: 24px; align-items: flex-start; flex-wrap: wrap; }
+.lineage-col { flex: 1; min-width: 200px; }
+.lineage-col h4 { font-size: 12px; text-transform: uppercase; color: var(--text2); margin-bottom: 8px; font-weight: 600; }
+.lineage-node {
+  display: flex; align-items: center; gap: 8px; padding: 6px 12px; margin-bottom: 4px;
+  background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius);
+  font-size: 12px; cursor: pointer; transition: all 0.1s;
+}
+.lineage-node:hover { border-color: var(--accent); background: var(--accent-light); }
+.lineage-center {
+  font-size: 14px; font-weight: 600; padding: 12px 20px;
+  background: var(--accent-light); border: 2px solid var(--accent); border-radius: var(--radius);
+  text-align: center;
+}
+.lineage-arrows { display: flex; align-items: center; justify-content: center; padding: 0 12px; color: var(--text3); font-size: 20px; }
+
+/* Model findings list */
+.model-finding {
+  padding: 12px; border: 1px solid var(--border); border-radius: var(--radius);
+  margin-bottom: 8px; background: var(--surface);
+}
+.model-finding .mf-header { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+.model-finding .mf-evidence { font-size: 12px; color: var(--text2); margin-bottom: 4px; }
+.model-finding .mf-action { font-size: 12px; color: var(--green); font-style: italic; }
+
+/* ========== Lineage Graph Tab ========== */
+.lineage-page { height: 100%; display: flex; flex-direction: column; }
+.lineage-toolbar {
+  display: flex; align-items: center; gap: 12px; padding: 12px 20px;
+  border-bottom: 1px solid var(--border); background: var(--surface); flex-shrink: 0;
+}
+.lineage-toolbar button {
+  padding: 5px 12px; border-radius: var(--radius); border: 1px solid var(--border);
+  background: var(--surface); font-size: 12px; color: var(--text2); font-weight: 500;
+}
+.lineage-toolbar button:hover { background: var(--bg2); color: var(--text); }
+.lineage-legend { display: flex; gap: 16px; margin-left: auto; font-size: 11px; color: var(--text2); }
+.lineage-legend span { display: flex; align-items: center; gap: 4px; }
+.lineage-legend .dot { width: 10px; height: 10px; border-radius: 50%; }
+
+#lineage-canvas { flex: 1; overflow: hidden; }
+#lineage-canvas svg { width: 100%; height: 100%; }
+
+/* Graph node styling */
+.graph-node rect { rx: 6; ry: 6; stroke-width: 1.5; cursor: pointer; transition: all 0.15s; }
+.graph-node rect:hover { stroke-width: 2.5; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.15)); }
+.graph-node text { font-size: 10px; font-family: var(--font); pointer-events: none; }
+.graph-edge { fill: none; stroke-width: 1.5; opacity: 0.5; }
+.graph-edge.highlighted { opacity: 1; stroke-width: 2.5; }
+.graph-node.dimmed rect { opacity: 0.2; }
+.graph-node.dimmed text { opacity: 0.2; }
+.graph-edge.dimmed { opacity: 0.05; }
+.graph-node.highlighted rect { stroke-width: 2.5; filter: drop-shadow(0 2px 6px rgba(0,0,0,0.2)); }
+
+/* Search results dropdown */
+.search-results {
+  position: absolute; top: 100%; left: 0; right: 0; background: var(--surface);
+  border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow-lg);
+  max-height: 300px; overflow-y: auto; z-index: 200; display: none;
+}
+.search-results.show { display: block; }
+.search-result-item {
+  display: flex; align-items: center; gap: 8px; padding: 8px 12px;
+  cursor: pointer; font-size: 13px; border-bottom: 1px solid var(--border);
+}
+.search-result-item:hover { background: var(--bg2); }
+.search-result-item:last-child { border-bottom: none; }
+.search-result-layer { font-size: 10px; padding: 1px 6px; border-radius: 3px; font-weight: 600; text-transform: uppercase; }
+
+/* ========== Responsive ========== */
+@media (max-width: 900px) {
+  .sidebar { display: none; }
+  .search-box { width: 160px; }
+  .severity-cards { grid-template-columns: repeat(2, 1fr); }
+  .score-section { flex-direction: column; }
+}
+
+/* ========== Scrollbar ========== */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text3); }
+
+/* Empty state */
+.empty-state { text-align: center; padding: 60px 20px; color: var(--text2); }
+.empty-state svg { width: 48px; height: 48px; margin-bottom: 12px; opacity: 0.3; }
+.empty-state h3 { font-size: 16px; margin-bottom: 8px; color: var(--text); }
+.empty-state p { font-size: 13px; }
+
+/* Tooltip */
+.tooltip {
+  position: absolute; background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 10px 14px; box-shadow: var(--shadow-lg);
+  font-size: 12px; z-index: 500; pointer-events: none; max-width: 300px; display: none;
+}
+.tooltip.show { display: block; }
+.tooltip .tt-title { font-weight: 600; margin-bottom: 4px; }
+.tooltip .tt-row { color: var(--text2); margin-bottom: 2px; }
+
+/* ========== dbt-style Lineage Overlay ========== */
+.lineage-overlay {
+  position: fixed; top: 52px; right: 0; width: 360px; height: calc(100vh - 52px);
+  background: linear-gradient(180deg, #0d4f4f 0%, #0a3d3d 100%);
+  border-left: 1px solid rgba(255,255,255,0.1);
+  z-index: 90; display: none; flex-direction: column;
+  box-shadow: -4px 0 24px rgba(0,0,0,0.15);
+}
+.lineage-overlay.show { display: flex; }
+.lineage-overlay-header {
+  padding: 16px 20px; display: flex; align-items: center; justify-content: space-between;
+  border-bottom: 1px solid rgba(255,255,255,0.15);
+}
+.lineage-overlay-header h3 { font-size: 14px; font-weight: 600; color: #e0f2f1; letter-spacing: 0.02em; }
+.lineage-overlay-actions { display: flex; gap: 8px; }
+.lineage-overlay-btn {
+  width: 32px; height: 32px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.2);
+  background: rgba(255,255,255,0.08); color: #b2dfdb; display: flex; align-items: center; justify-content: center;
+  cursor: pointer; font-size: 14px; transition: all 0.15s;
+}
+.lineage-overlay-btn:hover { background: rgba(255,255,255,0.15); color: white; }
+.lineage-overlay-body {
+  flex: 1; padding: 24px; overflow-y: auto; display: flex; flex-direction: column; align-items: center; justify-content: center;
+}
+.lineage-overlay-graph {
+  display: flex; flex-direction: column; align-items: center; gap: 16px; width: 100%;
+}
+.lineage-overlay-node {
+  display: flex; align-items: center; gap: 10px; padding: 10px 16px;
+  background: rgba(255,255,255,0.08); border-radius: 8px; border: 1px solid rgba(255,255,255,0.12);
+  font-size: 12px; color: #e0f2f1; font-family: var(--mono); cursor: pointer; transition: all 0.15s;
+  width: 100%; max-width: 280px; justify-content: center;
+}
+.lineage-overlay-node:hover { background: rgba(255,255,255,0.12); }
+.lineage-overlay-node.current { background: rgba(255,255,255,0.15); border-color: #4dd0e1; }
+.lineage-overlay-node .node-dot {
+  width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0;
+}
+.lineage-overlay-arrow {
+  color: rgba(255,255,255,0.4); font-size: 18px; line-height: 1;
+}
+.lineage-overlay-empty { color: rgba(255,255,255,0.5); font-size: 13px; text-align: center; padding: 24px; }
+
+/* AI Analysis section */
+.ai-section {
+  background: linear-gradient(135deg, rgba(99,102,241,0.08) 0%, rgba(139,92,246,0.08) 100%);
+  border: 1px solid rgba(99,102,241,0.2); border-radius: var(--radius-lg);
+  padding: 16px 20px; margin-bottom: 24px;
+}
+.ai-section-title { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: #6366f1; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+.ai-section-stats { display: flex; gap: 20px; flex-wrap: wrap; }
+.ai-stat { font-size: 13px; color: var(--text2); }
+.ai-stat strong { color: var(--text); }
+.ai-stat code { background: rgba(0,0,0,0.08); padding: 2px 6px; border-radius: 4px; font-size: 12px; }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <!-- Header -->
+  <header class="header">
+    <div class="header-left">
+      <div class="logo"><span>Data</span>Pilot</div>
+      <span class="ai-badge">AI-Powered</span>
+      <span class="version-badge">v2.0</span>
+      <nav class="nav-tabs">
+        <button class="nav-tab active" data-tab="overview">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+          Overview
+        </button>
+        <button class="nav-tab" data-tab="lineage">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="5" cy="12" r="2"/><circle cx="19" cy="6" r="2"/><circle cx="19" cy="18" r="2"/><line x1="7" y1="12" x2="17" y2="6"/><line x1="7" y1="12" x2="17" y2="18"/></svg>
+          Lineage
+        </button>
+        <button class="nav-tab" data-tab="findings">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          Findings
+        </button>
+      </nav>
+    </div>
+    <div class="header-right">
+      <div class="search-box" style="position:relative">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" id="global-search" placeholder="Search for models..." autocomplete="off">
+        <div class="search-results" id="search-results"></div>
+      </div>
+      <button class="theme-toggle" id="theme-toggle" title="Toggle theme">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <div class="main">
+    <!-- Sidebar (dbt-style) -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-tabs">
+        <button class="sidebar-tab active">Project</button>
+      </div>
+      <div class="sidebar-header">
+        <span>Overview</span>
+        <span class="count" id="model-count">0</span>
+      </div>
+      <div class="sidebar-content" id="model-tree"></div>
+    </aside>
+
+    <!-- Content -->
+    <main class="content" id="content"></main>
+  </div>
+</div>
+
+<!-- Lineage Overlay (dbt-style) -->
+<div class="lineage-overlay" id="lineage-overlay">
+  <div class="lineage-overlay-header">
+    <h3>Lineage Graph</h3>
+    <div class="lineage-overlay-actions">
+      <button class="lineage-overlay-btn" id="lineage-fullscreen" title="Full screen">&#9744;</button>
+      <button class="lineage-overlay-btn" id="lineage-close" title="Close">&#215;</button>
+    </div>
+  </div>
+  <div class="lineage-overlay-body" id="lineage-overlay-body"></div>
+</div>
+
+<!-- Tooltip -->
+<div class="tooltip" id="tooltip"></div>
+
+<script>
+// ==================== State ====================
+let state = {
+  report: null, graph: null, models: null,
+  activeTab: 'overview', selectedModel: null,
+  findingsFilter: 'all', theme: localStorage.getItem('dp-theme') || 'light',
+  allModelsFlat: [],
+};
+
+// ==================== Init ====================
+async function init() {
+  applyTheme(state.theme);
+  setupEventListeners();
+  const [reportData, graphData, modelsData] = await Promise.all([
+    fetch('/api/report').then(r => r.json()),
+    fetch('/api/graph').then(r => r.json()),
+    fetch('/api/models').then(r => r.json()),
+  ]);
+  state.report = reportData;
+  state.graph = graphData;
+  state.models = modelsData;
+
+  // Flatten models
+  state.allModelsFlat = [];
+  for (const [layer, models] of Object.entries(state.models)) {
+    for (const m of models) {
+      state.allModelsFlat.push(m);
+    }
+  }
+
+  document.getElementById('model-count').textContent = state.allModelsFlat.length;
+  renderSidebar();
+  renderContent();
+}
+
+// ==================== Theme ====================
+function applyTheme(theme) {
+  document.documentElement.setAttribute('data-theme', theme);
+  state.theme = theme;
+  localStorage.setItem('dp-theme', theme);
+  const btn = document.getElementById('theme-toggle');
+  if (theme === 'dark') {
+    btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>';
+  } else {
+    btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>';
+  }
+}
+
+// ==================== Event Listeners ====================
+function setupEventListeners() {
+  // Tabs
+  document.querySelectorAll('.nav-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      state.activeTab = tab.dataset.tab;
+      state.selectedModel = null;
+      hideLineageOverlay();
+      renderContent();
+    });
+  });
+
+  // Lineage overlay
+  document.getElementById('lineage-close').addEventListener('click', hideLineageOverlay);
+  document.getElementById('lineage-fullscreen').addEventListener('click', toggleLineageFullscreen);
+
+  // Theme toggle
+  document.getElementById('theme-toggle').addEventListener('click', () => {
+    applyTheme(state.theme === 'light' ? 'dark' : 'light');
+    if (state.activeTab === 'lineage') renderContent(); // re-render graph with new colors
+  });
+
+  // Search
+  const searchInput = document.getElementById('global-search');
+  const searchResults = document.getElementById('search-results');
+  searchInput.addEventListener('input', () => {
+    const q = searchInput.value.toLowerCase().trim();
+    if (!q) { searchResults.classList.remove('show'); return; }
+    const matches = state.allModelsFlat.filter(m =>
+      m.name.toLowerCase().includes(q) || m.description.toLowerCase().includes(q)
+    ).slice(0, 10);
+    if (!matches.length) { searchResults.classList.remove('show'); return; }
+    searchResults.innerHTML = matches.map(m => `
+      <div class="search-result-item" onclick="selectModel('${m.name}')">
+        <span class="search-result-layer layer-${m.layer}" style="background:var(--${m.layer}-color);color:white">${m.layer}</span>
+        <span>${m.name}</span>
+        ${m.has_problem ? '<span style="color:var(--red)">&#9679;</span>' : ''}
+      </div>
+    `).join('');
+    searchResults.classList.add('show');
+  });
+  searchInput.addEventListener('blur', () => setTimeout(() => searchResults.classList.remove('show'), 200));
+
+  // Ctrl+K shortcut
+  document.addEventListener('keydown', (e) => {
+    if ((e.ctrlKey || e.metaKey) && e.key === 'k') { e.preventDefault(); searchInput.focus(); }
+    if (e.key === 'Escape') { searchInput.blur(); searchResults.classList.remove('show'); }
+  });
+}
+
+// ==================== Sidebar ====================
+function renderSidebar() {
+  const tree = document.getElementById('model-tree');
+  const layers = ['raw', 'source', 'core', 'analytics'];
+  const layerColors = { raw: 'var(--raw-color)', source: 'var(--source-color)', core: 'var(--core-color)', analytics: 'var(--analytics-color)' };
+  const layerIcons = { raw: '&#9671;', source: '&#9651;', core: '&#9679;', analytics: '&#9733;' };
+
+  tree.innerHTML = layers.filter(l => state.models[l]).map(layer => {
+    const models = state.models[layer];
+    return `
+      <div class="tree-group">
+        <div class="tree-group-header" onclick="toggleTreeGroup(this)">
+          <span class="arrow open">&#9654;</span>
+          <span class="layer-dot" style="background:${layerColors[layer]}"></span>
+          <span>models/${layer}</span>
+          <span class="layer-count">${models.length}</span>
+        </div>
+        <div class="tree-items open">
+          ${models.map(m => `
+            <div class="tree-item ${state.selectedModel === m.name ? 'active' : ''}" onclick="selectModel('${m.name}')">
+              <span class="model-icon">${layerIcons[layer]}</span>
+              <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${m.name}</span>
+              ${m.has_problem ? '<span class="problem-dot"></span>' : ''}
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function toggleTreeGroup(el) {
+  const items = el.nextElementSibling;
+  const arrow = el.querySelector('.arrow');
+  items.classList.toggle('open');
+  arrow.classList.toggle('open');
+}
+
+// ==================== Content Router ====================
+function renderContent() {
+  const content = document.getElementById('content');
+  if (state.selectedModel) {
+    renderModelDetail(content);
+  } else {
+    switch (state.activeTab) {
+      case 'overview': renderOverview(content); break;
+      case 'lineage': renderLineage(content); break;
+      case 'findings': renderFindings(content); break;
+    }
+  }
+}
+
+// ==================== Select Model ====================
+function selectModel(name) {
+  state.selectedModel = name;
+  document.querySelectorAll('.tree-item').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.tree-item').forEach(el => {
+    if (el.textContent.trim().includes(name)) el.classList.add('active');
+  });
+  document.getElementById('search-results').classList.remove('show');
+  document.getElementById('global-search').value = '';
+  renderContent();
+  updateLineageOverlay(name);
+  document.getElementById('lineage-overlay').classList.add('show');
+}
+
+function updateLineageOverlay(modelName) {
+  const body = document.getElementById('lineage-overlay-body');
+  if (!body) return;
+  fetch(`/api/models/${modelName}/lineage`).then(r => r.json()).then(lin => {
+    const upstream = lin.upstream || [];
+    const downstream = lin.downstream || [];
+    const hasAny = upstream.length > 0 || downstream.length > 0;
+    body.innerHTML = hasAny ? `
+      <div class="lineage-overlay-graph">
+        ${upstream.slice(0, 3).map(u => `
+          <div class="lineage-overlay-node" onclick="selectModel('${u}')">
+            <span class="node-dot" style="background:${getLayerColor(u)}"></span>
+            <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${u}</span>
+          </div>
+        `).join('')}
+        ${upstream.length > 0 ? '<div class="lineage-overlay-arrow">&#8595;</div>' : ''}
+        <div class="lineage-overlay-node current">
+          <span class="node-dot" style="background:${getLayerColor(modelName)}"></span>
+          <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${modelName}</span>
+        </div>
+        ${downstream.length > 0 ? '<div class="lineage-overlay-arrow">&#8595;</div>' : ''}
+        ${downstream.slice(0, 3).map(d => `
+          <div class="lineage-overlay-node" onclick="selectModel('${d}')">
+            <span class="node-dot" style="background:${getLayerColor(d)}"></span>
+            <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${d}</span>
+          </div>
+        `).join('')}
+      </div>
+    ` : '<div class="lineage-overlay-empty">No lineage data for this model.</div>';
+  }).catch(() => { body.innerHTML = '<div class="lineage-overlay-empty">Could not load lineage.</div>'; });
+}
+
+function hideLineageOverlay() {
+  document.getElementById('lineage-overlay').classList.remove('show');
+}
+
+function toggleLineageFullscreen() {
+  const ov = document.getElementById('lineage-overlay');
+  ov.classList.toggle('fullscreen');
+  if (ov.classList.contains('fullscreen')) {
+    ov.style.cssText = 'top:0;right:0;width:100%;height:100%;';
+  } else {
+    ov.style.cssText = '';
+  }
+}
+
+// ==================== Overview ====================
+function renderOverview(container) {
+  const r = state.report?.report || state.report || {};
+  const score = state.report?.score || {};
+  const sev = r.by_severity || {};
+  const byType = r.by_type || {};
+  const maxType = Math.max(...Object.values(byType), 1);
+  const typeColors = {
+    dead_model: 'var(--red)', orphaned_model: 'var(--orange)', broken_lineage: '#dc3545',
+    missing_tests: 'var(--purple)', deprecated_source: '#6c757d', wrong_grain_join: '#fd7e14',
+    duplicate_metric: 'var(--accent)', logic_drift: '#20c997', redundant_model: '#e83e8c',
+  };
+
+  const scorePct = score.score_pct || 0;
+  const circumference = 2 * Math.PI * 45;
+  const offset = circumference - (scorePct / 100) * circumference;
+  const scoreColor = scorePct >= 80 ? 'var(--green)' : scorePct >= 50 ? 'var(--orange)' : 'var(--red)';
+
+  container.innerHTML = `
+    <div class="overview">
+      <h2>Project Health Overview</h2>
+
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="label">Total Models</div>
+          <div class="value">${r.total_models || state.allModelsFlat.length}</div>
+          <div class="sub">across ${Object.keys(state.models).length} layers</div>
+        </div>
+        <div class="stat-card">
+          <div class="label">Total Findings</div>
+          <div class="value" style="color:var(--orange)">${r.total_findings || 0}</div>
+          <div class="sub">issues detected</div>
+        </div>
+        <div class="stat-card">
+          <div class="label">Monthly Waste</div>
+          <div class="value" style="color:var(--red)">$${r.total_monthly_waste_usd || 0}</div>
+          <div class="sub">estimated savings</div>
+        </div>
+        <div class="stat-card">
+          <div class="label">Lineage Edges</div>
+          <div class="value">${(state.graph?.edges || []).length}</div>
+          <div class="sub">model dependencies</div>
+        </div>
+      </div>
+
+      <div class="severity-cards">
+        <div class="sev-card sev-critical"><div class="sev-count">${sev.critical || 0}</div><div class="sev-label">Critical</div></div>
+        <div class="sev-card sev-high"><div class="sev-count">${sev.high || 0}</div><div class="sev-label">High</div></div>
+        <div class="sev-card sev-medium"><div class="sev-count">${sev.medium || 0}</div><div class="sev-label">Medium</div></div>
+        <div class="sev-card sev-low"><div class="sev-count">${sev.low || 0}</div><div class="sev-label">Low</div></div>
+      </div>
+
+      ${(() => {
+    const astats = r.agent_stats || {};
+    const totalCalls = Object.values(astats).reduce((s, x) => s + (x.calls || 0), 0);
+    const totalCost = Object.values(astats).reduce((s, x) => s + (x.total_cost_usd || x.cost_usd || 0), 0);
+    const hasFindings = (r.total_findings || 0) > 0;
+    if (totalCalls > 0 || totalCost > 0) {
+      return `
+      <div class="ai-section">
+        <div class="ai-section-title"><span>&#9881;</span> AI Analysis</div>
+        <div class="ai-section-stats">
+          <span class="ai-stat">Findings analyzed by AI agents</span>
+          <span class="ai-stat">LLM calls: <strong>${totalCalls}</strong></span>
+          <span class="ai-stat">Cost: <strong>$${totalCost.toFixed(4)}</strong></span>
+        </div>
+      </div>`;
+    }
+    if (hasFindings) {
+      return `
+      <div class="ai-section" style="border-color: rgba(99,102,241,0.3)">
+        <div class="ai-section-title"><span>&#9881;</span> AI Analysis</div>
+        <div class="ai-section-stats">
+          <span class="ai-stat">Add <code>GROQ_API_KEY</code> to <code>.env</code> to enable AI-powered analysis.</span>
+        </div>
+      </div>`;
+    }
+    return '';
+  })()}
+
+      <div class="score-section">
+        <div class="score-ring-card">
+          <div class="score-ring">
+            <svg viewBox="0 0 100 100" width="120" height="120">
+              <circle cx="50" cy="50" r="45" fill="none" stroke="var(--bg3)" stroke-width="8"/>
+              <circle cx="50" cy="50" r="45" fill="none" stroke="${scoreColor}" stroke-width="8"
+                stroke-dasharray="${circumference}" stroke-dashoffset="${offset}" stroke-linecap="round"/>
+            </svg>
+            <div class="score-text" style="color:${scoreColor}">${scorePct}%</div>
+          </div>
+          <div class="score-ring .score-subtitle" style="font-size:12px;color:var(--text2);margin-top:8px">
+            ${score.found || 0} / ${score.planted || 0} planted problems found
+          </div>
+          <div style="font-size:12px;margin-top:4px;font-weight:600;color:${score.passed ? 'var(--green)' : 'var(--red)'}">
+            ${score.passed ? 'PASSED' : 'NEEDS WORK'}
+          </div>
+        </div>
+
+        <div class="findings-breakdown">
+          <div class="breakdown-title">Findings by Type</div>
+          ${Object.entries(byType).sort((a, b) => b[1] - a[1]).map(([type, count]) => `
+            <div class="breakdown-bar-row">
+              <span class="breakdown-bar-label">${type.replace(/_/g, ' ')}</span>
+              <div class="breakdown-bar-track">
+                <div class="breakdown-bar-fill" style="width:${(count / maxType) * 100}%;background:${typeColors[type] || 'var(--accent)'}">
+                  ${count}
+                </div>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+// ==================== Findings ====================
+function renderFindings(container) {
+  const r = state.report?.report || state.report || {};
+  const findings = r.findings || [];
+  const types = ['all', ...new Set(findings.map(f => f.type))];
+
+  container.innerHTML = `
+    <div class="findings-page">
+      <h2>Audit Findings</h2>
+      <div class="findings-filters" id="findings-filters">
+        ${types.map(t => `
+          <button class="filter-chip ${state.findingsFilter === t ? 'active' : ''}" onclick="filterFindings('${t}')">
+            ${t === 'all' ? 'All' : t.replace(/_/g, ' ')} (${t === 'all' ? findings.length : findings.filter(f => f.type === t).length})
+          </button>
+        `).join('')}
+      </div>
+      <table class="findings-table">
+        <thead>
+          <tr><th>Severity</th><th>Model</th><th>Type</th><th>Evidence</th><th>Cost</th><th>Action</th></tr>
+        </thead>
+        <tbody id="findings-tbody"></tbody>
+      </table>
+    </div>
+  `;
+
+  showFilteredFindings(findings);
+}
+
+function filterFindings(type) {
+  state.findingsFilter = type;
+  document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+  event.target.classList.add('active');
+  const r = state.report?.report || state.report || {};
+  showFilteredFindings(r.findings || []);
+}
+
+function showFilteredFindings(findings) {
+  const filtered = state.findingsFilter === 'all' ? findings : findings.filter(f => f.type === state.findingsFilter);
+  const tbody = document.getElementById('findings-tbody');
+  if (!tbody) return;
+  tbody.innerHTML = filtered.map(f => `
+    <tr onclick="selectModel('${f.model}')">
+      <td><span class="sev-badge ${f.severity}">${f.severity}</span></td>
+      <td style="font-weight:500;font-family:var(--mono);font-size:12px">${f.model}</td>
+      <td><span class="type-badge">${(f.type || '').replace(/_/g, ' ')}</span></td>
+      <td style="font-size:12px;color:var(--text2);max-width:300px">${f.evidence || ''}</td>
+      <td style="font-weight:600;color:var(--orange)">${f.cost_usd ? '$' + f.cost_usd + '/mo' : '-'}</td>
+      <td style="font-size:12px;color:var(--text2);max-width:250px">${f.action || ''}</td>
+    </tr>
+  `).join('');
+}
+
+// ==================== Model Detail ====================
+async function renderModelDetail(container) {
+  const m = state.allModelsFlat.find(x => x.name === state.selectedModel);
+  if (!m) { container.innerHTML = '<div class="empty-state"><h3>Model not found</h3></div>'; return; }
+
+  // Fetch SQL
+  const sqlResp = await fetch(`/api/models/${m.name}/sql`);
+  const sqlData = await sqlResp.json();
+  const sql = sqlData.sql || '';
+
+  // Fetch lineage
+  const linResp = await fetch(`/api/models/${m.name}/lineage`);
+  const lineage = await linResp.json();
+
+  container.innerHTML = `
+    <div class="model-detail">
+      <div class="model-header">
+        <h2>
+          <span class="layer-badge layer-${m.layer}">${m.layer}</span>
+          ${m.name}
+          ${m.has_problem ? '<span style="color:var(--red);font-size:14px" title="Has issues">&#9888;</span>' : '<span style="color:var(--green);font-size:14px" title="Healthy">&#10003;</span>'}
+        </h2>
+        <div class="model-description">${m.description || 'No description available.'}</div>
+        <div class="model-stats">
+          <span class="model-stat">Queries (30d): <strong>${m.q30 != null ? m.q30 : '—'}</strong></span>
+          <span class="model-stat">Queries (90d): <strong>${m.q90 != null ? m.q90 : '—'}</strong></span>
+          <span class="model-stat">Columns: <strong>${m.columns.length}</strong></span>
+          <span class="model-stat">Findings: <strong style="color:${m.findings_count > 0 ? 'var(--red)' : 'var(--green)'}">${m.findings_count}</strong></span>
+          <span class="model-stat">Tags: <strong>${m.tags.join(', ') || '—'}</strong></span>
+        </div>
+      </div>
+
+      <div class="model-tabs">
+        <button class="model-tab" onclick="switchModelTab(this, 'description')">Description</button>
+        <button class="model-tab active" onclick="switchModelTab(this, 'sql')">SQL</button>
+        <button class="model-tab" onclick="switchModelTab(this, 'columns')">Columns (${m.columns.length})</button>
+        <button class="model-tab" onclick="switchModelTab(this, 'lineage'); document.getElementById('lineage-overlay').classList.add('show');">Lineage</button>
+        ${m.findings_count > 0 ? `<button class="model-tab" onclick="switchModelTab(this, 'findings')">Findings (${m.findings_count})</button>` : ''}
+      </div>
+
+      <div class="model-tab-content" id="tab-description">
+        <div class="model-description" style="font-size:14px;line-height:1.6;margin:0">${m.description || 'No description available. Add a description in the model YAML file.'}</div>
+        <div style="margin-top:16px;font-size:12px;color:var(--text2)">
+          <strong>Layer:</strong> ${m.layer} &middot;
+          <strong>Columns:</strong> ${m.columns.length} &middot;
+          <strong>Findings:</strong> ${m.findings_count}
+        </div>
+      </div>
+      <div class="model-tab-content active" id="tab-sql">
+        <div class="sql-block">${highlightSQL(sql)}</div>
+      </div>
+
+      <div class="model-tab-content" id="tab-columns">
+        ${m.columns.length ? `
+          <table class="columns-table">
+            <thead><tr><th>Column</th><th>Description</th><th>Tests</th></tr></thead>
+            <tbody>
+              ${m.columns.map(c => `
+                <tr>
+                  <td class="col-name">${c.name}</td>
+                  <td style="color:var(--text2)">${c.description || '—'}</td>
+                  <td>${(c.tests || []).length ? c.tests.map(t => {
+                    const tname = typeof t === 'string' ? t : Object.keys(t)[0];
+                    return `<span class="test-badge">${tname}</span>`;
+                  }).join('') : '<span class="no-tests">no tests</span>'}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        ` : '<div class="empty-state"><h3>No columns defined</h3><p>Add column definitions to the YAML file.</p></div>'}
+      </div>
+
+      <div class="model-tab-content" id="tab-lineage">
+        <div class="lineage-mini">
+          <div class="lineage-col">
+            <h4>&#8592; Upstream (${lineage.upstream.length})</h4>
+            ${lineage.upstream.length ? lineage.upstream.map(u => `
+              <div class="lineage-node" onclick="selectModel('${u}')">
+                <span class="layer-dot" style="width:6px;height:6px;border-radius:50%;background:${getLayerColor(u)}"></span>
+                ${u}
+              </div>
+            `).join('') : '<div style="font-size:12px;color:var(--text3)">No upstream dependencies</div>'}
+          </div>
+          <div class="lineage-arrows">&#8594;</div>
+          <div class="lineage-col" style="min-width:160px">
+            <div class="lineage-center">${m.name}</div>
+          </div>
+          <div class="lineage-arrows">&#8594;</div>
+          <div class="lineage-col">
+            <h4>Downstream &#8594; (${lineage.downstream.length})</h4>
+            ${lineage.downstream.length ? lineage.downstream.map(d => `
+              <div class="lineage-node" onclick="selectModel('${d}')">
+                <span class="layer-dot" style="width:6px;height:6px;border-radius:50%;background:${getLayerColor(d)}"></span>
+                ${d}
+              </div>
+            `).join('') : '<div style="font-size:12px;color:var(--text3)">No downstream consumers</div>'}
+          </div>
+        </div>
+      </div>
+
+      <div class="model-tab-content" id="tab-findings">
+        ${m.findings.map(f => `
+          <div class="model-finding">
+            <div class="mf-header">
+              <span class="sev-badge ${f.severity}">${f.severity}</span>
+              <span class="type-badge">${(f.type || '').replace(/_/g, ' ')}</span>
+              ${f.cost_usd ? `<span style="font-size:12px;color:var(--orange);font-weight:600">$${f.cost_usd}/mo</span>` : ''}
+            </div>
+            <div class="mf-evidence">${f.evidence || ''}</div>
+            <div class="mf-action">&#8594; ${f.action || ''}</div>
+          </div>
+        `).join('')}
+      </div>
+
+      <div style="margin-top:16px">
+        <button onclick="state.selectedModel=null;hideLineageOverlay();renderSidebar();renderContent();"
+                style="padding:6px 14px;border:1px solid var(--border);border-radius:var(--radius);background:var(--surface);color:var(--text2);font-size:12px">
+          &#8592; Back to ${state.activeTab}
+        </button>
+      </div>
+    </div>
+  `;
+}
+
+function switchModelTab(btn, tabId) {
+  document.querySelectorAll('.model-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.model-tab-content').forEach(t => t.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  const el = document.getElementById('tab-' + tabId);
+  if (el) el.classList.add('active');
+}
+
+function getLayerColor(name) {
+  if (name.startsWith('raw')) return 'var(--raw-color)';
+  if (name.startsWith('src')) return 'var(--source-color)';
+  if (name.startsWith('core')) return 'var(--core-color)';
+  if (name.startsWith('analytics')) return 'var(--analytics-color)';
+  return 'var(--text3)';
+}
+
+function highlightSQL(sql) {
+  return sql
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/--(.*)$/gm, '<span class="cm">--$1</span>')
+    .replace(/\{\{.*?\}\}/g, m => `<span class="ref">${m}</span>`)
+    .replace(/'([^']*)'/g, '<span class="str">\'$1\'</span>')
+    .replace(/\b(select|from|where|join|left|right|inner|outer|on|as|with|group\s+by|order\s+by|having|union|all|distinct|case|when|then|else|end|and|or|not|in|is|null|true|false|between|like|limit|offset|insert|update|delete|create|drop|alter|into|values|set|exists|cast|coalesce|if|date_trunc|sum|count|avg|min|max|row_number|rank|dense_rank|over|partition\s+by|asc|desc)\b/gi,
+      m => `<span class="kw">${m}</span>`)
+    ;
+}
+
+// ==================== Lineage Graph ====================
+function renderLineage(container) {
+  container.innerHTML = `
+    <div class="lineage-page">
+      <div class="lineage-toolbar">
+        <button onclick="resetLineageView()">Reset View</button>
+        <button onclick="fitLineage()">Fit to Screen</button>
+        <div class="lineage-legend">
+          <span><span class="dot" style="background:var(--raw-color)"></span> Raw</span>
+          <span><span class="dot" style="background:var(--source-color)"></span> Source</span>
+          <span><span class="dot" style="background:var(--core-color)"></span> Core</span>
+          <span><span class="dot" style="background:var(--analytics-color)"></span> Analytics</span>
+          <span><span class="dot" style="background:var(--red)"></span> Has Issues</span>
+        </div>
+      </div>
+      <div id="lineage-canvas"></div>
+    </div>
+  `;
+  setTimeout(() => drawLineageGraph(), 50);
+}
+
+let lineageSvg, lineageG, lineageZoom;
+
+function drawLineageGraph() {
+  const canvas = document.getElementById('lineage-canvas');
+  if (!canvas) return;
+  const w = canvas.clientWidth;
+  const h = canvas.clientHeight;
+
+  const nodes = state.graph?.nodes || [];
+  const edges = state.graph?.edges || [];
+
+  // Assign layer order for horizontal layout
+  const layerOrder = { raw: 0, source: 1, core: 2, analytics: 3 };
+  const nodeMap = {};
+  nodes.forEach(n => { nodeMap[n.id] = { ...n, x: 0, y: 0 }; });
+
+  // Also add phantom nodes from edges
+  edges.forEach(e => {
+    if (!nodeMap[e.source]) nodeMap[e.source] = { id: e.source, layer: guessLayer(e.source), has_problem: false, x: 0, y: 0 };
+    if (!nodeMap[e.target]) nodeMap[e.target] = { id: e.target, layer: guessLayer(e.target), has_problem: false, x: 0, y: 0 };
+  });
+
+  // Group by layer
+  const layerGroups = {};
+  Object.values(nodeMap).forEach(n => {
+    const l = n.layer || 'core';
+    if (!layerGroups[l]) layerGroups[l] = [];
+    layerGroups[l].push(n);
+  });
+
+  // Position nodes
+  const nodeW = 160, nodeH = 32, padX = 220, padY = 42;
+  const layers = ['raw', 'source', 'core', 'analytics'];
+  layers.forEach((l, li) => {
+    const group = layerGroups[l] || [];
+    group.sort((a, b) => a.id.localeCompare(b.id));
+    group.forEach((n, i) => {
+      n.x = li * padX + 40;
+      n.y = i * padY + 60;
+    });
+  });
+
+  // SVG
+  const svg = d3.select(canvas).html('').append('svg').attr('width', w).attr('height', h);
+  const g = svg.append('g');
+  lineageSvg = svg;
+  lineageG = g;
+
+  // Zoom
+  lineageZoom = d3.zoom().scaleExtent([0.1, 3]).on('zoom', (e) => g.attr('transform', e.transform));
+  svg.call(lineageZoom);
+
+  const getColor = (layer) => {
+    const cs = getComputedStyle(document.documentElement);
+    const map = { raw: '--raw-color', source: '--source-color', core: '--core-color', analytics: '--analytics-color' };
+    return cs.getPropertyValue(map[layer] || '--text3').trim();
+  };
+
+  // Edges
+  const edgeG = g.append('g');
+  edges.forEach(e => {
+    const s = nodeMap[e.source];
+    const t = nodeMap[e.target];
+    if (!s || !t) return;
+    edgeG.append('path')
+      .attr('class', 'graph-edge')
+      .attr('d', `M${s.x + nodeW},${s.y + nodeH / 2} C${s.x + nodeW + 60},${s.y + nodeH / 2} ${t.x - 60},${t.y + nodeH / 2} ${t.x},${t.y + nodeH / 2}`)
+      .attr('stroke', 'var(--border2)')
+      .attr('data-source', e.source)
+      .attr('data-target', e.target);
+  });
+
+  // Nodes
+  const nodeG = g.selectAll('.graph-node')
+    .data(Object.values(nodeMap))
+    .enter().append('g')
+    .attr('class', 'graph-node')
+    .attr('transform', d => `translate(${d.x},${d.y})`)
+    .attr('data-id', d => d.id)
+    .on('click', (ev, d) => selectModel(d.id))
+    .on('mouseenter', (ev, d) => highlightLineage(d.id))
+    .on('mouseleave', () => clearHighlight());
+
+  nodeG.append('rect')
+    .attr('width', nodeW).attr('height', nodeH)
+    .attr('fill', d => d.has_problem ? 'var(--red-bg)' : 'var(--surface)')
+    .attr('stroke', d => getColor(d.layer));
+
+  nodeG.append('text')
+    .attr('x', 8).attr('y', nodeH / 2 + 4)
+    .attr('fill', 'var(--text)')
+    .text(d => d.id.length > 22 ? d.id.slice(0, 20) + '..' : d.id);
+
+  // Problem indicator
+  nodeG.filter(d => d.has_problem).append('circle')
+    .attr('cx', nodeW - 10).attr('cy', nodeH / 2)
+    .attr('r', 4).attr('fill', 'var(--red)');
+
+  // Fit to screen
+  setTimeout(fitLineage, 100);
+}
+
+function guessLayer(name) {
+  if (name.startsWith('raw')) return 'raw';
+  if (name.startsWith('src')) return 'source';
+  if (name.startsWith('core')) return 'core';
+  if (name.startsWith('analytics')) return 'analytics';
+  return 'core';
+}
+
+function highlightLineage(nodeId) {
+  const connected = new Set([nodeId]);
+  const edges = state.graph?.edges || [];
+  // BFS upstream and downstream
+  let changed = true;
+  while (changed) {
+    changed = false;
+    edges.forEach(e => {
+      if (connected.has(e.source) && !connected.has(e.target)) { connected.add(e.target); changed = true; }
+      if (connected.has(e.target) && !connected.has(e.source)) { connected.add(e.source); changed = true; }
+    });
+  }
+
+  d3.selectAll('.graph-node').classed('dimmed', d => !connected.has(d.id)).classed('highlighted', d => d.id === nodeId);
+  d3.selectAll('.graph-edge').classed('dimmed', function() {
+    return !connected.has(this.getAttribute('data-source')) || !connected.has(this.getAttribute('data-target'));
+  }).classed('highlighted', function() {
+    return connected.has(this.getAttribute('data-source')) && connected.has(this.getAttribute('data-target'));
+  });
+}
+
+function clearHighlight() {
+  d3.selectAll('.graph-node').classed('dimmed', false).classed('highlighted', false);
+  d3.selectAll('.graph-edge').classed('dimmed', false).classed('highlighted', false);
+}
+
+function resetLineageView() {
+  if (lineageSvg && lineageZoom) lineageSvg.transition().duration(500).call(lineageZoom.transform, d3.zoomIdentity);
+}
+
+function fitLineage() {
+  if (!lineageG || !lineageSvg) return;
+  const canvas = document.getElementById('lineage-canvas');
+  if (!canvas) return;
+  const bounds = lineageG.node().getBBox();
+  const w = canvas.clientWidth;
+  const h = canvas.clientHeight;
+  const scale = Math.min(w / (bounds.width + 80), h / (bounds.height + 80), 1.5) * 0.9;
+  const tx = (w - bounds.width * scale) / 2 - bounds.x * scale;
+  const ty = (h - bounds.height * scale) / 2 - bounds.y * scale;
+  lineageSvg.transition().duration(500).call(lineageZoom.transform, d3.zoomIdentity.translate(tx, ty).scale(scale));
+}
+
+// ==================== Start ====================
+init();
+</script>
+</body>
+</html>

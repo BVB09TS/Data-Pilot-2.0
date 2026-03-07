@@ -1,0 +1,1087 @@
+==================== 2026-03-01T11:08:33.069194Z | 4bb6b453-9011-4293-a6ce-e9a6a4218de3 ====================
+11:08:33.069304 [info ]: Starting dbt LSP server
+11:08:33.069351 [info ]: Connecting to LSP client on port 8000
+11:08:33.071279 [info ]: Successfully connected to LSP client
+11:08:33.071300 [info ]: Creating LSP service...
+11:08:33.162828 [info ]: Creating LSP server...
+11:08:33.162876 [info ]: Starting LSP server...
+11:08:33.230001 [info ]: Started loading project
+11:08:33.241745 [info ]: Loading profiles.yml
+11:08:33.578455 [info ]:    Started resolving packages from packages.yml
+11:08:33.977977 [info ]:   Finished [  0.40s] resolving packages from packages.yml (1 items)
+11:08:33.978137 [info ]: Installing packages
+11:08:33.982755 [info ]: Installing dbt-labs/dbt_utils
+11:08:34.421411 [info ]: Loading profiles.yml
+11:08:35.102674 [info ]:  Installed dbt-labs/dbt_utils: 1.3.3
+11:08:35.104580 [info ]:  Installed 1 package
+11:08:35.104905 [debug]:    Started loading packages
+11:08:35.138849 [debug]:     Loaded [  0.03s] packages
+11:08:35.138975 [debug]:    Started loading internal packages
+11:08:35.237089 [debug]:     Loaded [  0.10s] internal packages
+11:08:35.237383 [info ]: Finished loading project [  2.01s]
+11:08:35.238144 [info ]: Started parsing
+11:08:35.409317 [debug]: Finished parsing models\analytics\analytics_b2b_pipeline.yml [  0.00s]
+11:08:35.410034 [debug]: Finished parsing models\analytics\analytics_cac_analysis.yml [  0.00s]
+11:08:35.410632 [debug]: Finished parsing models\analytics\analytics_channel_roi.yml [  0.00s]
+11:08:35.411366 [debug]: Finished parsing models\analytics\analytics_churn_risk.yml [  0.00s]
+11:08:35.411889 [debug]: Finished parsing models\analytics\analytics_cohort_retention.yml [  0.00s]
+11:08:35.412405 [debug]: Finished parsing models\analytics\analytics_customer_360.yml [  0.00s]
+11:08:35.413132 [debug]: Finished parsing models\analytics\analytics_customer_health.yml [  0.00s]
+11:08:35.413961 [debug]: Finished parsing models\analytics\analytics_email_performance.yml [  0.00s]
+11:08:35.414881 [debug]: Finished parsing models\analytics\analytics_executive_kpis.yml [  0.00s]
+11:08:35.415560 [debug]: Finished parsing models\analytics\analytics_finance_monthly.yml [  0.00s]
+11:08:35.416505 [debug]: Finished parsing models\analytics\analytics_geographic_revenue.yml [  0.00s]
+11:08:35.417205 [debug]: Finished parsing models\analytics\analytics_inventory_current.yml [  0.00s]
+11:08:35.417702 [debug]: Finished parsing models\analytics\analytics_inventory_legacy.yml [  0.00s]
+11:08:35.418199 [debug]: Finished parsing models\analytics\analytics_legacy_kpis.yml [  0.00s]
+11:08:35.418818 [debug]: Finished parsing models\analytics\analytics_marketing_weekly.yml [  0.00s]
+11:08:35.419413 [debug]: Finished parsing models\analytics\analytics_mobile_engagement.yml [  0.00s]
+11:08:35.420039 [debug]: Finished parsing models\analytics\analytics_new_customer_acquisition.yml [  0.00s]
+11:08:35.420691 [debug]: Finished parsing models\analytics\analytics_new_vs_returning.yml [  0.00s]
+11:08:35.421265 [debug]: Finished parsing models\analytics\analytics_product_performance.yml [  0.00s]
+11:08:35.421857 [debug]: Finished parsing models\analytics\analytics_refund_analysis.yml [  0.00s]
+11:08:35.422469 [debug]: Finished parsing models\analytics\analytics_revenue_v1.yml [  0.00s]
+11:08:35.423206 [debug]: Finished parsing models\analytics\analytics_revenue_v2.yml [  0.00s]
+11:08:35.423892 [debug]: Finished parsing models\analytics\analytics_seller_dashboard_v1.yml [  0.00s]
+11:08:35.424795 [debug]: Finished parsing models\analytics\analytics_seller_dashboard_v2.yml [  0.00s]
+11:08:35.425550 [debug]: Finished parsing models\analytics\analytics_subscription_health.yml [  0.00s]
+11:08:35.426270 [debug]: Finished parsing models\analytics\analytics_subscription_mrr_trend.yml [  0.00s]
+11:08:35.426991 [debug]: Finished parsing models\analytics\analytics_web_traffic.yml [  0.00s]
+11:08:35.427576 [debug]: Finished parsing models\core\core_ad_performance.yml [  0.00s]
+11:08:35.428312 [debug]: Finished parsing models\core\core_b2b_accounts.yml [  0.00s]
+11:08:35.429081 [debug]: Finished parsing models\core\core_cohort_retention.yml [  0.00s]
+11:08:35.430832 [debug]: Finished parsing models\core\core_coupon_analysis.yml [  0.00s]
+11:08:35.431881 [debug]: Finished parsing models\core\core_customer_segments.yml [  0.00s]
+11:08:35.432831 [debug]: Finished parsing models\core\core_customers.yml [  0.00s]
+11:08:35.433924 [debug]: Finished parsing models\core\core_email_performance.yml [  0.00s]
+11:08:35.436575 [debug]: Finished parsing models\core\core_experimental_ltv.yml [  0.00s]
+11:08:35.438151 [debug]: Finished parsing models\core\core_geographic_revenue.yml [  0.00s]
+11:08:35.439346 [debug]: Finished parsing models\core\core_inventory_legacy.yml [  0.00s]
+11:08:35.440127 [debug]: Finished parsing models\core\core_inventory_status.yml [  0.00s]
+11:08:35.440830 [debug]: Finished parsing models\core\core_mobile_engagement.yml [  0.00s]
+11:08:35.441581 [debug]: Finished parsing models\core\core_new_vs_returning.yml [  0.00s]
+11:08:35.442157 [debug]: Finished parsing models\core\core_opportunities.yml [  0.00s]
+11:08:35.442765 [debug]: Finished parsing models\core\core_orders.yml [  0.00s]
+11:08:35.443384 [debug]: Finished parsing models\core\core_products.yml [  0.00s]
+11:08:35.443959 [debug]: Finished parsing models\core\core_refunds.yml [  0.00s]
+11:08:35.444525 [debug]: Finished parsing models\core\core_revenue_combined.yml [  0.00s]
+11:08:35.445140 [debug]: Finished parsing models\core\core_revenue_daily.yml [  0.00s]
+11:08:35.445662 [debug]: Finished parsing models\core\core_revenue_monthly.yml [  0.00s]
+11:08:35.448256 [debug]: Finished parsing models\core\core_revenue_summary.yml [  0.00s]
+11:08:35.452734 [debug]: Finished parsing models\core\core_seller_metrics.yml [  0.00s]
+11:08:35.453798 [debug]: Finished parsing models\core\core_subscriptions.yml [  0.00s]
+11:08:35.454264 [debug]: Finished parsing models\core\core_web_engagement.yml [  0.00s]
+11:08:35.454802 [debug]: Finished parsing models\raw\raw_email_campaigns.yml [  0.00s]
+11:08:35.455570 [debug]: Finished parsing models\raw\raw_email_events.yml [  0.00s]
+11:08:35.456334 [debug]: Finished parsing models\raw\raw_erp_products.yml [  0.00s]
+11:08:35.457016 [debug]: Finished parsing models\raw\raw_erp_warehouses.yml [  0.00s]
+11:08:35.457653 [debug]: Finished parsing models\raw\raw_google_ads_campaigns.yml [  0.00s]
+11:08:35.458180 [debug]: Finished parsing models\raw\raw_google_ads_performance.yml [  0.00s]
+11:08:35.458900 [debug]: Finished parsing models\raw\raw_inventory_snapshots.yml [  0.00s]
+11:08:35.459672 [debug]: Finished parsing models\raw\raw_mobile_events.yml [  0.00s]
+11:08:35.460374 [debug]: Finished parsing models\raw\raw_mobile_sessions.yml [  0.00s]
+11:08:35.460927 [debug]: Finished parsing models\raw\raw_salesforce_accounts.yml [  0.00s]
+11:08:35.461487 [debug]: Finished parsing models\raw\raw_salesforce_contacts.yml [  0.00s]
+11:08:35.462217 [debug]: Finished parsing models\raw\raw_salesforce_opportunities.yml [  0.00s]
+11:08:35.463329 [debug]: Finished parsing models\raw\raw_shopify_customers.yml [  0.00s]
+11:08:35.465701 [debug]: Finished parsing models\raw\raw_shopify_gift_cards.yml [  0.00s]
+11:08:35.468182 [debug]: Finished parsing models\raw\raw_shopify_order_items.yml [  0.00s]
+11:08:35.469220 [debug]: Finished parsing models\raw\raw_shopify_orders.yml [  0.00s]
+11:08:35.470362 [debug]: Finished parsing models\raw\raw_shopify_product_variants.yml [  0.00s]
+11:08:35.472618 [debug]: Finished parsing models\raw\raw_shopify_products.yml [  0.00s]
+11:08:35.473538 [debug]: Finished parsing models\raw\raw_shopify_refunds.yml [  0.00s]
+11:08:35.474414 [debug]: Finished parsing models\raw\raw_stripe_payments.yml [  0.00s]
+11:08:35.475270 [debug]: Finished parsing models\raw\raw_stripe_refunds.yml [  0.00s]
+11:08:35.475960 [debug]: Finished parsing models\raw\raw_stripe_subscriptions.yml [  0.00s]
+11:08:35.476739 [debug]: Finished parsing models\raw\raw_web_sessions.yml [  0.00s]
+11:08:35.477582 [debug]: Finished parsing models\source\src_email_campaigns.yml [  0.00s]
+11:08:35.478376 [debug]: Finished parsing models\source\src_email_events.yml [  0.00s]
+11:08:35.482290 [debug]: Finished parsing models\source\src_erp_products.yml [  0.00s]
+11:08:35.484509 [debug]: Finished parsing models\source\src_erp_warehouses.yml [  0.00s]
+11:08:35.485542 [debug]: Finished parsing models\source\src_google_ads_campaigns.yml [  0.00s]
+11:08:35.486455 [debug]: Finished parsing models\source\src_google_ads_performance.yml [  0.00s]
+11:08:35.487230 [debug]: Finished parsing models\source\src_inventory_snapshots.yml [  0.00s]
+11:08:35.488485 [debug]: Finished parsing models\source\src_mobile_events.yml [  0.00s]
+11:08:35.489400 [debug]: Finished parsing models\source\src_orders_v2.yml [  0.00s]
+11:08:35.490567 [debug]: Finished parsing models\source\src_salesforce_accounts.yml [  0.00s]
+11:08:35.491696 [debug]: Finished parsing models\source\src_salesforce_contacts.yml [  0.00s]
+11:08:35.492487 [debug]: Finished parsing models\source\src_salesforce_opportunities.yml [  0.00s]
+11:08:35.493309 [debug]: Finished parsing models\source\src_shopify_customers.yml [  0.00s]
+11:08:35.494220 [debug]: Finished parsing models\source\src_shopify_gift_cards_v2.yml [  0.00s]
+11:08:35.495475 [debug]: Finished parsing models\source\src_shopify_order_items.yml [  0.00s]
+11:08:35.496508 [debug]: Finished parsing models\source\src_shopify_orders.yml [  0.00s]
+11:08:35.497932 [debug]: Finished parsing models\source\src_shopify_product_variants.yml [  0.00s]
+11:08:35.499735 [debug]: Finished parsing models\source\src_shopify_products.yml [  0.00s]
+11:08:35.501456 [debug]: Finished parsing models\source\src_shopify_refunds.yml [  0.00s]
+11:08:35.502377 [debug]: Finished parsing models\source\src_stripe_payments.yml [  0.00s]
+11:08:35.502864 [debug]: Finished parsing models\source\src_stripe_refunds.yml [  0.00s]
+11:08:35.503386 [debug]: Finished parsing models\source\src_stripe_subscriptions.yml [  0.00s]
+11:08:35.503957 [debug]: Finished parsing models\source\src_subscription_events.yml [  0.00s]
+11:08:35.504620 [debug]: Finished parsing models\source\src_web_sessions.yml [  0.00s]
+11:08:35.556227 [debug]: Finished parsing models\analytics\analytics_b2b_pipeline.sql [  0.00s]
+11:08:35.556355 [debug]: Finished parsing models\raw\raw_erp_warehouses.sql [  0.00s]
+11:08:35.556425 [debug]: Finished parsing models\source\src_mobile_events.sql [  0.00s]
+11:08:35.556462 [debug]: Finished parsing models\core\core_inventory_legacy.sql [  0.00s]
+11:08:35.556462 [debug]: Finished parsing models\analytics\analytics_product_performance.sql [  0.00s]
+11:08:35.556482 [debug]: Finished parsing models\analytics\analytics_finance_monthly.sql [  0.00s]
+11:08:35.556558 [debug]: Finished parsing models\raw\raw_shopify_customers.sql [  0.00s]
+11:08:35.556954 [debug]: Finished parsing models\raw\raw_stripe_subscriptions.sql [  0.00s]
+11:08:35.556966 [debug]: Finished parsing models\core\core_revenue_daily.sql [  0.00s]
+11:08:35.557484 [debug]: Finished parsing models\core\core_ad_performance.sql [  0.01s]
+11:08:35.557517 [debug]: Finished parsing models\source\src_shopify_product_variants.sql [  0.01s]
+11:08:35.558981 [debug]: Finished parsing models\source\src_shopify_products.sql [  0.00s]
+11:08:35.559156 [debug]: Finished parsing models\raw\raw_shopify_gift_cards.sql [  0.00s]
+11:08:35.559378 [debug]: Finished parsing models\analytics\analytics_refund_analysis.sql [  0.00s]
+11:08:35.559631 [debug]: Finished parsing models\raw\raw_google_ads_campaigns.sql [  0.00s]
+11:08:35.559666 [debug]: Finished parsing models\core\core_inventory_status.sql [  0.00s]
+11:08:35.560107 [debug]: Finished parsing models\core\core_b2b_accounts.sql [  0.00s]
+11:08:35.560139 [debug]: Finished parsing models\raw\raw_web_sessions.sql [  0.00s]
+11:08:35.560153 [debug]: Finished parsing models\analytics\analytics_cac_analysis.sql [  0.00s]
+11:08:35.560165 [debug]: Finished parsing models\core\core_revenue_monthly.sql [  0.00s]
+11:08:35.560735 [debug]: Finished parsing models\source\src_shopify_refunds.sql [  0.00s]
+11:08:35.560992 [debug]: Finished parsing models\source\src_orders_v2.sql [  0.00s]
+11:08:35.561233 [debug]: Finished parsing models\source\src_salesforce_accounts.sql [  0.00s]
+11:08:35.561509 [debug]: Finished parsing models\raw\raw_shopify_order_items.sql [  0.00s]
+11:08:35.561574 [debug]: Finished parsing models\core\core_mobile_engagement.sql [  0.00s]
+11:08:35.561581 [debug]: Finished parsing models\core\core_cohort_retention.sql [  0.00s]
+11:08:35.561646 [debug]: Finished parsing models\raw\raw_google_ads_performance.sql [  0.00s]
+11:08:35.561659 [debug]: Finished parsing models\analytics\analytics_channel_roi.sql [  0.00s]
+11:08:35.562166 [debug]: Finished parsing models\analytics\analytics_geographic_revenue.sql [  0.01s]
+11:08:35.563424 [debug]: Finished parsing models\source\src_salesforce_contacts.sql [  0.00s]
+11:08:35.563460 [debug]: Finished parsing models\core\core_coupon_analysis.sql [  0.00s]
+11:08:35.563490 [debug]: Finished parsing models\analytics\analytics_churn_risk.sql [  0.00s]
+11:08:35.563559 [debug]: Finished parsing models\raw\raw_shopify_orders.sql [  0.00s]
+11:08:35.563582 [debug]: Finished parsing models\source\src_stripe_payments.sql [  0.00s]
+11:08:35.563672 [debug]: Finished parsing models\analytics\analytics_revenue_v1.sql [  0.00s]
+11:08:35.563685 [debug]: Finished parsing models\raw\raw_inventory_snapshots.sql [  0.00s]
+11:08:35.564245 [debug]: Finished parsing models\analytics\analytics_inventory_current.sql [  0.01s]
+11:08:35.564288 [debug]: Finished parsing models\core\core_new_vs_returning.sql [  0.00s]
+11:08:35.564683 [debug]: Finished parsing models\source\src_email_campaigns.sql [  0.01s]
+11:08:35.566643 [debug]: Finished parsing models\analytics\analytics_revenue_v2.sql [  0.00s]
+11:08:35.566761 [debug]: Finished parsing models\core\core_revenue_summary.sql [  0.01s]
+11:08:35.566777 [debug]: Finished parsing models\analytics\analytics_cohort_retention.sql [  0.00s]
+11:08:35.566807 [debug]: Finished parsing models\raw\raw_mobile_events.sql [  0.00s]
+11:08:35.566904 [debug]: Finished parsing models\source\src_salesforce_opportunities.sql [  0.00s]
+11:08:35.567121 [debug]: Finished parsing models\raw\raw_shopify_product_variants.sql [  0.00s]
+11:08:35.567154 [debug]: Finished parsing models\core\core_customer_segments.sql [  0.00s]
+11:08:35.567260 [debug]: Finished parsing models\core\core_opportunities.sql [  0.00s]
+11:08:35.567399 [debug]: Finished parsing models\source\src_email_events.sql [  0.01s]
+11:08:35.567448 [debug]: Finished parsing models\analytics\analytics_inventory_legacy.sql [  0.00s]
+11:08:35.567881 [debug]: Finished parsing models\source\src_stripe_refunds.sql [  0.00s]
+11:08:35.568681 [debug]: Finished parsing models\source\src_shopify_customers.sql [  0.00s]
+11:08:35.569302 [debug]: Finished parsing models\analytics\analytics_legacy_kpis.sql [  0.00s]
+11:08:35.569423 [debug]: Finished parsing models\core\core_seller_metrics.sql [  0.00s]
+11:08:35.569466 [debug]: Finished parsing models\analytics\analytics_seller_dashboard_v1.sql [  0.00s]
+11:08:35.569800 [debug]: Finished parsing models\analytics\analytics_customer_360.sql [  0.00s]
+11:08:35.569929 [debug]: Finished parsing models\core\core_customers.sql [  0.00s]
+11:08:35.569966 [debug]: Finished parsing models\raw\raw_shopify_products.sql [  0.00s]
+11:08:35.570261 [debug]: Finished parsing models\raw\raw_mobile_sessions.sql [  0.00s]
+11:08:35.570254 [debug]: Finished parsing models\source\src_erp_products.sql [  0.00s]
+11:08:35.570408 [debug]: Finished parsing models\core\core_orders.sql [  0.00s]
+11:08:35.570424 [debug]: Finished parsing models\source\src_stripe_subscriptions.sql [  0.00s]
+11:08:35.570501 [debug]: Finished parsing models\source\src_shopify_gift_cards_v2.sql [  0.00s]
+11:08:35.571037 [debug]: Finished parsing models\analytics\analytics_seller_dashboard_v2.sql [  0.00s]
+11:08:35.571614 [debug]: Finished parsing models\analytics\analytics_customer_health.sql [  0.00s]
+11:08:35.571712 [debug]: Finished parsing models\analytics\analytics_marketing_weekly.sql [  0.00s]
+11:08:35.571742 [debug]: Finished parsing models\source\src_erp_warehouses.sql [  0.00s]
+11:08:35.571759 [debug]: Finished parsing models\core\core_products.sql [  0.00s]
+11:08:35.571771 [debug]: Finished parsing models\core\core_subscriptions.sql [  0.00s]
+11:08:35.571785 [debug]: Finished parsing models\core\core_email_performance.sql [  0.00s]
+11:08:35.572240 [debug]: Finished parsing models\raw\raw_shopify_refunds.sql [  0.00s]
+11:08:35.572563 [debug]: Finished parsing models\analytics\analytics_subscription_health.sql [  0.00s]
+11:08:35.572614 [debug]: Finished parsing models\source\src_subscription_events.sql [  0.00s]
+11:08:35.572703 [debug]: Finished parsing models\source\src_shopify_order_items.sql [  0.00s]
+11:08:35.572889 [debug]: Finished parsing models\raw\raw_salesforce_accounts.sql [  0.00s]
+11:08:35.573593 [debug]: Finished parsing models\analytics\analytics_email_performance.sql [  0.00s]
+11:08:35.573671 [debug]: Finished parsing models\analytics\analytics_mobile_engagement.sql [  0.00s]
+11:08:35.573898 [debug]: Finished parsing models\source\src_shopify_orders.sql [  0.00s]
+11:08:35.573919 [debug]: Finished parsing models\source\src_web_sessions.sql [  0.00s]
+11:08:35.573932 [debug]: Finished parsing models\analytics\analytics_subscription_mrr_trend.sql [  0.00s]
+11:08:35.574178 [debug]: Finished parsing models\core\core_web_engagement.sql [  0.00s]
+11:08:35.574221 [debug]: Finished parsing models\source\src_google_ads_campaigns.sql [  0.00s]
+11:08:35.574246 [debug]: Finished parsing models\raw\raw_stripe_payments.sql [  0.00s]
+11:08:35.574317 [debug]: Finished parsing models\core\core_refunds.sql [  0.00s]
+11:08:35.574432 [debug]: Finished parsing models\core\core_experimental_ltv.sql [  0.00s]
+11:08:35.574543 [debug]: Finished parsing models\raw\raw_salesforce_contacts.sql [  0.00s]
+11:08:35.574913 [debug]: Finished parsing models\analytics\analytics_executive_kpis.sql [  0.00s]
+11:08:35.574984 [debug]: Finished parsing models\raw\raw_stripe_refunds.sql [  0.00s]
+11:08:35.575240 [debug]: Finished parsing models\analytics\analytics_web_traffic.sql [  0.00s]
+11:08:35.575602 [debug]: Finished parsing models\core\core_revenue_combined.sql [  0.00s]
+11:08:35.575620 [debug]: Finished parsing models\core\core_geographic_revenue.sql [  0.00s]
+11:08:35.575754 [debug]: Finished parsing models\raw\raw_salesforce_opportunities.sql [  0.00s]
+11:08:35.576057 [debug]: Finished parsing models\analytics\analytics_new_customer_acquisition.sql [  0.00s]
+11:08:35.576071 [debug]: Finished parsing models\source\src_google_ads_performance.sql [  0.00s]
+11:08:35.576199 [debug]: Finished parsing models\raw\raw_email_campaigns.sql [  0.00s]
+11:08:35.577577 [debug]: Finished parsing models\source\src_inventory_snapshots.sql [  0.00s]
+11:08:35.577594 [debug]: Finished parsing models\analytics\analytics_new_vs_returning.sql [  0.00s]
+11:08:35.578190 [debug]: Finished parsing models\raw\raw_email_events.sql [  0.00s]
+11:08:35.579747 [debug]: Finished parsing models\raw\raw_erp_products.sql [  0.00s]
+11:08:35.991969 [debug]: Finished parsing target\generic_tests\unique_src_shopify_refunds_refund_id.sql [  0.00s]
+11:08:35.992107 [debug]: Finished parsing target\generic_tests\not_null_src_shopify_order_items_line_item_id.sql [  0.00s]
+11:08:35.992226 [debug]: Finished parsing target\generic_tests\unique_core_email_performance_campaign_id.sql [  0.00s]
+11:08:35.992233 [debug]: Finished parsing target\generic_tests\not_null_core_orders_order_id.sql [  0.00s]
+11:08:35.992252 [debug]: Finished parsing target\generic_tests\unique_core_subscriptions_subscription_id.sql [  0.00s]
+11:08:35.992277 [debug]: Finished parsing target\generic_tests\unique_src_email_events_event_id.sql [  0.00s]
+11:08:35.992309 [debug]: Finished parsing target\generic_tests\unique_raw_stripe_payments_payment_id.sql [  0.00s]
+11:08:35.992327 [debug]: Finished parsing target\generic_tests\unique_analytics_inventory_current_variant_id.sql [  0.00s]
+11:08:35.992303 [debug]: Finished parsing target\generic_tests\unique_raw_mobile_events_event_id.sql [  0.00s]
+11:08:35.992272 [debug]: Finished parsing target\generic_tests\unique_src_salesforce_accounts_account_id.sql [  0.00s]
+11:08:35.992389 [debug]: Finished parsing target\generic_tests\unique_analytics_b2b_pipeline_account_id.sql [  0.00s]
+11:08:35.995170 [debug]: Finished parsing target\generic_tests\not_null_raw_stripe_payments_payment_id.sql [  0.00s]
+11:08:35.995163 [debug]: Finished parsing target\generic_tests\not_null_src_shopify_orders_customer_id.sql [  0.00s]
+11:08:35.995235 [debug]: Finished parsing target\generic_tests\not_null_src_email_events_event_id.sql [  0.00s]
+11:08:35.995272 [debug]: Finished parsing target\generic_tests\not_null_raw_mobile_events_event_id.sql [  0.00s]
+11:08:35.995571 [debug]: Finished parsing target\generic_tests\not_null_analytics_b2b_pipeline_account_id.sql [  0.00s]
+11:08:35.995966 [debug]: Finished parsing target\generic_tests\not_null_core_orders_order_total_amount.sql [  0.00s]
+11:08:35.997076 [debug]: Finished parsing target\generic_tests\not_null_src_shopify_orders_order_created_at.sql [  0.00s]
+11:08:35.998087 [debug]: Finished parsing target\generic_tests\not_null_src_shopify_refunds_refund_id.sql [  0.01s]
+11:08:35.998222 [debug]: Finished parsing target\generic_tests\not_null_core_subscriptions_subscription_id.sql [  0.01s]
+11:08:35.998529 [debug]: Finished parsing target\generic_tests\unique_raw_shopify_order_items_line_item_id.sql [  0.01s]
+11:08:35.998889 [debug]: Finished parsing target\generic_tests\unique_src_google_ads_campaigns_campaign_id.sql [  0.00s]
+11:08:35.999156 [debug]: Finished parsing target\generic_tests\not_null_analytics_inventory_current_variant_id.sql [  0.01s]
+11:08:35.999294 [debug]: Finished parsing target\generic_tests\unique_raw_stripe_refunds_refund_id.sql [  0.00s]
+11:08:35.999666 [debug]: Finished parsing target\generic_tests\unique_raw_salesforce_accounts_account_id.sql [  0.00s]
+11:08:35.999703 [debug]: Finished parsing target\generic_tests\unique_analytics_customer_360_customer_id.sql [  0.00s]
+11:08:35.999875 [debug]: Finished parsing target\generic_tests\not_null_core_email_performance_campaign_id.sql [  0.01s]
+11:08:36.000289 [debug]: Finished parsing target\generic_tests\unique_raw_email_campaigns_campaign_id.sql [  0.00s]
+11:08:36.000457 [debug]: Finished parsing target\generic_tests\unique_src_shopify_orders_order_id.sql [  0.00s]
+11:08:36.000437 [debug]: Finished parsing target\generic_tests\not_null_raw_shopify_order_items_line_item_id.sql [  0.00s]
+11:08:36.001039 [debug]: Finished parsing target\generic_tests\unique_analytics_product_performance_product_id.sql [  0.00s]
+11:08:36.001077 [debug]: Finished parsing target\generic_tests\not_null_src_salesforce_accounts_account_id.sql [  0.01s]
+11:08:36.002606 [debug]: Finished parsing target\generic_tests\unique_core_products_product_id.sql [  0.01s]
+11:08:36.002752 [debug]: Finished parsing target\generic_tests\not_null_raw_email_campaigns_campaign_id.sql [  0.00s]
+11:08:36.002799 [debug]: Finished parsing target\generic_tests\unique_core_inventory_status_variant_id.sql [  0.00s]
+11:08:36.002821 [debug]: Finished parsing target\generic_tests\not_null_src_google_ads_campaigns_campaign_id.sql [  0.00s]
+11:08:36.002984 [debug]: Finished parsing target\generic_tests\unique_raw_shopify_orders_order_id.sql [  0.00s]
+11:08:36.003125 [debug]: Finished parsing target\generic_tests\not_null_raw_stripe_refunds_refund_id.sql [  0.00s]
+11:08:36.003370 [debug]: Finished parsing target\generic_tests\not_null_src_shopify_orders_order_id.sql [  0.00s]
+11:08:36.003460 [debug]: Finished parsing target\generic_tests\not_null_analytics_customer_360_customer_id.sql [  0.00s]
+11:08:36.003478 [debug]: Finished parsing target\generic_tests\not_null_raw_salesforce_accounts_account_id.sql [  0.00s]
+11:08:36.004931 [debug]: Finished parsing target\generic_tests\not_null_core_inventory_status_variant_id.sql [  0.00s]
+11:08:36.006255 [debug]: Finished parsing target\generic_tests\unique_src_stripe_payments_payment_id.sql [  0.01s]
+11:08:36.006522 [debug]: Finished parsing target\generic_tests\unique_raw_email_events_event_id.sql [  0.00s]
+11:08:36.006753 [debug]: Finished parsing target\generic_tests\not_null_src_google_ads_performance_performance_date.sql [  0.00s]
+11:08:36.006943 [debug]: Finished parsing target\generic_tests\unique_src_salesforce_contacts_contact_id.sql [  0.01s]
+11:08:36.007369 [debug]: Finished parsing target\generic_tests\unique_raw_stripe_subscriptions_subscription_id.sql [  0.00s]
+11:08:36.007583 [debug]: Finished parsing target\generic_tests\not_null_core_products_product_id.sql [  0.01s]
+11:08:36.007795 [debug]: Finished parsing target\generic_tests\unique_src_inventory_snapshots_snapshot_id.sql [  0.00s]
+11:08:36.007878 [debug]: Finished parsing target\generic_tests\unique_analytics_customer_health_customer_id.sql [  0.00s]
+11:08:36.007933 [debug]: Finished parsing target\generic_tests\not_null_raw_shopify_orders_order_id.sql [  0.00s]
+11:08:36.007939 [debug]: Finished parsing target\generic_tests\unique_core_new_vs_returning_order_id.sql [  0.00s]
+11:08:36.007959 [debug]: Finished parsing target\generic_tests\not_null_src_salesforce_contacts_contact_id.sql [  0.01s]
+11:08:36.008065 [debug]: Finished parsing target\generic_tests\unique_raw_salesforce_contacts_contact_id.sql [  0.00s]
+11:08:36.008191 [debug]: Finished parsing target\generic_tests\not_null_src_stripe_payments_payment_id.sql [  0.01s]
+11:08:36.008352 [debug]: Finished parsing target\generic_tests\not_null_src_shopify_orders_order_total_amount.sql [  0.01s]
+11:08:36.009060 [debug]: Finished parsing target\generic_tests\not_null_raw_email_events_event_id.sql [  0.00s]
+11:08:36.010202 [debug]: Finished parsing target\generic_tests\not_null_raw_stripe_subscriptions_subscription_id.sql [  0.00s]
+11:08:36.010653 [debug]: Finished parsing target\generic_tests\unique_raw_shopify_product_variants_variant_id.sql [  0.00s]
+11:08:36.010705 [debug]: Finished parsing target\generic_tests\not_null_analytics_customer_health_customer_id.sql [  0.00s]
+11:08:36.010716 [debug]: Finished parsing target\generic_tests\not_null_raw_salesforce_contacts_contact_id.sql [  0.00s]
+11:08:36.010751 [debug]: Finished parsing target\generic_tests\unique_src_salesforce_opportunities_opportunity_id.sql [  0.00s]
+11:08:36.010764 [debug]: Finished parsing target\generic_tests\unique_src_stripe_refunds_refund_id.sql [  0.00s]
+11:08:36.010773 [debug]: Finished parsing target\generic_tests\unique_src_shopify_product_variants_variant_id.sql [  0.00s]
+11:08:36.010784 [debug]: Finished parsing target\generic_tests\unique_raw_google_ads_campaigns_campaign_id.sql [  0.00s]
+11:08:36.010798 [debug]: Finished parsing target\generic_tests\not_null_src_inventory_snapshots_snapshot_id.sql [  0.00s]
+11:08:36.011355 [debug]: Finished parsing target\generic_tests\not_null_core_new_vs_returning_order_id.sql [  0.00s]
+11:08:36.011501 [debug]: Finished parsing target\generic_tests\unique_core_refunds_refund_id.sql [  0.00s]
+11:08:36.013532 [debug]: Finished parsing target\generic_tests\not_null_src_mobile_events_event_at.sql [  0.00s]
+11:08:36.013625 [debug]: Finished parsing target\generic_tests\not_null_src_stripe_refunds_refund_id.sql [  0.00s]
+11:08:36.013731 [debug]: Finished parsing target\generic_tests\unique_analytics_email_performance_campaign_id.sql [  0.00s]
+11:08:36.013831 [debug]: Finished parsing target\generic_tests\not_null_src_salesforce_opportunities_opportunity_id.sql [  0.00s]
+11:08:36.014554 [debug]: Finished parsing target\generic_tests\unique_raw_salesforce_opportunities_opportunity_id.sql [  0.00s]
+11:08:36.014625 [debug]: Finished parsing target\generic_tests\not_null_raw_shopify_product_variants_variant_id.sql [  0.00s]
+11:08:36.014633 [debug]: Finished parsing target\generic_tests\unique_core_opportunities_opportunity_id.sql [  0.00s]
+11:08:36.014692 [debug]: Finished parsing target\generic_tests\not_null_src_shopify_product_variants_variant_id.sql [  0.00s]
+11:08:36.014811 [debug]: Finished parsing target\generic_tests\not_null_raw_google_ads_campaigns_campaign_id.sql [  0.00s]
+11:08:36.015504 [debug]: Finished parsing target\generic_tests\not_null_analytics_email_performance_campaign_id.sql [  0.00s]
+11:08:36.015508 [debug]: Finished parsing target\generic_tests\not_null_core_refunds_refund_id.sql [  0.00s]
+11:08:36.015819 [debug]: Finished parsing target\generic_tests\unique_raw_web_sessions_session_id.sql [  0.01s]
+11:08:36.016287 [debug]: Finished parsing target\generic_tests\unique_src_stripe_subscriptions_subscription_id.sql [  0.00s]
+11:08:36.016606 [debug]: Finished parsing target\generic_tests\unique_src_mobile_events_event_id.sql [  0.00s]
+11:08:36.016785 [debug]: Finished parsing target\generic_tests\not_null_src_shopify_customers_customer_email.sql [  0.00s]
+11:08:36.016810 [debug]: Finished parsing target\generic_tests\not_null_core_opportunities_opportunity_id.sql [  0.00s]
+11:08:36.016868 [debug]: Finished parsing target\generic_tests\unique_core_revenue_daily_revenue_date.sql [  0.00s]
+11:08:36.016881 [debug]: Finished parsing target\generic_tests\unique_raw_inventory_snapshots_snapshot_id.sql [  0.00s]
+11:08:36.016902 [debug]: Finished parsing target\generic_tests\unique_analytics_finance_monthly_report_month.sql [  0.00s]
+11:08:36.017522 [debug]: Finished parsing target\generic_tests\not_null_raw_salesforce_opportunities_opportunity_id.sql [  0.00s]
+11:08:36.017817 [debug]: Finished parsing target\generic_tests\unique_raw_shopify_products_product_id.sql [  0.00s]
+11:08:36.017871 [debug]: Finished parsing target\generic_tests\unique_src_shopify_products_product_id.sql [  0.00s]
+11:08:36.017890 [debug]: Finished parsing target\generic_tests\not_null_raw_web_sessions_session_id.sql [  0.00s]
+11:08:36.018125 [debug]: Finished parsing target\generic_tests\not_null_src_stripe_subscriptions_subscription_id.sql [  0.00s]
+11:08:36.018243 [debug]: Finished parsing target\generic_tests\not_null_analytics_finance_monthly_report_month.sql [  0.00s]
+11:08:36.018481 [debug]: Finished parsing target\generic_tests\unique_src_shopify_customers_customer_id.sql [  0.00s]
+11:08:36.018455 [debug]: Finished parsing target\generic_tests\not_null_raw_inventory_snapshots_snapshot_id.sql [  0.00s]
+11:08:36.019028 [debug]: Finished parsing target\generic_tests\not_null_core_orders_customer_id.sql [  0.00s]
+11:08:36.019152 [debug]: Finished parsing target\generic_tests\not_null_raw_shopify_products_product_id.sql [  0.00s]
+11:08:36.019322 [debug]: Finished parsing target\generic_tests\unique_raw_shopify_customers_customer_id.sql [  0.00s]
+11:08:36.019603 [debug]: Finished parsing target\generic_tests\not_null_core_revenue_daily_revenue_date.sql [  0.00s]
+11:08:36.019639 [debug]: Finished parsing target\generic_tests\not_null_src_shopify_products_product_id.sql [  0.00s]
+11:08:36.019625 [debug]: Finished parsing target\generic_tests\not_null_src_mobile_events_event_id.sql [  0.00s]
+11:08:36.019733 [debug]: Finished parsing target\generic_tests\not_null_src_shopify_customers_customer_id.sql [  0.00s]
+11:08:36.019818 [debug]: Finished parsing target\generic_tests\unique_src_web_sessions_session_id.sql [  0.00s]
+11:08:36.019945 [debug]: Finished parsing target\generic_tests\unique_src_email_campaigns_campaign_id.sql [  0.00s]
+11:08:36.021169 [debug]: Finished parsing target\generic_tests\not_null_raw_shopify_customers_customer_id.sql [  0.00s]
+11:08:36.021220 [debug]: Finished parsing target\generic_tests\unique_core_orders_order_id.sql [  0.00s]
+11:08:36.021231 [debug]: Finished parsing target\generic_tests\unique_core_revenue_monthly_revenue_month.sql [  0.00s]
+11:08:36.021244 [debug]: Finished parsing target\generic_tests\unique_src_shopify_order_items_line_item_id.sql [  0.00s]
+11:08:36.021262 [debug]: Finished parsing target\generic_tests\unique_raw_shopify_refunds_refund_id.sql [  0.00s]
+11:08:36.021338 [debug]: Finished parsing target\generic_tests\not_null_src_web_sessions_session_id.sql [  0.00s]
+11:08:36.021365 [debug]: Finished parsing target\generic_tests\not_null_src_email_campaigns_campaign_id.sql [  0.00s]
+11:08:36.022710 [debug]: Finished parsing target\generic_tests\not_null_core_revenue_monthly_revenue_month.sql [  0.00s]
+11:08:36.022754 [debug]: Finished parsing target\generic_tests\not_null_raw_shopify_refunds_refund_id.sql [  0.00s]
+11:08:36.023078 [debug]: Finished parsing target\generic_tests\not_null_analytics_product_performance_product_id.sql [  0.02s]
+11:08:36.024184 [debug]: Finished parsing target\generic_tests\unique_core_b2b_accounts_account_id.sql [  0.00s]
+11:08:36.025107 [debug]: Finished parsing target\generic_tests\not_null_core_b2b_accounts_account_id.sql [  0.00s]
+11:08:36.026255 [debug]: Finished parsing target\generic_tests\unique_core_customer_segments_customer_id.sql [  0.00s]
+11:08:36.027443 [debug]: Finished parsing target\generic_tests\not_null_core_customer_segments_customer_id.sql [  0.00s]
+11:08:36.028447 [debug]: Finished parsing target\generic_tests\unique_core_customers_customer_id.sql [  0.00s]
+11:08:36.030432 [debug]: Finished parsing target\generic_tests\not_null_core_customers_customer_id.sql [  0.00s]
+11:08:36.068609 [error]: dbt1005: Ref 'src_shopify_sellers' not found in project. Searched for 'shopmesh.src_shopify_sellers, src_shopify_sellers'
+  --> models\core\core_seller_metrics.sql:10:19
+11:08:36.068700 [error]: dbt1005: Source 'email_tool.campaigns' not found in project. Searched for 'campaigns'
+  --> models\raw\raw_email_campaigns.sql:5:19
+11:08:36.068727 [error]: dbt1005: Source 'email_tool.events' not found in project. Searched for 'events'
+  --> models\raw\raw_email_events.sql:5:19
+11:08:36.068796 [error]: dbt1005: Source 'legacy_erp.products_legacy' not found in project. Searched for 'products_legacy'
+  --> models\raw\raw_erp_products.sql:7:19
+11:08:36.068831 [error]: dbt1005: Source 'legacy_erp.warehouses_legacy' not found in project. Searched for 'warehouses_legacy'
+  --> models\raw\raw_erp_warehouses.sql:7:19
+11:08:36.068846 [error]: dbt1005: Source 'google_ads.campaigns' not found in project. Searched for 'campaigns'
+  --> models\raw\raw_google_ads_campaigns.sql:5:19
+11:08:36.068868 [error]: dbt1005: Source 'google_ads.ad_performance' not found in project. Searched for 'ad_performance'
+  --> models\raw\raw_google_ads_performance.sql:5:19
+11:08:36.068891 [error]: dbt1005: Source 'warehouse_ops.inventory_snapshots' not found in project. Searched for 'inventory_snapshots'
+  --> models\raw\raw_inventory_snapshots.sql:5:19
+11:08:36.068908 [error]: dbt1005: Source 'mobile_app.events' not found in project. Searched for 'events'
+  --> models\raw\raw_mobile_events.sql:5:19
+11:08:36.068929 [error]: dbt1005: Source 'mobile_app.sessions' not found in project. Searched for 'sessions'
+  --> models\raw\raw_mobile_sessions.sql:7:19
+11:08:36.068971 [error]: dbt1005: Source 'salesforce.accounts' not found in project. Searched for 'accounts'
+  --> models\raw\raw_salesforce_accounts.sql:5:19
+11:08:36.069085 [error]: dbt1005: Source 'salesforce.contacts' not found in project. Searched for 'contacts'
+  --> models\raw\raw_salesforce_contacts.sql:5:19
+11:08:36.069138 [error]: dbt1005: Source 'salesforce.opportunities' not found in project. Searched for 'opportunities'
+  --> models\raw\raw_salesforce_opportunities.sql:5:19
+11:08:36.069162 [error]: dbt1005: Source 'shopify.customers' not found in project. Searched for 'customers'
+  --> models\raw\raw_shopify_customers.sql:5:19
+11:08:36.069202 [error]: dbt1005: Source 'shopify.gift_cards' not found in project. Searched for 'gift_cards'
+  --> models\raw\raw_shopify_gift_cards.sql:7:19
+11:08:36.069230 [error]: dbt1005: Source 'shopify.order_line_items' not found in project. Searched for 'order_line_items'
+  --> models\raw\raw_shopify_order_items.sql:5:19
+11:08:36.069256 [error]: dbt1005: Source 'shopify.orders' not found in project. Searched for 'orders'
+  --> models\raw\raw_shopify_orders.sql:5:19
+11:08:36.069281 [error]: dbt1005: Source 'shopify.product_variants' not found in project. Searched for 'product_variants'
+  --> models\raw\raw_shopify_product_variants.sql:5:19
+11:08:36.069301 [error]: dbt1005: Source 'shopify.products' not found in project. Searched for 'products'
+  --> models\raw\raw_shopify_products.sql:5:19
+11:08:36.069326 [error]: dbt1005: Source 'shopify.refunds' not found in project. Searched for 'refunds'
+  --> models\raw\raw_shopify_refunds.sql:5:19
+11:08:36.069370 [error]: dbt1005: Source 'stripe.payments' not found in project. Searched for 'payments'
+  --> models\raw\raw_stripe_payments.sql:5:19
+11:08:36.069429 [error]: dbt1005: Source 'stripe.refunds' not found in project. Searched for 'refunds'
+  --> models\raw\raw_stripe_refunds.sql:5:19
+11:08:36.069482 [error]: dbt1005: Source 'stripe.subscriptions' not found in project. Searched for 'subscriptions'
+  --> models\raw\raw_stripe_subscriptions.sql:5:19
+11:08:36.069514 [error]: dbt1005: Source 'web_analytics.sessions' not found in project. Searched for 'sessions'
+  --> models\raw\raw_web_sessions.sql:5:19
+11:08:36.080228 [info ]: Cached model count updated: 98 models (estimate)
+11:08:36.080282 [info ]: Cached model count updated: 98 models (accurate)
+11:08:36.080797 [info ]: Started scheduling
+11:08:36.083271 [info ]: Finished scheduling [  0.00s]
+11:08:36.083390 [info ]: Started scheduling
+11:08:36.085074 [info ]: Finished scheduling [  0.00s]
+11:08:36.087297 [info ]: Started deferring state
+11:08:36.087363 [info ]: Finished deferring state [  0.00s]
+11:08:36.090809 [info ]: Started downloading schemas
+11:08:36.091147 [debug]:    Started downloading relations
+11:08:36.091271 [debug]:   Finished [  0.00s] downloading relations
+11:08:36.091316 [info ]: Finished downloading schemas [  0.00s]
+11:08:36.389485 [info ]: Started building task graph
+11:08:36.390971 [info ]: Finished building task graph [  0.00s]
+11:08:36.391591 [info ]: Started rendering (102 nodes)
+11:08:36.391638 [info ]: Started seed seeds.product_categories
+11:08:36.391681 [debug]: Started rendering seed seeds.product_categories
+11:08:36.391720 [info ]: Started seed seeds.market_regions
+11:08:36.391730 [debug]: Started rendering seed seeds.market_regions
+11:08:36.391737 [info ]: Started seed seeds.currency_rates
+11:08:36.391741 [debug]: Started rendering seed seeds.currency_rates
+11:08:36.391753 [info ]: Started model raw.raw_shopify_refunds
+11:08:36.391760 [debug]: Started rendering model raw.raw_shopify_refunds
+11:08:36.391768 [info ]: Started model raw.raw_shopify_gift_cards
+11:08:36.391773 [debug]: Started rendering model raw.raw_shopify_gift_cards
+11:08:36.391780 [info ]: Started model raw.raw_mobile_sessions
+11:08:36.391784 [debug]: Started rendering model raw.raw_mobile_sessions
+11:08:36.391790 [info ]: Started model raw.raw_erp_warehouses
+11:08:36.391798 [debug]: Started rendering model raw.raw_erp_warehouses
+11:08:36.391804 [info ]: Started model raw.raw_erp_products
+11:08:36.391808 [debug]: Started rendering model raw.raw_erp_products
+11:08:36.391815 [info ]: Started model raw.raw_shopify_products
+11:08:36.391819 [debug]: Started rendering model raw.raw_shopify_products
+11:08:36.391829 [info ]: Started model raw.raw_shopify_product_variants
+11:08:36.391832 [debug]: Started rendering model raw.raw_shopify_product_variants
+11:08:36.391840 [info ]: Started model raw.raw_inventory_snapshots
+11:08:36.391843 [debug]: Started rendering model raw.raw_inventory_snapshots
+11:08:36.391849 [info ]: Started model raw.raw_stripe_refunds
+11:08:36.391852 [debug]: Started rendering model raw.raw_stripe_refunds
+11:08:36.391863 [info ]: Started seed seeds.plan_definitions
+11:08:36.391866 [debug]: Started rendering seed seeds.plan_definitions
+11:08:36.391881 [info ]: Started model raw.raw_email_events
+11:08:36.391884 [debug]: Started rendering model raw.raw_email_events
+11:08:36.391891 [info ]: Started model raw.raw_email_campaigns
+11:08:36.391900 [debug]: Started rendering model raw.raw_email_campaigns
+11:08:36.391910 [info ]: Started model raw.raw_mobile_events
+11:08:36.391915 [debug]: Started rendering model raw.raw_mobile_events
+11:08:36.391921 [info ]: Started model raw.raw_web_sessions
+11:08:36.391924 [debug]: Started rendering model raw.raw_web_sessions
+11:08:36.391932 [info ]: Started model raw.raw_google_ads_performance
+11:08:36.391936 [debug]: Started rendering model raw.raw_google_ads_performance
+11:08:36.391942 [info ]: Started model raw.raw_google_ads_campaigns
+11:08:36.391946 [debug]: Started rendering model raw.raw_google_ads_campaigns
+11:08:36.391952 [info ]: Started model raw.raw_salesforce_opportunities
+11:08:36.391956 [debug]: Started rendering model raw.raw_salesforce_opportunities
+11:08:36.391962 [info ]: Started model raw.raw_salesforce_contacts
+11:08:36.391965 [debug]: Started rendering model raw.raw_salesforce_contacts
+11:08:36.391980 [info ]: Started model raw.raw_salesforce_accounts
+11:08:36.391985 [debug]: Started rendering model raw.raw_salesforce_accounts
+11:08:36.391990 [info ]: Started model raw.raw_stripe_subscriptions
+11:08:36.391995 [debug]: Started rendering model raw.raw_stripe_subscriptions
+11:08:36.392002 [info ]: Started model raw.raw_shopify_customers
+11:08:36.392006 [debug]: Started rendering model raw.raw_shopify_customers
+11:08:36.392135 [info ]: Finished parsing [  1.15s]
+11:08:36.392012 [info ]: Started model raw.raw_stripe_payments
+11:08:36.392457 [debug]: Started rendering model raw.raw_stripe_payments
+11:08:36.392566 [info ]: Started model raw.raw_shopify_orders
+11:08:36.392588 [debug]: Started rendering model raw.raw_shopify_orders
+11:08:36.392602 [info ]: Started model raw.raw_shopify_order_items
+11:08:36.395185 [debug]: Started rendering model raw.raw_shopify_order_items
+11:08:36.395753 [error]: dbt1501: Failed to render SQL not a key type: Source not found for source name: mobile_app, table name: events
+(in models\raw\raw_mobile_events.sql:5:19)
+  --> models\raw\raw_mobile_events.sql:5:19
+11:08:36.396286 [debug]: Finished rendering [  0.00s] model raw.raw_mobile_events [error]
+11:08:36.396710 [info ]: Started analyzing (102 nodes)
+11:08:36.396831 [debug]: Started analyzing model raw.raw_mobile_events
+11:08:36.396974 [info ]:     Failed [  0.00s] model raw.raw_mobile_events (view)
+11:08:36.397094 [debug]: Finished analyzing [  0.00s] model raw.raw_mobile_events [skipped]
+11:08:36.397135 [info ]: Started model source.src_mobile_events
+11:08:36.397155 [debug]: Started rendering model source.src_mobile_events
+11:08:36.397204 [debug]: Finished rendering [  0.00s] model source.src_mobile_events [skipped]
+11:08:36.397242 [debug]: Started analyzing model source.src_mobile_events
+11:08:36.397265 [info ]:    Skipped [-------] model source.src_mobile_events (view)
+11:08:36.397291 [debug]: Finished analyzing [  0.00s] model source.src_mobile_events [skipped]
+11:08:36.397315 [info ]: Started model core.core_mobile_engagement
+11:08:36.397332 [debug]: Started rendering model core.core_mobile_engagement
+11:08:36.397348 [debug]: Finished rendering [  0.00s] model core.core_mobile_engagement [skipped]
+11:08:36.397361 [debug]: Started analyzing model core.core_mobile_engagement
+11:08:36.397394 [info ]:    Skipped [-------] model core.core_mobile_engagement (table)
+11:08:36.397411 [debug]: Finished analyzing [  0.00s] model core.core_mobile_engagement [skipped]
+11:08:36.397434 [info ]: Started model analytics.analytics_mobile_engagement
+11:08:36.397450 [debug]: Started rendering model analytics.analytics_mobile_engagement
+11:08:36.397469 [debug]: Finished rendering [  0.00s] model analytics.analytics_mobile_engagement [skipped]
+11:08:36.397484 [debug]: Started analyzing model analytics.analytics_mobile_engagement
+11:08:36.397503 [info ]:    Skipped [-------] model analytics.analytics_mobile_engagement (table)
+11:08:36.397522 [debug]: Finished analyzing [  0.00s] model analytics.analytics_mobile_engagement [skipped]
+11:08:36.397600 [error]: dbt1501: Failed to render SQL not a key type: Source not found for source name: legacy_erp, table name: products_legacy
+(in models\raw\raw_erp_products.sql:7:19)
+  --> models\raw\raw_erp_products.sql:7:19
+11:08:36.397675 [debug]: Started analyzing model raw.raw_erp_products
+11:08:36.397724 [debug]: Finished rendering [  0.01s] model raw.raw_erp_products [error]
+11:08:36.397723 [info ]:     Failed [  0.01s] model raw.raw_erp_products (view)
+11:08:36.397767 [debug]: Finished analyzing [  0.00s] model raw.raw_erp_products [skipped]
+11:08:36.397798 [info ]: Started model source.src_erp_products
+11:08:36.397824 [debug]: Started rendering model source.src_erp_products
+11:08:36.397847 [debug]: Finished rendering [  0.00s] model source.src_erp_products [skipped]
+11:08:36.397875 [debug]: Started analyzing model source.src_erp_products
+11:08:36.397895 [info ]:    Skipped [-------] model source.src_erp_products (view)
+11:08:36.397914 [debug]: Finished analyzing [  0.00s] model source.src_erp_products [skipped]
+11:08:36.397933 [info ]: Started model core.core_inventory_legacy
+11:08:36.397945 [debug]: Started rendering model core.core_inventory_legacy
+11:08:36.397980 [debug]: Finished rendering [  0.00s] model core.core_inventory_legacy [skipped]
+11:08:36.398000 [debug]: Started analyzing model core.core_inventory_legacy
+11:08:36.398016 [info ]:    Skipped [-------] model core.core_inventory_legacy (table)
+11:08:36.398032 [debug]: Finished analyzing [  0.00s] model core.core_inventory_legacy [skipped]
+11:08:36.398055 [info ]: Started model analytics.analytics_inventory_legacy
+11:08:36.398069 [debug]: Started rendering model analytics.analytics_inventory_legacy
+11:08:36.398085 [debug]: Finished rendering [  0.00s] model analytics.analytics_inventory_legacy [skipped]
+11:08:36.398102 [debug]: Started analyzing model analytics.analytics_inventory_legacy
+11:08:36.398117 [info ]:    Skipped [-------] model analytics.analytics_inventory_legacy (table)
+11:08:36.398144 [debug]: Finished analyzing [  0.00s] model analytics.analytics_inventory_legacy [skipped]
+11:08:36.398212 [error]: dbt1501: Failed to render SQL not a key type: Source not found for source name: legacy_erp, table name: warehouses_legacy
+(in models\raw\raw_erp_warehouses.sql:7:19)
+  --> models\raw\raw_erp_warehouses.sql:7:19
+11:08:36.398289 [debug]: Started analyzing model raw.raw_erp_warehouses
+11:08:36.398315 [debug]: Finished rendering [  0.01s] model raw.raw_erp_warehouses [error]
+11:08:36.398320 [info ]:     Failed [  0.01s] model raw.raw_erp_warehouses (view)
+11:08:36.398343 [debug]: Finished analyzing [  0.00s] model raw.raw_erp_warehouses [skipped]
+11:08:36.398364 [info ]: Started model source.src_erp_warehouses
+11:08:36.398384 [debug]: Started rendering model source.src_erp_warehouses
+11:08:36.398403 [debug]: Finished rendering [  0.00s] model source.src_erp_warehouses [skipped]
+11:08:36.398421 [debug]: Started analyzing model source.src_erp_warehouses
+11:08:36.398446 [info ]:    Skipped [-------] model source.src_erp_warehouses (view)
+11:08:36.398462 [debug]: Finished analyzing [  0.00s] model source.src_erp_warehouses [skipped]
+11:08:36.398507 [error]: dbt1501: Failed to render SQL not a key type: Source not found for source name: shopify, table name: refunds
+(in models\raw\raw_shopify_refunds.sql:5:19)
+  --> models\raw\raw_shopify_refunds.sql:5:19
+11:08:36.398560 [debug]: Started analyzing model raw.raw_shopify_refunds
+11:08:36.398580 [debug]: Finished rendering [  0.01s] model raw.raw_shopify_refunds [error]
+11:08:36.398582 [info ]:     Failed [  0.01s] model raw.raw_shopify_refunds (view)
+11:08:36.398603 [debug]: Finished analyzing [  0.00s] model raw.raw_shopify_refunds [skipped]
+11:08:36.398621 [info ]: Started model source.src_shopify_refunds
+11:08:36.398646 [debug]: Started rendering model source.src_shopify_refunds
+11:08:36.398665 [debug]: Finished rendering [  0.00s] model source.src_shopify_refunds [skipped]
+11:08:36.398683 [debug]: Started analyzing model source.src_shopify_refunds
+11:08:36.398702 [info ]:    Skipped [-------] model source.src_shopify_refunds (view)
+11:08:36.398728 [debug]: Finished analyzing [  0.00s] model source.src_shopify_refunds [skipped]
+11:08:36.398777 [error]: dbt1501: Failed to render SQL not a key type: Source not found for source name: mobile_app, table name: sessions
+(in models\raw\raw_mobile_sessions.sql:7:19)
+  --> models\raw\raw_mobile_sessions.sql:7:19
+11:08:36.398828 [debug]: Started analyzing model raw.raw_mobile_sessions
+11:08:36.398859 [info ]:     Failed [  0.01s] model raw.raw_mobile_sessions (view)
+11:08:36.398884 [debug]: Finished analyzing [  0.00s] model raw.raw_mobile_sessions [skipped]
+11:08:36.398938 [error]: dbt1501: Failed to render SQL not a key type: Source not found for source name: shopify, table name: products
+(in models\raw\raw_shopify_products.sql:5:19)
+  --> models\raw\raw_shopify_products.sql:5:19
+11:08:36.398995 [debug]: Finished rendering [  0.01s] model raw.raw_mobile_sessions [error]
+11:08:36.399032 [debug]: Started analyzing model raw.raw_shopify_products
+11:08:36.399055 [info ]:     Failed [  0.01s] model raw.raw_shopify_products (view)
+11:08:36.399067 [debug]: Finished rendering [  0.01s] model raw.raw_shopify_products [error]
+11:08:36.399083 [debug]: Finished analyzing [  0.00s] model raw.raw_shopify_products [skipped]
+11:08:36.399109 [info ]: Started model source.src_shopify_products
+11:08:36.399124 [debug]: Started rendering model source.src_shopify_products
+11:08:36.399148 [debug]: Finished rendering [  0.00s] model source.src_shopify_products [skipped]
+11:08:36.399163 [debug]: Started analyzing model source.src_shopify_products
+11:08:36.399180 [info ]:    Skipped [-------] model source.src_shopify_products (view)
+11:08:36.399195 [debug]: Finished analyzing [  0.00s] model source.src_shopify_products [skipped]
+11:08:36.399236 [error]: dbt1501: Failed to render SQL not a key type: Source not found for source name: shopify, table name: gift_cards
+(in models\raw\raw_shopify_gift_cards.sql:7:19)
+  --> models\raw\raw_shopify_gift_cards.sql:7:19
+11:08:36.399286 [debug]: Started analyzing model raw.raw_shopify_gift_cards
+11:08:36.399311 [info ]:     Failed [  0.01s] model raw.raw_shopify_gift_cards (view)
+11:08:36.399308 [debug]: Finished rendering [  0.01s] model raw.raw_shopify_gift_cards [error]
+11:08:36.399332 [debug]: Finished analyzing [  0.00s] model raw.raw_shopify_gift_cards [skipped]
+11:08:36.399351 [info ]: Started model source.src_shopify_gift_cards_v2
+11:08:36.399370 [debug]: Started rendering model source.src_shopify_gift_cards_v2
+11:08:36.399387 [debug]: Finished rendering [  0.00s] model source.src_shopify_gift_cards_v2 [skipped]
+11:08:36.399399 [debug]: Started analyzing model source.src_shopify_gift_cards_v2
+11:08:36.399418 [info ]:    Skipped [-------] model source.src_shopify_gift_cards_v2 (view)
+11:08:36.399433 [debug]: Finished analyzing [  0.00s] model source.src_shopify_gift_cards_v2 [skipped]
+11:08:36.399470 [error]: dbt1501: Failed to render SQL not a key type: Source not found for source name: stripe, table name: refunds
+(in models\raw\raw_stripe_refunds.sql:5:19)
+  --> models\raw\raw_stripe_refunds.sql:5:19
+11:08:36.399540 [debug]: Started analyzing model raw.raw_stripe_refunds
+11:08:36.399566 [info ]:     Failed [  0.01s] model raw.raw_stripe_refunds (view)
+11:08:36.399568 [debug]: Finished rendering [  0.01s] model raw.raw_stripe_refunds [error]
+11:08:36.399586 [debug]: Finished analyzing [  0.00s] model raw.raw_stripe_refunds [skipped]
+11:08:36.399605 [info ]: Started model source.src_stripe_refunds
+11:08:36.399619 [debug]: Started rendering model source.src_stripe_refunds
+11:08:36.399633 [debug]: Finished rendering [  0.00s] model source.src_stripe_refunds [skipped]
+11:08:36.399645 [debug]: Started analyzing model source.src_stripe_refunds
+11:08:36.399659 [info ]:    Skipped [-------] model source.src_stripe_refunds (view)
+11:08:36.399680 [debug]: Finished analyzing [  0.00s] model source.src_stripe_refunds [skipped]
+11:08:36.399723 [error]: dbt1501: Failed to render SQL not a key type: Source not found for source name: warehouse_ops, table name: inventory_snapshots
+(in models\raw\raw_inventory_snapshots.sql:5:19)
+  --> models\raw\raw_inventory_snapshots.sql:5:19
+11:08:36.399795 [debug]: Started analyzing model raw.raw_inventory_snapshots
+11:08:36.399818 [info ]:     Failed [  0.01s] model raw.raw_inventory_snapshots (view)
+11:08:36.399819 [debug]: Finished rendering [  0.01s] model raw.raw_inventory_snapshots [error]
+11:08:36.399839 [debug]: Finished analyzing [  0.00s] model raw.raw_inventory_snapshots [skipped]
+11:08:36.399858 [info ]: Started model source.src_inventory_snapshots
+11:08:36.399879 [debug]: Started rendering model source.src_inventory_snapshots
+11:08:36.399896 [debug]: Finished rendering [  0.00s] model source.src_inventory_snapshots [skipped]
+11:08:36.399913 [debug]: Started analyzing model source.src_inventory_snapshots
+11:08:36.399974 [info ]:    Skipped [-------] model source.src_inventory_snapshots (view)
+11:08:36.400014 [debug]: Finished analyzing [  0.00s] model source.src_inventory_snapshots [skipped]
+11:08:36.400069 [error]: dbt1501: Failed to render SQL not a key type: Source not found for source name: email_tool, table name: events
+(in models\raw\raw_email_events.sql:5:19)
+  --> models\raw\raw_email_events.sql:5:19
+11:08:36.400217 [debug]: Started analyzing model raw.raw_email_events
+11:08:36.400230 [debug]: Finished rendering [  0.01s] model raw.raw_email_events [error]
+11:08:36.400257 [info ]:     Failed [  0.01s] model raw.raw_email_events (view)
+11:08:36.400284 [debug]: Finished analyzing [  0.00s] model raw.raw_email_events [skipped]
+11:08:36.400318 [info ]: Started model source.src_email_events
+11:08:36.400342 [debug]: Started rendering model source.src_email_events
+11:08:36.400360 [debug]: Finished rendering [  0.00s] model source.src_email_events [skipped]
+11:08:36.400383 [debug]: Started analyzing model source.src_email_events
+11:08:36.400398 [info ]:    Skipped [-------] model source.src_email_events (view)
+11:08:36.400419 [debug]: Finished analyzing [  0.00s] model source.src_email_events [skipped]
+11:08:36.400469 [error]: dbt1501: Failed to render SQL not a key type: Source not found for source name: email_tool, table name: campaigns
+(in models\raw\raw_email_campaigns.sql:5:19)
+  --> models\raw\raw_email_campaigns.sql:5:19
+11:08:36.400535 [debug]: Started analyzing model raw.raw_email_campaigns
+11:08:36.400561 [info ]:     Failed [  0.01s] model raw.raw_email_campaigns (view)
+11:08:36.400574 [debug]: Finished rendering [  0.01s] model raw.raw_email_campaigns [error]
+11:08:36.400579 [debug]: Finished analyzing [  0.00s] model raw.raw_email_campaigns [skipped]
+11:08:36.400599 [info ]: Started model source.src_email_campaigns
+11:08:36.400611 [debug]: Started rendering model source.src_email_campaigns
+11:08:36.400627 [debug]: Finished rendering [  0.00s] model source.src_email_campaigns [skipped]
+11:08:36.400649 [debug]: Started analyzing model source.src_email_campaigns
+11:08:36.400663 [info ]:    Skipped [-------] model source.src_email_campaigns (view)
+11:08:36.400679 [debug]: Finished analyzing [  0.00s] model source.src_email_campaigns [skipped]
+11:08:36.400696 [info ]: Started model core.core_email_performance
+11:08:36.400713 [debug]: Started rendering model core.core_email_performance
+11:08:36.400727 [debug]: Finished rendering [  0.00s] model core.core_email_performance [skipped]
+11:08:36.400743 [debug]: Started analyzing model core.core_email_performance
+11:08:36.400763 [info ]:    Skipped [-------] model core.core_email_performance (table)
+11:08:36.400779 [debug]: Finished analyzing [  0.00s] model core.core_email_performance [skipped]
+11:08:36.400797 [info ]: Started model analytics.analytics_email_performance
+11:08:36.400815 [debug]: Started rendering model analytics.analytics_email_performance
+11:08:36.400830 [debug]: Finished rendering [  0.00s] model analytics.analytics_email_performance [skipped]
+11:08:36.400848 [debug]: Started analyzing model analytics.analytics_email_performance
+11:08:36.400862 [info ]:    Skipped [-------] model analytics.analytics_email_performance (table)
+11:08:36.400885 [debug]: Finished analyzing [  0.00s] model analytics.analytics_email_performance [skipped]
+11:08:36.400931 [error]: dbt1501: Failed to render SQL not a key type: Source not found for source name: shopify, table name: product_variants
+(in models\raw\raw_shopify_product_variants.sql:5:19)
+  --> models\raw\raw_shopify_product_variants.sql:5:19
+11:08:36.401004 [debug]: Started analyzing model raw.raw_shopify_product_variants
+11:08:36.401027 [info ]:     Failed [  0.01s] model raw.raw_shopify_product_variants (view)
+11:08:36.401049 [debug]: Finished analyzing [  0.00s] model raw.raw_shopify_product_variants [skipped]
+11:08:36.401043 [debug]: Finished rendering [  0.01s] model raw.raw_shopify_product_variants [error]
+11:08:36.401067 [info ]: Started model source.src_shopify_product_variants
+11:08:36.401078 [debug]: Started rendering model source.src_shopify_product_variants
+11:08:36.401094 [debug]: Finished rendering [  0.00s] model source.src_shopify_product_variants [skipped]
+11:08:36.401109 [debug]: Started analyzing model source.src_shopify_product_variants
+11:08:36.401122 [info ]:    Skipped [-------] model source.src_shopify_product_variants (view)
+11:08:36.401140 [debug]: Finished analyzing [  0.00s] model source.src_shopify_product_variants [skipped]
+11:08:36.401155 [info ]: Started model core.core_inventory_status
+11:08:36.401166 [debug]: Started rendering model core.core_inventory_status
+11:08:36.401187 [debug]: Finished rendering [  0.00s] model core.core_inventory_status [skipped]
+11:08:36.401202 [debug]: Started analyzing model core.core_inventory_status
+11:08:36.401221 [info ]:    Skipped [-------] model core.core_inventory_status (table)
+11:08:36.401237 [debug]: Finished analyzing [  0.00s] model core.core_inventory_status [skipped]
+11:08:36.401254 [info ]: Started model analytics.analytics_inventory_current
+11:08:36.401264 [debug]: Started rendering model analytics.analytics_inventory_current
+11:08:36.401278 [debug]: Finished rendering [  0.00s] model analytics.analytics_inventory_current [skipped]
+11:08:36.401292 [debug]: Started analyzing model analytics.analytics_inventory_current
+11:08:36.401305 [info ]:    Skipped [-------] model analytics.analytics_inventory_current (table)
+11:08:36.401322 [debug]: Finished analyzing [  0.00s] model analytics.analytics_inventory_current [skipped]
+11:08:36.401361 [error]: dbt1501: Failed to render SQL not a key type: Source not found for source name: salesforce, table name: contacts
+(in models\raw\raw_salesforce_contacts.sql:5:19)
+  --> models\raw\raw_salesforce_contacts.sql:5:19
+11:08:36.401424 [debug]: Started analyzing model raw.raw_salesforce_contacts
+11:08:36.401450 [info ]:     Failed [  0.01s] model raw.raw_salesforce_contacts (view)
+11:08:36.401452 [debug]: Finished rendering [  0.01s] model raw.raw_salesforce_contacts [error]
+11:08:36.401474 [debug]: Finished analyzing [  0.00s] model raw.raw_salesforce_contacts [skipped]
+11:08:36.401492 [info ]: Started model source.src_salesforce_contacts
+11:08:36.401509 [debug]: Started rendering model source.src_salesforce_contacts
+11:08:36.401526 [debug]: Finished rendering [  0.00s] model source.src_salesforce_contacts [skipped]
+11:08:36.401539 [debug]: Started analyzing model source.src_salesforce_contacts
+11:08:36.401560 [info ]:    Skipped [-------] model source.src_salesforce_contacts (view)
+11:08:36.401582 [debug]: Finished analyzing [  0.00s] model source.src_salesforce_contacts [skipped]
+11:08:36.401656 [error]: dbt1501: Failed to render SQL not a key type: Source not found for source name: salesforce, table name: opportunities
+(in models\raw\raw_salesforce_opportunities.sql:5:19)
+  --> models\raw\raw_salesforce_opportunities.sql:5:19
+11:08:36.401822 [debug]: Finished rendering [  0.01s] model raw.raw_salesforce_opportunities [error]
+11:08:36.401852 [debug]: Started analyzing model raw.raw_salesforce_opportunities
+11:08:36.401919 [info ]:     Failed [  0.01s] model raw.raw_salesforce_opportunities (view)
+11:08:36.401964 [debug]: Finished analyzing [  0.00s] model raw.raw_salesforce_opportunities [skipped]
+11:08:36.401996 [info ]: Started model source.src_salesforce_opportunities
+11:08:36.402020 [debug]: Started rendering model source.src_salesforce_opportunities
+11:08:36.402040 [debug]: Finished rendering [  0.00s] model source.src_salesforce_opportunities [skipped]
+11:08:36.402056 [debug]: Started analyzing model source.src_salesforce_opportunities
+11:08:36.402080 [info ]:    Skipped [-------] model source.src_salesforce_opportunities (view)
+11:08:36.402099 [debug]: Finished analyzing [  0.00s] model source.src_salesforce_opportunities [skipped]
+11:08:36.402154 [error]: dbt1501: Failed to render SQL not a key type: Source not found for source name: web_analytics, table name: sessions
+(in models\raw\raw_web_sessions.sql:5:19)
+  --> models\raw\raw_web_sessions.sql:5:19
+11:08:36.402252 [debug]: Started analyzing model raw.raw_web_sessions
+11:08:36.402279 [info ]:     Failed [  0.01s] model raw.raw_web_sessions (view)
+11:08:36.402299 [debug]: Finished analyzing [  0.00s] model raw.raw_web_sessions [skipped]
+11:08:36.402293 [debug]: Finished rendering [  0.01s] model raw.raw_web_sessions [error]
+11:08:36.402348 [info ]: Started model source.src_web_sessions
+11:08:36.402373 [debug]: Started rendering model source.src_web_sessions
+11:08:36.402395 [debug]: Finished rendering [  0.00s] model source.src_web_sessions [skipped]
+11:08:36.402422 [debug]: Started analyzing model source.src_web_sessions
+11:08:36.402440 [info ]:    Skipped [-------] model source.src_web_sessions (view)
+11:08:36.402467 [debug]: Finished analyzing [  0.00s] model source.src_web_sessions [skipped]
+11:08:36.402486 [info ]: Started model core.core_web_engagement
+11:08:36.402501 [debug]: Started rendering model core.core_web_engagement
+11:08:36.402518 [debug]: Finished rendering [  0.00s] model core.core_web_engagement [skipped]
+11:08:36.402539 [debug]: Started analyzing model core.core_web_engagement
+11:08:36.402561 [info ]:    Skipped [-------] model core.core_web_engagement (table)
+11:08:36.402584 [debug]: Finished analyzing [  0.00s] model core.core_web_engagement [skipped]
+11:08:36.402601 [info ]: Started model analytics.analytics_web_traffic
+11:08:36.402618 [debug]: Started rendering model analytics.analytics_web_traffic
+11:08:36.402634 [debug]: Finished rendering [  0.00s] model analytics.analytics_web_traffic [skipped]
+11:08:36.402655 [debug]: Started analyzing model analytics.analytics_web_traffic
+11:08:36.402672 [info ]:    Skipped [-------] model analytics.analytics_web_traffic (table)
+11:08:36.402695 [debug]: Finished analyzing [  0.00s] model analytics.analytics_web_traffic [skipped]
+11:08:36.402747 [error]: dbt1501: Failed to render SQL not a key type: Source not found for source name: salesforce, table name: accounts
+(in models\raw\raw_salesforce_accounts.sql:5:19)
+  --> models\raw\raw_salesforce_accounts.sql:5:19
+11:08:36.402826 [debug]: Started analyzing model raw.raw_salesforce_accounts
+11:08:36.402853 [info ]:     Failed [  0.01s] model raw.raw_salesforce_accounts (view)
+11:08:36.402850 [debug]: Finished rendering [  0.01s] model raw.raw_salesforce_accounts [error]
+11:08:36.402876 [debug]: Finished analyzing [  0.00s] model raw.raw_salesforce_accounts [skipped]
+11:08:36.402894 [info ]: Started model source.src_salesforce_accounts
+11:08:36.402942 [debug]: Started rendering model source.src_salesforce_accounts
+11:08:36.402966 [debug]: Finished rendering [  0.00s] model source.src_salesforce_accounts [skipped]
+11:08:36.403023 [debug]: Started analyzing model source.src_salesforce_accounts
+11:08:36.403045 [info ]:    Skipped [-------] model source.src_salesforce_accounts (view)
+11:08:36.403067 [debug]: Finished analyzing [  0.00s] model source.src_salesforce_accounts [skipped]
+11:08:36.403086 [info ]: Started model core.core_opportunities
+11:08:36.403101 [debug]: Started rendering model core.core_opportunities
+11:08:36.403117 [debug]: Finished rendering [  0.00s] model core.core_opportunities [skipped]
+11:08:36.403132 [debug]: Started analyzing model core.core_opportunities
+11:08:36.403154 [info ]:    Skipped [-------] model core.core_opportunities (table)
+11:08:36.403175 [debug]: Finished analyzing [  0.00s] model core.core_opportunities [skipped]
+11:08:36.403224 [error]: dbt1501: Failed to render SQL not a key type: Source not found for source name: stripe, table name: subscriptions
+(in models\raw\raw_stripe_subscriptions.sql:5:19)
+  --> models\raw\raw_stripe_subscriptions.sql:5:19
+11:08:36.403453 [debug]: Started analyzing model raw.raw_stripe_subscriptions
+11:08:36.403480 [debug]: Finished rendering [  0.01s] model raw.raw_stripe_subscriptions [error]
+11:08:36.403487 [info ]:     Failed [  0.01s] model raw.raw_stripe_subscriptions (view)
+11:08:36.403530 [debug]: Finished analyzing [  0.00s] model raw.raw_stripe_subscriptions [skipped]
+11:08:36.403554 [info ]: Started model source.src_stripe_subscriptions
+11:08:36.403566 [debug]: Started rendering model source.src_stripe_subscriptions
+11:08:36.403626 [debug]: Finished rendering [  0.00s] model source.src_stripe_subscriptions [skipped]
+11:08:36.403651 [debug]: Started analyzing model source.src_stripe_subscriptions
+11:08:36.403667 [info ]:    Skipped [-------] model source.src_stripe_subscriptions (view)
+11:08:36.403685 [debug]: Finished analyzing [  0.00s] model source.src_stripe_subscriptions [skipped]
+11:08:36.403703 [info ]: Started model source.src_subscription_events
+11:08:36.403714 [debug]: Started rendering model source.src_subscription_events
+11:08:36.403725 [debug]: Finished rendering [  0.00s] model source.src_subscription_events [skipped]
+11:08:36.403735 [debug]: Started analyzing model source.src_subscription_events
+11:08:36.403743 [info ]:    Skipped [-------] model source.src_subscription_events (view)
+11:08:36.403755 [debug]: Finished analyzing [  0.00s] model source.src_subscription_events [skipped]
+11:08:36.403769 [info ]: Started model core.core_revenue_monthly
+11:08:36.403777 [debug]: Started rendering model core.core_revenue_monthly
+11:08:36.403787 [debug]: Finished rendering [  0.00s] model core.core_revenue_monthly [skipped]
+11:08:36.403797 [debug]: Started analyzing model core.core_revenue_monthly
+11:08:36.403803 [info ]:    Skipped [-------] model core.core_revenue_monthly (table)
+11:08:36.403812 [debug]: Finished analyzing [  0.00s] model core.core_revenue_monthly [skipped]
+11:08:36.403821 [info ]: Started model analytics.analytics_subscription_mrr_trend
+11:08:36.403829 [debug]: Started rendering model analytics.analytics_subscription_mrr_trend
+11:08:36.403837 [debug]: Finished rendering [  0.00s] model analytics.analytics_subscription_mrr_trend [skipped]
+11:08:36.403845 [debug]: Started analyzing model analytics.analytics_subscription_mrr_trend
+11:08:36.403854 [info ]:    Skipped [-------] model analytics.analytics_subscription_mrr_trend (table)
+11:08:36.403866 [debug]: Finished analyzing [  0.00s] model analytics.analytics_subscription_mrr_trend [skipped]
+11:08:36.403909 [error]: dbt1501: Failed to render SQL not a key type: Source not found for source name: google_ads, table name: ad_performance
+(in models\raw\raw_google_ads_performance.sql:5:19)
+  --> models\raw\raw_google_ads_performance.sql:5:19
+11:08:36.403970 [debug]: Started analyzing model raw.raw_google_ads_performance
+11:08:36.403988 [info ]:     Failed [  0.01s] model raw.raw_google_ads_performance (view)
+11:08:36.404000 [debug]: Finished analyzing [  0.00s] model raw.raw_google_ads_performance [skipped]
+11:08:36.404011 [debug]: Finished rendering [  0.01s] model raw.raw_google_ads_performance [error]
+11:08:36.404031 [info ]: Started model source.src_google_ads_performance
+11:08:36.404069 [debug]: Started rendering model source.src_google_ads_performance
+11:08:36.404100 [debug]: Finished rendering [  0.00s] model source.src_google_ads_performance [skipped]
+11:08:36.404121 [debug]: Started analyzing model source.src_google_ads_performance
+11:08:36.404143 [info ]:    Skipped [-------] model source.src_google_ads_performance (view)
+11:08:36.404167 [debug]: Finished analyzing [  0.00s] model source.src_google_ads_performance [skipped]
+11:08:36.404218 [error]: dbt1501: Failed to render SQL not a key type: Source not found for source name: google_ads, table name: campaigns
+(in models\raw\raw_google_ads_campaigns.sql:5:19)
+  --> models\raw\raw_google_ads_campaigns.sql:5:19
+11:08:36.404292 [debug]: Started analyzing model raw.raw_google_ads_campaigns
+11:08:36.404315 [info ]:     Failed [  0.01s] model raw.raw_google_ads_campaigns (view)
+11:08:36.404327 [debug]: Finished rendering [  0.01s] model raw.raw_google_ads_campaigns [error]
+11:08:36.404337 [debug]: Finished analyzing [  0.00s] model raw.raw_google_ads_campaigns [skipped]
+11:08:36.404359 [info ]: Started model source.src_google_ads_campaigns
+11:08:36.404371 [debug]: Started rendering model source.src_google_ads_campaigns
+11:08:36.404384 [debug]: Finished rendering [  0.00s] model source.src_google_ads_campaigns [skipped]
+11:08:36.404399 [debug]: Started analyzing model source.src_google_ads_campaigns
+11:08:36.404415 [info ]:    Skipped [-------] model source.src_google_ads_campaigns (view)
+11:08:36.404430 [debug]: Finished analyzing [  0.00s] model source.src_google_ads_campaigns [skipped]
+11:08:36.404446 [info ]: Started model core.core_ad_performance
+11:08:36.404461 [debug]: Started rendering model core.core_ad_performance
+11:08:36.404474 [debug]: Finished rendering [  0.00s] model core.core_ad_performance [skipped]
+11:08:36.404488 [debug]: Started analyzing model core.core_ad_performance
+11:08:36.404551 [info ]:    Skipped [-------] model core.core_ad_performance (table)
+11:08:36.404586 [debug]: Finished analyzing [  0.00s] model core.core_ad_performance [skipped]
+11:08:36.404614 [info ]: Started model analytics.analytics_marketing_weekly
+11:08:36.404639 [debug]: Started rendering model analytics.analytics_marketing_weekly
+11:08:36.404662 [debug]: Finished rendering [  0.00s] model analytics.analytics_marketing_weekly [skipped]
+11:08:36.404687 [debug]: Started analyzing model analytics.analytics_marketing_weekly
+11:08:36.404703 [info ]:    Skipped [-------] model analytics.analytics_marketing_weekly (table)
+11:08:36.404728 [debug]: Finished analyzing [  0.00s] model analytics.analytics_marketing_weekly [skipped]
+11:08:36.404782 [error]: dbt1501: Failed to render SQL not a key type: Source not found for source name: stripe, table name: payments
+(in models\raw\raw_stripe_payments.sql:5:19)
+  --> models\raw\raw_stripe_payments.sql:5:19
+11:08:36.405057 [debug]: Finished rendering [  0.01s] model raw.raw_stripe_payments [error]
+11:08:36.405123 [debug]: Started analyzing model raw.raw_stripe_payments
+11:08:36.405152 [info ]:     Failed [  0.01s] model raw.raw_stripe_payments (view)
+11:08:36.405211 [debug]: Finished analyzing [  0.00s] model raw.raw_stripe_payments [skipped]
+11:08:36.405242 [info ]: Started model source.src_stripe_payments
+11:08:36.405260 [debug]: Started rendering model source.src_stripe_payments
+11:08:36.405277 [debug]: Finished rendering [  0.00s] model source.src_stripe_payments [skipped]
+11:08:36.405292 [debug]: Started analyzing model source.src_stripe_payments
+11:08:36.405310 [info ]:    Skipped [-------] model source.src_stripe_payments (view)
+11:08:36.405328 [debug]: Finished analyzing [  0.00s] model source.src_stripe_payments [skipped]
+11:08:36.405376 [error]: dbt1501: Failed to render SQL not a key type: Source not found for source name: shopify, table name: customers
+(in models\raw\raw_shopify_customers.sql:5:19)
+  --> models\raw\raw_shopify_customers.sql:5:19
+11:08:36.405530 [debug]: Finished rendering [  0.01s] model raw.raw_shopify_customers [error]
+11:08:36.405533 [debug]: Started analyzing model raw.raw_shopify_customers
+11:08:36.405576 [info ]:     Failed [  0.01s] model raw.raw_shopify_customers (view)
+11:08:36.405601 [debug]: Finished analyzing [  0.00s] model raw.raw_shopify_customers [skipped]
+11:08:36.405631 [info ]: Started model source.src_shopify_customers
+11:08:36.405645 [debug]: Started rendering model source.src_shopify_customers
+11:08:36.405667 [debug]: Finished rendering [  0.00s] model source.src_shopify_customers [skipped]
+11:08:36.405683 [debug]: Started analyzing model source.src_shopify_customers
+11:08:36.405702 [info ]:    Skipped [-------] model source.src_shopify_customers (view)
+11:08:36.405719 [debug]: Finished analyzing [  0.00s] model source.src_shopify_customers [skipped]
+11:08:36.405763 [error]: dbt1501: Failed to render SQL not a key type: Source not found for source name: shopify, table name: orders
+(in models\raw\raw_shopify_orders.sql:5:19)
+  --> models\raw\raw_shopify_orders.sql:5:19
+11:08:36.405994 [debug]: Finished rendering [  0.01s] model raw.raw_shopify_orders [error]
+11:08:36.406021 [debug]: Started analyzing model raw.raw_shopify_orders
+11:08:36.406044 [info ]:     Failed [  0.01s] model raw.raw_shopify_orders (view)
+11:08:36.406075 [debug]: Finished analyzing [  0.00s] model raw.raw_shopify_orders [skipped]
+11:08:36.406094 [info ]: Started model source.src_shopify_orders
+11:08:36.406106 [debug]: Started rendering model source.src_shopify_orders
+11:08:36.406122 [debug]: Finished rendering [  0.00s] model source.src_shopify_orders [skipped]
+11:08:36.406135 [debug]: Started analyzing model source.src_shopify_orders
+11:08:36.406151 [info ]:    Skipped [-------] model source.src_shopify_orders (view)
+11:08:36.406171 [debug]: Finished analyzing [  0.00s] model source.src_shopify_orders [skipped]
+11:08:36.406188 [info ]: Started model core.core_new_vs_returning
+11:08:36.406198 [debug]: Started rendering model core.core_new_vs_returning
+11:08:36.406212 [debug]: Finished rendering [  0.00s] model core.core_new_vs_returning [skipped]
+11:08:36.406229 [debug]: Started analyzing model core.core_new_vs_returning
+11:08:36.406242 [info ]:    Skipped [-------] model core.core_new_vs_returning (table)
+11:08:36.406257 [debug]: Finished analyzing [  0.00s] model core.core_new_vs_returning [skipped]
+11:08:36.406280 [info ]: Started model analytics.analytics_new_customer_acquisition
+11:08:36.406322 [debug]: Started rendering model analytics.analytics_new_customer_acquisition
+11:08:36.406345 [debug]: Finished rendering [  0.00s] model analytics.analytics_new_customer_acquisition [skipped]
+11:08:36.406360 [debug]: Started analyzing model analytics.analytics_new_customer_acquisition
+11:08:36.406408 [info ]:    Skipped [-------] model analytics.analytics_new_customer_acquisition (table)
+11:08:36.406429 [debug]: Finished analyzing [  0.00s] model analytics.analytics_new_customer_acquisition [skipped]
+11:08:36.406458 [info ]: Started model analytics.analytics_new_vs_returning
+11:08:36.406473 [debug]: Started rendering model analytics.analytics_new_vs_returning
+11:08:36.406487 [debug]: Finished rendering [  0.00s] model analytics.analytics_new_vs_returning [skipped]
+11:08:36.406499 [debug]: Started analyzing model analytics.analytics_new_vs_returning
+11:08:36.406510 [info ]:    Skipped [-------] model analytics.analytics_new_vs_returning (table)
+11:08:36.406526 [debug]: Finished analyzing [  0.00s] model analytics.analytics_new_vs_returning [skipped]
+11:08:36.406539 [info ]: Started model source.src_orders_v2
+11:08:36.406548 [debug]: Started rendering model source.src_orders_v2
+11:08:36.406560 [debug]: Finished rendering [  0.00s] model source.src_orders_v2 [skipped]
+11:08:36.406572 [debug]: Started analyzing model source.src_orders_v2
+11:08:36.406581 [info ]:    Skipped [-------] model source.src_orders_v2 (view)
+11:08:36.406596 [debug]: Finished analyzing [  0.00s] model source.src_orders_v2 [skipped]
+11:08:36.406641 [error]: dbt1501: Failed to render SQL not a key type: Source not found for source name: shopify, table name: order_line_items
+(in models\raw\raw_shopify_order_items.sql:5:19)
+  --> models\raw\raw_shopify_order_items.sql:5:19
+11:08:36.406899 [debug]: Started analyzing model raw.raw_shopify_order_items
+11:08:36.406927 [info ]:     Failed [  0.01s] model raw.raw_shopify_order_items (view)
+11:08:36.406947 [debug]: Finished analyzing [  0.00s] model raw.raw_shopify_order_items [skipped]
+11:08:36.406991 [debug]: Finished rendering [  0.01s] model raw.raw_shopify_order_items [error]
+11:08:36.407053 [info ]: Started model source.src_shopify_order_items
+11:08:36.407081 [debug]: Started rendering model source.src_shopify_order_items
+11:08:36.407101 [debug]: Finished rendering [  0.00s] model source.src_shopify_order_items [skipped]
+11:08:36.407124 [debug]: Started analyzing model source.src_shopify_order_items
+11:08:36.407138 [info ]:    Skipped [-------] model source.src_shopify_order_items (view)
+11:08:36.407160 [debug]: Finished analyzing [  0.00s] model source.src_shopify_order_items [skipped]
+11:08:36.407177 [info ]: Started model core.core_coupon_analysis
+11:08:36.407187 [debug]: Started rendering model core.core_coupon_analysis
+11:08:36.407202 [debug]: Finished rendering [  0.00s] model core.core_coupon_analysis [skipped]
+11:08:36.407214 [debug]: Started analyzing model core.core_coupon_analysis
+11:08:36.407231 [info ]:    Skipped [-------] model core.core_coupon_analysis (table)
+11:08:36.407244 [debug]: Finished analyzing [  0.00s] model core.core_coupon_analysis [skipped]
+11:08:36.407260 [info ]: Started model core.core_orders
+11:08:36.407275 [debug]: Started rendering model core.core_orders
+11:08:36.407286 [debug]: Finished rendering [  0.00s] model core.core_orders [skipped]
+11:08:36.407297 [debug]: Started analyzing model core.core_orders
+11:08:36.407314 [info ]:    Skipped [-------] model core.core_orders (table)
+11:08:36.407331 [debug]: Finished analyzing [  0.00s] model core.core_orders [skipped]
+11:08:36.407345 [info ]: Started model core.core_revenue_summary
+11:08:36.407354 [debug]: Started rendering model core.core_revenue_summary
+11:08:36.407365 [debug]: Finished rendering [  0.00s] model core.core_revenue_summary [skipped]
+11:08:36.407376 [debug]: Started analyzing model core.core_revenue_summary
+11:08:36.407393 [info ]:    Skipped [-------] model core.core_revenue_summary (table)
+11:08:36.407406 [debug]: Finished analyzing [  0.00s] model core.core_revenue_summary [skipped]
+11:08:36.407419 [info ]: Started model core.core_customers
+11:08:36.407433 [debug]: Started rendering model core.core_customers
+11:08:36.407445 [debug]: Finished rendering [  0.00s] model core.core_customers [skipped]
+11:08:36.407456 [debug]: Started analyzing model core.core_customers
+11:08:36.407473 [info ]:    Skipped [-------] model core.core_customers (table)
+11:08:36.407484 [debug]: Finished analyzing [  0.00s] model core.core_customers [skipped]
+11:08:36.407497 [info ]: Started model analytics.analytics_churn_risk
+11:08:36.407506 [debug]: Started rendering model analytics.analytics_churn_risk
+11:08:36.407517 [debug]: Finished rendering [  0.00s] model analytics.analytics_churn_risk [skipped]
+11:08:36.407528 [debug]: Started analyzing model analytics.analytics_churn_risk
+11:08:36.407539 [info ]:    Skipped [-------] model analytics.analytics_churn_risk (table)
+11:08:36.407551 [debug]: Finished analyzing [  0.00s] model analytics.analytics_churn_risk [skipped]
+11:08:36.407563 [info ]: Started model core.core_b2b_accounts
+11:08:36.407572 [debug]: Started rendering model core.core_b2b_accounts
+11:08:36.407583 [debug]: Finished rendering [  0.00s] model core.core_b2b_accounts [skipped]
+11:08:36.407593 [debug]: Started analyzing model core.core_b2b_accounts
+11:08:36.407610 [info ]:    Skipped [-------] model core.core_b2b_accounts (table)
+11:08:36.407622 [debug]: Finished analyzing [  0.00s] model core.core_b2b_accounts [skipped]
+11:08:36.407636 [info ]: Started model analytics.analytics_b2b_pipeline
+11:08:36.407651 [debug]: Started rendering model analytics.analytics_b2b_pipeline
+11:08:36.407663 [debug]: Finished rendering [  0.00s] model analytics.analytics_b2b_pipeline [skipped]
+11:08:36.407674 [debug]: Started analyzing model analytics.analytics_b2b_pipeline
+11:08:36.407690 [info ]:    Skipped [-------] model analytics.analytics_b2b_pipeline (table)
+11:08:36.407703 [debug]: Finished analyzing [  0.00s] model analytics.analytics_b2b_pipeline [skipped]
+11:08:36.407716 [info ]: Started model core.core_geographic_revenue
+11:08:36.407729 [debug]: Started rendering model core.core_geographic_revenue
+11:08:36.407741 [debug]: Finished rendering [  0.00s] model core.core_geographic_revenue [skipped]
+11:08:36.407752 [debug]: Started analyzing model core.core_geographic_revenue
+11:08:36.407768 [info ]:    Skipped [-------] model core.core_geographic_revenue (table)
+11:08:36.407781 [debug]: Finished analyzing [  0.00s] model core.core_geographic_revenue [skipped]
+11:08:36.407794 [info ]: Started model analytics.analytics_geographic_revenue
+11:08:36.407808 [debug]: Started rendering model analytics.analytics_geographic_revenue
+11:08:36.407820 [debug]: Finished rendering [  0.00s] model analytics.analytics_geographic_revenue [skipped]
+11:08:36.407833 [debug]: Started analyzing model analytics.analytics_geographic_revenue
+11:08:36.407846 [info ]:    Skipped [-------] model analytics.analytics_geographic_revenue (table)
+11:08:36.407859 [debug]: Finished analyzing [  0.00s] model analytics.analytics_geographic_revenue [skipped]
+11:08:36.407872 [info ]: Started model core.core_cohort_retention
+11:08:36.407886 [debug]: Started rendering model core.core_cohort_retention
+11:08:36.407898 [debug]: Finished rendering [  0.00s] model core.core_cohort_retention [skipped]
+11:08:36.407908 [debug]: Started analyzing model core.core_cohort_retention
+11:08:36.407920 [info ]:    Skipped [-------] model core.core_cohort_retention (table)
+11:08:36.407933 [debug]: Finished analyzing [  0.00s] model core.core_cohort_retention [skipped]
+11:08:36.407949 [info ]: Started model analytics.analytics_cohort_retention
+11:08:36.407964 [debug]: Started rendering model analytics.analytics_cohort_retention
+11:08:36.407977 [debug]: Finished rendering [  0.00s] model analytics.analytics_cohort_retention [skipped]
+11:08:36.407990 [debug]: Started analyzing model analytics.analytics_cohort_retention
+11:08:36.408007 [info ]:    Skipped [-------] model analytics.analytics_cohort_retention (table)
+11:08:36.408019 [debug]: Finished analyzing [  0.00s] model analytics.analytics_cohort_retention [skipped]
+11:08:36.408033 [info ]: Started model analytics.analytics_cac_analysis
+11:08:36.408047 [debug]: Started rendering model analytics.analytics_cac_analysis
+11:08:36.408059 [debug]: Finished rendering [  0.00s] model analytics.analytics_cac_analysis [skipped]
+11:08:36.408069 [debug]: Started analyzing model analytics.analytics_cac_analysis
+11:08:36.408081 [info ]:    Skipped [-------] model analytics.analytics_cac_analysis (table)
+11:08:36.408097 [debug]: Finished analyzing [  0.00s] model analytics.analytics_cac_analysis [skipped]
+11:08:36.408111 [info ]: Started model core.core_experimental_ltv
+11:08:36.408120 [debug]: Started rendering model core.core_experimental_ltv
+11:08:36.408138 [debug]: Finished rendering [  0.00s] model core.core_experimental_ltv [skipped]
+11:08:36.408149 [debug]: Started analyzing model core.core_experimental_ltv
+11:08:36.408161 [info ]:    Skipped [-------] model core.core_experimental_ltv (table)
+11:08:36.408173 [debug]: Finished analyzing [  0.00s] model core.core_experimental_ltv [skipped]
+11:08:36.408186 [info ]: Started model core.core_customer_segments
+11:08:36.408196 [debug]: Started rendering model core.core_customer_segments
+11:08:36.408207 [debug]: Finished rendering [  0.00s] model core.core_customer_segments [skipped]
+11:08:36.408218 [debug]: Started analyzing model core.core_customer_segments
+11:08:36.408235 [info ]:    Skipped [-------] model core.core_customer_segments (table)
+11:08:36.408247 [debug]: Finished analyzing [  0.00s] model core.core_customer_segments [skipped]
+11:08:36.408263 [info ]: Started model analytics.analytics_customer_360
+11:08:36.408277 [debug]: Started rendering model analytics.analytics_customer_360
+11:08:36.408289 [debug]: Finished rendering [  0.00s] model analytics.analytics_customer_360 [skipped]
+11:08:36.408301 [debug]: Started analyzing model analytics.analytics_customer_360
+11:08:36.408361 [info ]:    Skipped [-------] model analytics.analytics_customer_360 (table)
+11:08:36.408388 [debug]: Finished analyzing [  0.00s] model analytics.analytics_customer_360 [skipped]
+11:08:36.408404 [info ]: Started model analytics.analytics_customer_health
+11:08:36.408414 [debug]: Started rendering model analytics.analytics_customer_health
+11:08:36.408424 [debug]: Finished rendering [  0.00s] model analytics.analytics_customer_health [skipped]
+11:08:36.408432 [debug]: Started analyzing model analytics.analytics_customer_health
+11:08:36.408440 [info ]:    Skipped [-------] model analytics.analytics_customer_health (table)
+11:08:36.408447 [debug]: Finished analyzing [  0.00s] model analytics.analytics_customer_health [skipped]
+11:08:36.408455 [info ]: Started model core.core_revenue_daily
+11:08:36.408461 [debug]: Started rendering model core.core_revenue_daily
+11:08:36.408467 [debug]: Finished rendering [  0.00s] model core.core_revenue_daily [skipped]
+11:08:36.408472 [debug]: Started analyzing model core.core_revenue_daily
+11:08:36.408478 [info ]:    Skipped [-------] model core.core_revenue_daily (table)
+11:08:36.408483 [debug]: Finished analyzing [  0.00s] model core.core_revenue_daily [skipped]
+11:08:36.408490 [info ]: Started model core.core_revenue_combined
+11:08:36.408495 [debug]: Started rendering model core.core_revenue_combined
+11:08:36.408500 [debug]: Finished rendering [  0.00s] model core.core_revenue_combined [skipped]
+11:08:36.408505 [debug]: Started analyzing model core.core_revenue_combined
+11:08:36.408510 [info ]:    Skipped [-------] model core.core_revenue_combined (table)
+11:08:36.408516 [debug]: Finished analyzing [  0.00s] model core.core_revenue_combined [skipped]
+11:08:36.408523 [info ]: Started model analytics.analytics_revenue_v2
+11:08:36.408527 [debug]: Started rendering model analytics.analytics_revenue_v2
+11:08:36.408532 [debug]: Finished rendering [  0.00s] model analytics.analytics_revenue_v2 [skipped]
+11:08:36.408537 [debug]: Started analyzing model analytics.analytics_revenue_v2
+11:08:36.408543 [info ]:    Skipped [-------] model analytics.analytics_revenue_v2 (table)
+11:08:36.408548 [debug]: Finished analyzing [  0.00s] model analytics.analytics_revenue_v2 [skipped]
+11:08:36.408554 [info ]: Started model analytics.analytics_revenue_v1
+11:08:36.408558 [debug]: Started rendering model analytics.analytics_revenue_v1
+11:08:36.408564 [debug]: Finished rendering [  0.00s] model analytics.analytics_revenue_v1 [skipped]
+11:08:36.408569 [debug]: Started analyzing model analytics.analytics_revenue_v1
+11:08:36.408574 [info ]:    Skipped [-------] model analytics.analytics_revenue_v1 (table)
+11:08:36.408579 [debug]: Finished analyzing [  0.00s] model analytics.analytics_revenue_v1 [skipped]
+11:08:36.408585 [info ]: Started model analytics.analytics_legacy_kpis
+11:08:36.408590 [debug]: Started rendering model analytics.analytics_legacy_kpis
+11:08:36.408595 [debug]: Finished rendering [  0.00s] model analytics.analytics_legacy_kpis [skipped]
+11:08:36.408600 [debug]: Started analyzing model analytics.analytics_legacy_kpis
+11:08:36.408605 [info ]:    Skipped [-------] model analytics.analytics_legacy_kpis (table)
+11:08:36.408610 [debug]: Finished analyzing [  0.00s] model analytics.analytics_legacy_kpis [skipped]
+11:08:36.408616 [info ]: Started model core.core_seller_metrics
+11:08:36.408620 [debug]: Started rendering model core.core_seller_metrics
+11:08:36.408625 [debug]: Finished rendering [  0.00s] model core.core_seller_metrics [skipped]
+11:08:36.408630 [debug]: Started analyzing model core.core_seller_metrics
+11:08:36.408635 [info ]:    Skipped [-------] model core.core_seller_metrics (table)
+11:08:36.408641 [debug]: Finished analyzing [  0.00s] model core.core_seller_metrics [skipped]
+11:08:36.408663 [info ]: Started model analytics.analytics_seller_dashboard_v1
+11:08:36.408667 [debug]: Started rendering model analytics.analytics_seller_dashboard_v1
+11:08:36.408672 [debug]: Finished rendering [  0.00s] model analytics.analytics_seller_dashboard_v1 [skipped]
+11:08:36.408678 [debug]: Started analyzing model analytics.analytics_seller_dashboard_v1
+11:08:36.408683 [info ]:    Skipped [-------] model analytics.analytics_seller_dashboard_v1 (table)
+11:08:36.408689 [debug]: Finished analyzing [  0.00s] model analytics.analytics_seller_dashboard_v1 [skipped]
+11:08:36.408701 [info ]: Started model analytics.analytics_seller_dashboard_v2
+11:08:36.408706 [debug]: Started rendering model analytics.analytics_seller_dashboard_v2
+11:08:36.408711 [debug]: Finished rendering [  0.00s] model analytics.analytics_seller_dashboard_v2 [skipped]
+11:08:36.408716 [debug]: Started analyzing model analytics.analytics_seller_dashboard_v2
+11:08:36.408721 [info ]:    Skipped [-------] model analytics.analytics_seller_dashboard_v2 (table)
+11:08:36.408727 [debug]: Finished analyzing [  0.00s] model analytics.analytics_seller_dashboard_v2 [skipped]
+11:08:36.408734 [info ]: Started model core.core_refunds
+11:08:36.408738 [debug]: Started rendering model core.core_refunds
+11:08:36.408744 [debug]: Finished rendering [  0.00s] model core.core_refunds [skipped]
+11:08:36.408749 [debug]: Started analyzing model core.core_refunds
+11:08:36.408754 [info ]:    Skipped [-------] model core.core_refunds (table)
+11:08:36.408760 [debug]: Finished analyzing [  0.00s] model core.core_refunds [skipped]
+11:08:36.408766 [info ]: Started model analytics.analytics_finance_monthly
+11:08:36.408770 [debug]: Started rendering model analytics.analytics_finance_monthly
+11:08:36.408775 [debug]: Finished rendering [  0.00s] model analytics.analytics_finance_monthly [skipped]
+11:08:36.408780 [debug]: Started analyzing model analytics.analytics_finance_monthly
+11:08:36.408786 [info ]:    Skipped [-------] model analytics.analytics_finance_monthly (table)
+11:08:36.408791 [debug]: Finished analyzing [  0.00s] model analytics.analytics_finance_monthly [skipped]
+11:08:36.408802 [info ]: Started model analytics.analytics_refund_analysis
+11:08:36.408805 [debug]: Started rendering model analytics.analytics_refund_analysis
+11:08:36.408811 [debug]: Finished rendering [  0.00s] model analytics.analytics_refund_analysis [skipped]
+11:08:36.408816 [debug]: Started analyzing model analytics.analytics_refund_analysis
+11:08:36.408821 [info ]:    Skipped [-------] model analytics.analytics_refund_analysis (table)
+11:08:36.408826 [debug]: Finished analyzing [  0.00s] model analytics.analytics_refund_analysis [skipped]
+11:08:36.408832 [info ]: Started model analytics.analytics_channel_roi
+11:08:36.408836 [debug]: Started rendering model analytics.analytics_channel_roi
+11:08:36.408842 [debug]: Finished rendering [  0.00s] model analytics.analytics_channel_roi [skipped]
+11:08:36.408846 [debug]: Started analyzing model analytics.analytics_channel_roi
+11:08:36.408851 [info ]:    Skipped [-------] model analytics.analytics_channel_roi (table)
+11:08:36.408856 [debug]: Finished analyzing [  0.00s] model analytics.analytics_channel_roi [skipped]
+11:08:36.408862 [info ]: Started model core.core_products
+11:08:36.408867 [debug]: Started rendering model core.core_products
+11:08:36.408872 [debug]: Finished rendering [  0.00s] model core.core_products [skipped]
+11:08:36.408877 [debug]: Started analyzing model core.core_products
+11:08:36.408882 [info ]:    Skipped [-------] model core.core_products (table)
+11:08:36.408924 [debug]: Finished analyzing [  0.00s] model core.core_products [skipped]
+11:08:36.408955 [info ]: Started model analytics.analytics_product_performance
+11:08:36.408979 [debug]: Started rendering model analytics.analytics_product_performance
+11:08:36.408996 [debug]: Finished rendering [  0.00s] model analytics.analytics_product_performance [skipped]
+11:08:36.409016 [debug]: Started analyzing model analytics.analytics_product_performance
+11:08:36.409032 [info ]:    Skipped [-------] model analytics.analytics_product_performance (table)
+11:08:36.409063 [debug]: Finished analyzing [  0.00s] model analytics.analytics_product_performance [skipped]
+11:08:36.420457 [debug]: Finished rendering [  0.03s] seed seeds.plan_definitions [success]
+11:08:36.420577 [debug]: Started analyzing seed seeds.plan_definitions
+11:08:36.420627 [debug]: Finished rendering [  0.03s] seed seeds.currency_rates [success]
+11:08:36.420656 [debug]: Started analyzing seed seeds.currency_rates
+11:08:36.420692 [debug]: Finished rendering [  0.03s] seed seeds.product_categories [success]
+11:08:36.420713 [debug]: Started analyzing seed seeds.product_categories
+11:08:36.420735 [debug]: Finished rendering [  0.03s] seed seeds.market_regions [success]
+11:08:36.420754 [debug]: Started analyzing seed seeds.market_regions
+11:08:36.420885 [info ]:  Succeeded [  0.03s] seed  seeds.market_regions (table)
+11:08:36.420934 [debug]: Finished analyzing [  0.00s] seed seeds.market_regions [success]
+11:08:36.420954 [info ]:  Succeeded [  0.03s] seed  seeds.plan_definitions (table)
+11:08:36.420975 [debug]: Finished analyzing [  0.00s] seed seeds.plan_definitions [success]
+11:08:36.421004 [info ]: Started model core.core_subscriptions
+11:08:36.421024 [debug]: Started rendering model core.core_subscriptions
+11:08:36.421044 [debug]: Finished rendering [  0.00s] model core.core_subscriptions [skipped]
+11:08:36.421057 [debug]: Started analyzing model core.core_subscriptions
+11:08:36.421073 [info ]:    Skipped [-------] model core.core_subscriptions (table)
+11:08:36.421086 [debug]: Finished analyzing [  0.00s] model core.core_subscriptions [skipped]
+11:08:36.421120 [info ]: Started model analytics.analytics_executive_kpis
+11:08:36.421131 [debug]: Started rendering model analytics.analytics_executive_kpis
+11:08:36.421146 [debug]: Finished rendering [  0.00s] model analytics.analytics_executive_kpis [skipped]
+11:08:36.421158 [debug]: Started analyzing model analytics.analytics_executive_kpis
+11:08:36.421169 [info ]:    Skipped [-------] model analytics.analytics_executive_kpis (table)
+11:08:36.421181 [debug]: Finished analyzing [  0.00s] model analytics.analytics_executive_kpis [skipped]
+11:08:36.421206 [info ]: Started model analytics.analytics_subscription_health
+11:08:36.421221 [debug]: Started rendering model analytics.analytics_subscription_health
+11:08:36.421248 [debug]: Finished rendering [  0.00s] model analytics.analytics_subscription_health [skipped]
+11:08:36.421259 [info ]: Finished rendering [  0.03s] (102 nodes, 75 skipped, 23 errors)
+11:08:36.421271 [debug]: Started analyzing model analytics.analytics_subscription_health
+11:08:36.421288 [info ]:    Skipped [-------] model analytics.analytics_subscription_health (table)
+11:08:36.421300 [debug]: Finished analyzing [  0.00s] model analytics.analytics_subscription_health [skipped]
+11:08:36.421317 [info ]:  Succeeded [  0.03s] seed  seeds.currency_rates (table)
+11:08:36.421336 [debug]: Finished analyzing [  0.00s] seed seeds.currency_rates [success]
+11:08:36.421365 [info ]:  Succeeded [  0.03s] seed  seeds.product_categories (table)
+11:08:36.421391 [debug]: Finished analyzing [  0.00s] seed seeds.product_categories [success]
+11:08:36.421398 [info ]: Finished analyzing [  0.02s] (102 nodes, 98 skipped, 0 errors)
+11:08:36.438635 [info ]: Cached model count updated: 98 models (accurate)

@@ -1,0 +1,16 @@
+version: 2
+models:
+  - name: core_products
+    description: "Product performance enriched with inventory. Grain: one row per product."
+    config:
+      tags: ["core"]
+    columns:
+      - name: product_id
+        description: "Product PK"
+        tests:
+          - unique
+          - not_null
+      - name: gross_product_revenue
+        description: "Total gross sales revenue"
+      - name: stock_status
+        description: "out_of_stock/low_stock/healthy/overstock"

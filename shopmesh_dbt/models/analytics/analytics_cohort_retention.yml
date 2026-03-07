@@ -1,0 +1,13 @@
+version: 2
+models:
+  - name: analytics_cohort_retention
+    description: "Cohort retention table for product and growth teams."
+    config:
+      tags: ["analytics"]
+    columns:
+      - name: cohort_month
+        description: "Acquisition cohort month"
+      - name: months_since_cohort
+        description: "0=acquisition, 1=first retention month"
+      - name: active_customers
+        description: "Customers who purchased in period"

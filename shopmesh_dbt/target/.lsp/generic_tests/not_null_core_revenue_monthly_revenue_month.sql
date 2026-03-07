@@ -1,0 +1,1 @@
+{{ test_not_null(column_name="revenue_month", model=get_where_subquery(ref('core_revenue_monthly'))) }}

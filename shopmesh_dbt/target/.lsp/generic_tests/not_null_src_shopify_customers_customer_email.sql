@@ -1,0 +1,1 @@
+{{ test_not_null(column_name="customer_email", model=get_where_subquery(ref('src_shopify_customers'))) }}

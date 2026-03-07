@@ -1,0 +1,16 @@
+version: 2
+models:
+  - name: src_salesforce_contacts
+    description: "Salesforce contacts with derived full name."
+    config:
+      tags: ["source"]
+    columns:
+      - name: contact_id
+        description: "Contact PK"
+        tests:
+          - unique
+          - not_null
+      - name: contact_email
+        description: "Contact email"
+      - name: full_name
+        description: "first_name || last_name"

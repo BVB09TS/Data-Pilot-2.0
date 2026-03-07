@@ -1,0 +1,1 @@
+{{ test_not_null(column_name="contact_id", model=get_where_subquery(ref('raw_salesforce_contacts'))) }}

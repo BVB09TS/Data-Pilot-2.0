@@ -1,0 +1,13 @@
+version: 2
+models:
+  - name: analytics_executive_kpis
+    description: "DUPLICATE METRIC — total_revenue DEFINITION 4: net + subscriptions. Executive team definition. Conflicts with core_revenue_summary, analytics_revenue_v1, analytics_revenue_v2."
+    config:
+      tags: ["analytics"]
+    columns:
+      - name: period
+        description: "Monthly grain"
+      - name: total_revenue
+        description: "DEFINITION 4: net_order_revenue + MRR — Executive definition"
+      - name: subscription_revenue
+        description: "Correctly aggregated MRR"

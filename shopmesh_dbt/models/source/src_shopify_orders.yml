@@ -1,0 +1,28 @@
+version: 2
+models:
+  - name: src_shopify_orders
+    description: "Shopify orders with typed amounts and is_cancelled flag."
+    config:
+      tags: ["source"]
+    columns:
+      - name: order_id
+        description: "Shopify order PK"
+        tests:
+          - unique
+          - not_null
+      - name: customer_id
+        description: "FK to src_shopify_customers"
+        tests:
+          - not_null
+      - name: order_created_at
+        description: "Typed timestamp"
+        tests:
+          - not_null
+      - name: order_total_amount
+        description: "Typed decimal"
+        tests:
+          - not_null
+      - name: financial_status
+        description: "paid/pending/refunded"
+      - name: is_cancelled
+        description: "Boolean cancellation flag"
