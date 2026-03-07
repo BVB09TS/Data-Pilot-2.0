@@ -10,6 +10,8 @@ from typing import Any
 import networkx as nx
 import structlog
 
+from datapilot.integrations.github_actions.parser import parse_github_actions
+
 logger = structlog.get_logger()
 
 

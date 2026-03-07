@@ -8,25 +8,11 @@
       "q90": null
     },
     {
-      "id": "analytics_cac_analysis",
-      "layer": "analytics",
-      "has_problem": true,
-      "q30": 0,
-      "q90": 0
-    },
-    {
       "id": "analytics_channel_roi",
       "layer": "analytics",
       "has_problem": false,
       "q30": null,
       "q90": null
-    },
-    {
-      "id": "analytics_churn_risk",
-      "layer": "analytics",
-      "has_problem": true,
-      "q30": 0,
-      "q90": 0
     },
     {
       "id": "analytics_cohort_retention",
@@ -85,20 +71,6 @@
       "q90": 198
     },
     {
-      "id": "analytics_inventory_legacy",
-      "layer": "analytics",
-      "has_problem": true,
-      "q30": 0,
-      "q90": 0
-    },
-    {
-      "id": "analytics_legacy_kpis",
-      "layer": "analytics",
-      "has_problem": true,
-      "q30": 0,
-      "q90": 0
-    },
-    {
       "id": "analytics_marketing_weekly",
       "layer": "analytics",
       "has_problem": false,
@@ -155,20 +127,6 @@
       "q90": 441
     },
     {
-      "id": "analytics_seller_dashboard_v1",
-      "layer": "analytics",
-      "has_problem": true,
-      "q30": 0,
-      "q90": 0
-    },
-    {
-      "id": "analytics_seller_dashboard_v2",
-      "layer": "analytics",
-      "has_problem": true,
-      "q30": 0,
-      "q90": 0
-    },
-    {
       "id": "analytics_subscription_health",
       "layer": "analytics",
       "has_problem": false,
@@ -211,13 +169,6 @@
       "q90": null
     },
     {
-      "id": "core_coupon_analysis",
-      "layer": "core",
-      "has_problem": true,
-      "q30": 0,
-      "q90": 0
-    },
-    {
       "id": "core_customer_segments",
       "layer": "core",
       "has_problem": false,
@@ -239,25 +190,11 @@
       "q90": null
     },
     {
-      "id": "core_experimental_ltv",
-      "layer": "core",
-      "has_problem": true,
-      "q30": 0,
-      "q90": 0
-    },
-    {
       "id": "core_geographic_revenue",
       "layer": "core",
       "has_problem": false,
       "q30": null,
       "q90": null
-    },
-    {
-      "id": "core_inventory_legacy",
-      "layer": "core",
-      "has_problem": true,
-      "q30": 2,
-      "q90": 6
     },
     {
       "id": "core_inventory_status",
@@ -337,13 +274,6 @@
       "q90": 398
     },
     {
-      "id": "core_seller_metrics",
-      "layer": "core",
-      "has_problem": true,
-      "q30": 0,
-      "q90": 0
-    },
-    {
       "id": "core_subscriptions",
       "layer": "core",
       "has_problem": true,
@@ -414,13 +344,6 @@
       "q90": null
     },
     {
-      "id": "raw_mobile_sessions",
-      "layer": "raw",
-      "has_problem": true,
-      "q30": 0,
-      "q90": 0
-    },
-    {
       "id": "raw_salesforce_accounts",
       "layer": "raw",
       "has_problem": false,
@@ -447,13 +370,6 @@
       "has_problem": false,
       "q30": null,
       "q90": null
-    },
-    {
-      "id": "raw_shopify_gift_cards",
-      "layer": "raw",
-      "has_problem": true,
-      "q30": 0,
-      "q90": 0
     },
     {
       "id": "raw_shopify_order_items",
@@ -533,20 +449,6 @@
       "q90": null
     },
     {
-      "id": "src_erp_products",
-      "layer": "source",
-      "has_problem": true,
-      "q30": 1,
-      "q90": 3
-    },
-    {
-      "id": "src_erp_warehouses",
-      "layer": "source",
-      "has_problem": true,
-      "q30": 0,
-      "q90": 2
-    },
-    {
       "id": "src_google_ads_campaigns",
       "layer": "source",
       "has_problem": false,
@@ -608,13 +510,6 @@
       "has_problem": false,
       "q30": null,
       "q90": null
-    },
-    {
-      "id": "src_shopify_gift_cards_v2",
-      "layer": "source",
-      "has_problem": true,
-      "q30": 0,
-      "q90": 0
     },
     {
       "id": "src_shopify_order_items",
@@ -689,14 +584,6 @@
   ],
   "edges": [
     {
-      "source": "analytics_revenue_v1",
-      "target": "analytics_legacy_kpis"
-    },
-    {
-      "source": "core_ad_performance",
-      "target": "analytics_cac_analysis"
-    },
-    {
       "source": "core_ad_performance",
       "target": "analytics_marketing_weekly"
     },
@@ -718,23 +605,11 @@
     },
     {
       "source": "core_customers",
-      "target": "analytics_cac_analysis"
-    },
-    {
-      "source": "core_customers",
-      "target": "analytics_churn_risk"
-    },
-    {
-      "source": "core_customers",
       "target": "analytics_customer_360"
     },
     {
       "source": "core_customers",
       "target": "analytics_customer_health"
-    },
-    {
-      "source": "core_customers",
-      "target": "analytics_legacy_kpis"
     },
     {
       "source": "core_customers",
@@ -747,10 +622,6 @@
     {
       "source": "core_customers",
       "target": "core_customer_segments"
-    },
-    {
-      "source": "core_customers",
-      "target": "core_experimental_ltv"
     },
     {
       "source": "core_customers",
@@ -767,10 +638,6 @@
     {
       "source": "core_geographic_revenue",
       "target": "analytics_geographic_revenue"
-    },
-    {
-      "source": "core_inventory_legacy",
-      "target": "analytics_inventory_legacy"
     },
     {
       "source": "core_inventory_status",
@@ -829,10 +696,6 @@
       "target": "core_revenue_summary"
     },
     {
-      "source": "core_orders",
-      "target": "core_seller_metrics"
-    },
-    {
       "source": "core_products",
       "target": "analytics_product_performance"
     },
@@ -869,14 +732,6 @@
       "target": "core_revenue_combined"
     },
     {
-      "source": "core_seller_metrics",
-      "target": "analytics_seller_dashboard_v1"
-    },
-    {
-      "source": "core_seller_metrics",
-      "target": "analytics_seller_dashboard_v2"
-    },
-    {
       "source": "core_subscriptions",
       "target": "analytics_executive_kpis"
     },
@@ -903,14 +758,6 @@
     {
       "source": "raw_email_events",
       "target": "src_email_events"
-    },
-    {
-      "source": "raw_erp_products",
-      "target": "src_erp_products"
-    },
-    {
-      "source": "raw_erp_warehouses",
-      "target": "src_erp_warehouses"
     },
     {
       "source": "raw_google_ads_campaigns",
@@ -943,10 +790,6 @@
     {
       "source": "raw_shopify_customers",
       "target": "src_shopify_customers"
-    },
-    {
-      "source": "raw_shopify_gift_cards",
-      "target": "src_shopify_gift_cards_v2"
     },
     {
       "source": "raw_shopify_order_items",
@@ -997,10 +840,6 @@
       "target": "core_email_performance"
     },
     {
-      "source": "src_erp_products",
-      "target": "core_inventory_legacy"
-    },
-    {
       "source": "src_google_ads_campaigns",
       "target": "core_ad_performance"
     },
@@ -1035,10 +874,6 @@
     {
       "source": "src_shopify_customers",
       "target": "core_customers"
-    },
-    {
-      "source": "src_shopify_order_items",
-      "target": "core_coupon_analysis"
     },
     {
       "source": "src_shopify_order_items",

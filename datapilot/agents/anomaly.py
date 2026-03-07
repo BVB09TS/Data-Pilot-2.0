@@ -32,14 +32,15 @@ def detect_anomalies(
         if model.startswith("total_") or not isinstance(cost, (int, float)):
             continue
         if cost >= cost_threshold_usd and model not in dead_list:
-            anomalies.append(
-                {
-                    "model": model,
-                    "type": "cost_anomaly",
-                    "evidence": f"Model costs ${cost}/month — consider optimization or deprecation.",
-                    "severity": "medium",
-                    "cost_usd": cost,
-                }
-            )
+            pass
+            # anomalies.append(
+            #     {
+            #         "model": model,
+            #         "type": "cost_anomaly",
+            #         "evidence": f"Model costs ${cost}/month — consider optimization or deprecation.",
+            #         "severity": "medium",
+            #         "cost_usd": cost,
+            #     }
+            # )
 
     return anomalies

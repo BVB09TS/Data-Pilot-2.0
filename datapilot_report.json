@@ -1,456 +1,122 @@
 {
   "report": {
-    "generated_at": "2026-03-02T07:22:46.166711",
-    "total_findings": 49,
+    "version": "2.0.0",
+    "generated_at": "2026-03-07T12:02:19.468493+00:00",
+    "total_findings": 19,
     "by_type": {
-      "dead_model": 15,
-      "orphaned_model": 16,
-      "broken_lineage": 3,
+      "orphaned_model": 7,
+      "broken_lineage": 1,
       "wrong_grain_join": 1,
-      "deprecated_source": 6,
+      "deprecated_source": 2,
       "missing_tests": 5,
       "logic_drift": 1,
       "duplicate_metric": 1,
       "redundant_model": 1
     },
-    "total_monthly_waste_usd": 247,
+    "by_severity": {
+      "low": 7,
+      "critical": 5,
+      "medium": 4,
+      "high": 3
+    },
+    "total_monthly_waste_usd": 0,
+    "total_models": 83,
     "findings": [
-      {
-        "type": "dead_model",
-        "model": "analytics_cac_analysis",
-        "evidence": "last queried 2023-09-22, q90=0",
-        "cost_usd": 18,
-        "severity": "high",
-        "action": "Drop this model and remove from the dbt project. Verify no hidden consumers first.",
-        "_raw": {
-          "model": "analytics_cac_analysis",
-          "issue": "dead_model",
-          "evidence": "last queried 2023-09-22, q90=0",
-          "cost_usd": 18
-        }
-      },
-      {
-        "type": "dead_model",
-        "model": "analytics_churn_risk",
-        "evidence": "last queried 2024-02-10, q90=0",
-        "cost_usd": 28,
-        "severity": "high",
-        "action": "Drop this model and remove from the dbt project. Verify no hidden consumers first.",
-        "_raw": {
-          "model": "analytics_churn_risk",
-          "issue": "dead_model",
-          "evidence": "last queried 2024-02-10, q90=0",
-          "cost_usd": 28
-        }
-      },
-      {
-        "type": "dead_model",
-        "model": "analytics_inventory_legacy",
-        "evidence": "Deprecated chain, last queried 2024-04-01, q90=0",
-        "cost_usd": 31,
-        "severity": "high",
-        "action": "Drop this model and remove from the dbt project. Verify no hidden consumers first.",
-        "_raw": {
-          "model": "analytics_inventory_legacy",
-          "issue": "dead_model",
-          "evidence": "Deprecated chain, last queried 2024-04-01, q90=0",
-          "cost_usd": 31
-        }
-      },
-      {
-        "type": "dead_model",
-        "model": "analytics_legacy_kpis",
-        "evidence": "last queried 2023-12-15, q90=0",
-        "cost_usd": 15,
-        "severity": "high",
-        "action": "Drop this model and remove from the dbt project. Verify no hidden consumers first.",
-        "_raw": {
-          "model": "analytics_legacy_kpis",
-          "issue": "dead_model",
-          "evidence": "last queried 2023-12-15, q90=0",
-          "cost_usd": 15
-        }
-      },
-      {
-        "type": "dead_model",
-        "model": "analytics_seller_dashboard_v1",
-        "evidence": "last queried 2023-10-03, q90=0",
-        "cost_usd": 22,
-        "severity": "high",
-        "action": "Drop this model and remove from the dbt project. Verify no hidden consumers first.",
-        "_raw": {
-          "model": "analytics_seller_dashboard_v1",
-          "issue": "dead_model",
-          "evidence": "last queried 2023-10-03, q90=0",
-          "cost_usd": 22
-        }
-      },
-      {
-        "type": "dead_model",
-        "model": "analytics_seller_dashboard_v2",
-        "evidence": "last queried None, q90=0",
-        "cost_usd": 22,
-        "severity": "high",
-        "action": "Drop this model and remove from the dbt project. Verify no hidden consumers first.",
-        "_raw": {
-          "model": "analytics_seller_dashboard_v2",
-          "issue": "dead_model",
-          "evidence": "last queried None, q90=0",
-          "cost_usd": 22
-        }
-      },
-      {
-        "type": "dead_model",
-        "model": "core_coupon_analysis",
-        "evidence": "last queried 2023-06-14, q90=0",
-        "cost_usd": 9,
-        "severity": "high",
-        "action": "Drop this model and remove from the dbt project. Verify no hidden consumers first.",
-        "_raw": {
-          "model": "core_coupon_analysis",
-          "issue": "dead_model",
-          "evidence": "last queried 2023-06-14, q90=0",
-          "cost_usd": 9
-        }
-      },
-      {
-        "type": "dead_model",
-        "model": "core_experimental_ltv",
-        "evidence": "last queried 2023-11-30, q90=0",
-        "cost_usd": 6,
-        "severity": "high",
-        "action": "Drop this model and remove from the dbt project. Verify no hidden consumers first.",
-        "_raw": {
-          "model": "core_experimental_ltv",
-          "issue": "dead_model",
-          "evidence": "last queried 2023-11-30, q90=0",
-          "cost_usd": 6
-        }
-      },
-      {
-        "type": "dead_model",
-        "model": "core_inventory_legacy",
-        "evidence": "Deprecated chain, last queried 2024-12-15, q90=6",
-        "cost_usd": 12,
-        "severity": "high",
-        "action": "Drop this model and remove from the dbt project. Verify no hidden consumers first.",
-        "_raw": {
-          "model": "core_inventory_legacy",
-          "issue": "dead_model",
-          "evidence": "Deprecated chain, last queried 2024-12-15, q90=6",
-          "cost_usd": 12
-        }
-      },
-      {
-        "type": "dead_model",
-        "model": "core_seller_metrics",
-        "evidence": "last queried None, q90=0",
-        "cost_usd": 0,
-        "severity": "high",
-        "action": "Drop this model and remove from the dbt project. Verify no hidden consumers first.",
-        "_raw": {
-          "model": "core_seller_metrics",
-          "issue": "dead_model",
-          "evidence": "last queried None, q90=0",
-          "cost_usd": 0
-        }
-      },
-      {
-        "type": "dead_model",
-        "model": "raw_mobile_sessions",
-        "evidence": "last queried None, q90=0",
-        "cost_usd": 4,
-        "severity": "high",
-        "action": "Drop this model and remove from the dbt project. Verify no hidden consumers first.",
-        "_raw": {
-          "model": "raw_mobile_sessions",
-          "issue": "dead_model",
-          "evidence": "last queried None, q90=0",
-          "cost_usd": 4
-        }
-      },
-      {
-        "type": "dead_model",
-        "model": "raw_shopify_gift_cards",
-        "evidence": "last queried None, q90=0",
-        "cost_usd": 3,
-        "severity": "high",
-        "action": "Drop this model and remove from the dbt project. Verify no hidden consumers first.",
-        "_raw": {
-          "model": "raw_shopify_gift_cards",
-          "issue": "dead_model",
-          "evidence": "last queried None, q90=0",
-          "cost_usd": 3
-        }
-      },
-      {
-        "type": "dead_model",
-        "model": "src_erp_products",
-        "evidence": "Deprecated chain, last queried 2024-12-01, q90=3",
-        "cost_usd": 0,
-        "severity": "high",
-        "action": "Drop this model and remove from the dbt project. Verify no hidden consumers first.",
-        "_raw": {
-          "model": "src_erp_products",
-          "issue": "dead_model",
-          "evidence": "Deprecated chain, last queried 2024-12-01, q90=3",
-          "cost_usd": 0
-        }
-      },
-      {
-        "type": "dead_model",
-        "model": "src_erp_warehouses",
-        "evidence": "Deprecated chain, last queried 2024-11-20, q90=2",
-        "cost_usd": 0,
-        "severity": "high",
-        "action": "Drop this model and remove from the dbt project. Verify no hidden consumers first.",
-        "_raw": {
-          "model": "src_erp_warehouses",
-          "issue": "dead_model",
-          "evidence": "Deprecated chain, last queried 2024-11-20, q90=2",
-          "cost_usd": 0
-        }
-      },
-      {
-        "type": "dead_model",
-        "model": "src_shopify_gift_cards_v2",
-        "evidence": "last queried None, q90=0",
-        "cost_usd": 0,
-        "severity": "high",
-        "action": "Drop this model and remove from the dbt project. Verify no hidden consumers first.",
-        "_raw": {
-          "model": "src_shopify_gift_cards_v2",
-          "issue": "dead_model",
-          "evidence": "last queried None, q90=0",
-          "cost_usd": 0
-        }
-      },
-      {
-        "type": "orphaned_model",
-        "model": "core_coupon_analysis",
-        "evidence": "No active downstream consumers (direct orphan).",
-        "cost_usd": 9,
-        "severity": "low",
-        "action": "Either connect to a downstream consumer or remove if no longer needed.",
-        "_raw": {
-          "model": "core_coupon_analysis",
-          "issue": "orphaned_model",
-          "evidence": "No active downstream consumers (direct orphan)."
-        }
-      },
-      {
-        "type": "orphaned_model",
-        "model": "core_experimental_ltv",
-        "evidence": "No active downstream consumers (direct orphan).",
-        "cost_usd": 6,
-        "severity": "low",
-        "action": "Either connect to a downstream consumer or remove if no longer needed.",
-        "_raw": {
-          "model": "core_experimental_ltv",
-          "issue": "orphaned_model",
-          "evidence": "No active downstream consumers (direct orphan)."
-        }
-      },
-      {
-        "type": "orphaned_model",
-        "model": "core_inventory_legacy",
-        "evidence": "No active downstream consumers (transitive orphan).",
-        "cost_usd": 12,
-        "severity": "low",
-        "action": "Either connect to a downstream consumer or remove if no longer needed.",
-        "_raw": {
-          "model": "core_inventory_legacy",
-          "issue": "orphaned_model",
-          "evidence": "No active downstream consumers (transitive orphan)."
-        }
-      },
       {
         "type": "orphaned_model",
         "model": "core_revenue_summary",
-        "evidence": "No active downstream consumers (direct orphan).",
+        "evidence": "No downstream consumers found for the core layer and kind=direct model",
         "cost_usd": 0,
         "severity": "low",
         "action": "Either connect to a downstream consumer or remove if no longer needed.",
         "_raw": {
           "model": "core_revenue_summary",
           "issue": "orphaned_model",
-          "evidence": "No active downstream consumers (direct orphan)."
-        }
-      },
-      {
-        "type": "orphaned_model",
-        "model": "core_seller_metrics",
-        "evidence": "No active downstream consumers (transitive orphan).",
-        "cost_usd": 0,
-        "severity": "low",
-        "action": "Either connect to a downstream consumer or remove if no longer needed.",
-        "_raw": {
-          "model": "core_seller_metrics",
-          "issue": "orphaned_model",
-          "evidence": "No active downstream consumers (transitive orphan)."
+          "evidence": "No downstream consumers found for the core layer and kind=direct model"
         }
       },
       {
         "type": "orphaned_model",
         "model": "raw_erp_products",
-        "evidence": "No active downstream consumers (transitive orphan).",
+        "evidence": "No downstream consumers found for the raw layer and kind=direct model",
         "cost_usd": 0,
         "severity": "low",
         "action": "Either connect to a downstream consumer or remove if no longer needed.",
         "_raw": {
           "model": "raw_erp_products",
           "issue": "orphaned_model",
-          "evidence": "No active downstream consumers (transitive orphan)."
+          "evidence": "No downstream consumers found for the raw layer and kind=direct model"
         }
       },
       {
         "type": "orphaned_model",
         "model": "raw_erp_warehouses",
-        "evidence": "No active downstream consumers (transitive orphan).",
+        "evidence": "No downstream consumers found for the raw layer and kind=direct model",
         "cost_usd": 0,
         "severity": "low",
         "action": "Either connect to a downstream consumer or remove if no longer needed.",
         "_raw": {
           "model": "raw_erp_warehouses",
           "issue": "orphaned_model",
-          "evidence": "No active downstream consumers (transitive orphan)."
-        }
-      },
-      {
-        "type": "orphaned_model",
-        "model": "raw_mobile_sessions",
-        "evidence": "No active downstream consumers (direct orphan).",
-        "cost_usd": 4,
-        "severity": "low",
-        "action": "Either connect to a downstream consumer or remove if no longer needed.",
-        "_raw": {
-          "model": "raw_mobile_sessions",
-          "issue": "orphaned_model",
-          "evidence": "No active downstream consumers (direct orphan)."
-        }
-      },
-      {
-        "type": "orphaned_model",
-        "model": "raw_shopify_gift_cards",
-        "evidence": "No active downstream consumers (transitive orphan).",
-        "cost_usd": 3,
-        "severity": "low",
-        "action": "Either connect to a downstream consumer or remove if no longer needed.",
-        "_raw": {
-          "model": "raw_shopify_gift_cards",
-          "issue": "orphaned_model",
-          "evidence": "No active downstream consumers (transitive orphan)."
-        }
-      },
-      {
-        "type": "orphaned_model",
-        "model": "raw_shopify_refunds",
-        "evidence": "No active downstream consumers (transitive orphan).",
-        "cost_usd": 0,
-        "severity": "low",
-        "action": "Either connect to a downstream consumer or remove if no longer needed.",
-        "_raw": {
-          "model": "raw_shopify_refunds",
-          "issue": "orphaned_model",
-          "evidence": "No active downstream consumers (transitive orphan)."
-        }
-      },
-      {
-        "type": "orphaned_model",
-        "model": "src_erp_products",
-        "evidence": "No active downstream consumers (transitive orphan).",
-        "cost_usd": 0,
-        "severity": "low",
-        "action": "Either connect to a downstream consumer or remove if no longer needed.",
-        "_raw": {
-          "model": "src_erp_products",
-          "issue": "orphaned_model",
-          "evidence": "No active downstream consumers (transitive orphan)."
-        }
-      },
-      {
-        "type": "orphaned_model",
-        "model": "src_erp_warehouses",
-        "evidence": "No active downstream consumers (direct orphan).",
-        "cost_usd": 0,
-        "severity": "low",
-        "action": "Either connect to a downstream consumer or remove if no longer needed.",
-        "_raw": {
-          "model": "src_erp_warehouses",
-          "issue": "orphaned_model",
-          "evidence": "No active downstream consumers (direct orphan)."
+          "evidence": "No downstream consumers found for the raw layer and kind=direct model"
         }
       },
       {
         "type": "orphaned_model",
         "model": "src_orders_v2",
-        "evidence": "No active downstream consumers (direct orphan).",
+        "evidence": "No downstream consumers found for the source layer and kind=direct model",
         "cost_usd": 0,
         "severity": "low",
         "action": "Either connect to a downstream consumer or remove if no longer needed.",
         "_raw": {
           "model": "src_orders_v2",
           "issue": "orphaned_model",
-          "evidence": "No active downstream consumers (direct orphan)."
-        }
-      },
-      {
-        "type": "orphaned_model",
-        "model": "src_shopify_gift_cards_v2",
-        "evidence": "No active downstream consumers (direct orphan).",
-        "cost_usd": 0,
-        "severity": "low",
-        "action": "Either connect to a downstream consumer or remove if no longer needed.",
-        "_raw": {
-          "model": "src_shopify_gift_cards_v2",
-          "issue": "orphaned_model",
-          "evidence": "No active downstream consumers (direct orphan)."
+          "evidence": "No downstream consumers found for the source layer and kind=direct model"
         }
       },
       {
         "type": "orphaned_model",
         "model": "src_shopify_refunds",
-        "evidence": "No active downstream consumers (direct orphan).",
+        "evidence": "No downstream consumers found for the source layer and kind=direct model",
         "cost_usd": 0,
         "severity": "low",
         "action": "Either connect to a downstream consumer or remove if no longer needed.",
         "_raw": {
           "model": "src_shopify_refunds",
           "issue": "orphaned_model",
-          "evidence": "No active downstream consumers (direct orphan)."
+          "evidence": "No downstream consumers found for the source layer and kind=direct model"
         }
       },
       {
         "type": "orphaned_model",
         "model": "src_subscription_events",
-        "evidence": "No active downstream consumers (direct orphan).",
+        "evidence": "No downstream consumers found for the source layer and kind=direct model",
         "cost_usd": 0,
         "severity": "low",
         "action": "Either connect to a downstream consumer or remove if no longer needed.",
         "_raw": {
           "model": "src_subscription_events",
           "issue": "orphaned_model",
-          "evidence": "No active downstream consumers (direct orphan)."
+          "evidence": "No downstream consumers found for the source layer and kind=direct model"
         }
       },
       {
-        "type": "broken_lineage",
-        "model": "core_seller_metrics",
-        "evidence": "References non-existent model src_shopify_sellers.",
+        "type": "orphaned_model",
+        "model": "raw_shopify_refunds",
+        "evidence": "No downstream consumers found, except transitive relations do not count",
         "cost_usd": 0,
-        "severity": "critical",
-        "action": "Fix the broken ref or remove the model if the upstream will not be created.",
+        "severity": "low",
+        "action": "Either connect to a downstream consumer or remove if no longer needed.",
         "_raw": {
-          "model": "core_seller_metrics",
-          "issue": "broken_lineage",
-          "missing_ref": "src_shopify_sellers",
-          "evidence": "References non-existent model src_shopify_sellers."
+          "model": "raw_shopify_refunds",
+          "issue": "orphaned_model",
+          "evidence": "No downstream consumers found, except transitive relations do not count"
         }
       },
       {
         "type": "broken_lineage",
         "model": "core_subscriptions",
-        "evidence": "References non-existent model plan_definitions.",
+        "evidence": "The core_subscriptions model is missing a reference to the plan_definitions model.",
         "cost_usd": 0,
         "severity": "critical",
         "action": "Fix the broken ref or remove the model if the upstream will not be created.",
@@ -458,27 +124,13 @@
           "model": "core_subscriptions",
           "issue": "broken_lineage",
           "missing_ref": "plan_definitions",
-          "evidence": "References non-existent model plan_definitions."
-        }
-      },
-      {
-        "type": "broken_lineage",
-        "model": "src_shopify_gift_cards_v2",
-        "evidence": "References non-existent model unconfigured upstream source.",
-        "cost_usd": 0,
-        "severity": "critical",
-        "action": "Fix the broken ref or remove the model if the upstream will not be created.",
-        "_raw": {
-          "model": "src_shopify_gift_cards_v2",
-          "issue": "broken_lineage",
-          "missing_ref": "unconfigured upstream source",
-          "evidence": "References non-existent model unconfigured upstream source."
+          "evidence": "The core_subscriptions model is missing a reference to the plan_definitions model."
         }
       },
       {
         "type": "wrong_grain_join",
         "model": "core_revenue_combined",
-        "evidence": "Daily model joined to monthly model causing ~30x inflation of subscription_revenue",
+        "evidence": "The daily model is joined to the monthly model, causing approximately 30x inflation of subscription revenue.",
         "cost_usd": 0,
         "severity": "critical",
         "action": "Fix the join to match grains \u2014 aggregate the finer grain before joining.",
@@ -487,85 +139,33 @@
           "issue": "wrong_grain_join",
           "upstream_daily": "core_revenue_daily",
           "upstream_monthly": "core_revenue_monthly",
-          "evidence": "Daily model joined to monthly model causing ~30x inflation of subscription_revenue"
-        }
-      },
-      {
-        "type": "deprecated_source",
-        "model": "analytics_inventory_legacy",
-        "evidence": "Model uses deprecated source chain.",
-        "cost_usd": 31,
-        "severity": "medium",
-        "action": "Migrate to the replacement source and decommission this model.",
-        "_raw": {
-          "model": "analytics_inventory_legacy",
-          "issue": "deprecated_source",
-          "evidence": "Model uses deprecated source chain."
-        }
-      },
-      {
-        "type": "deprecated_source",
-        "model": "core_inventory_legacy",
-        "evidence": "Model uses legacy_erp which was decommissioned.",
-        "cost_usd": 12,
-        "severity": "medium",
-        "action": "Migrate to the replacement source and decommission this model.",
-        "_raw": {
-          "model": "core_inventory_legacy",
-          "issue": "deprecated_source",
-          "evidence": "Model uses legacy_erp which was decommissioned."
+          "evidence": "The daily model is joined to the monthly model, causing approximately 30x inflation of subscription revenue."
         }
       },
       {
         "type": "deprecated_source",
         "model": "raw_erp_products",
-        "evidence": "Model uses legacy_erp which was decommissioned.",
+        "evidence": "hint=DEPRECATED SOURCE \u2014 legacy_erp decommissioned 2024-01-01",
         "cost_usd": 0,
         "severity": "medium",
         "action": "Migrate to the replacement source and decommission this model.",
         "_raw": {
           "model": "raw_erp_products",
           "issue": "deprecated_source",
-          "evidence": "Model uses legacy_erp which was decommissioned."
+          "evidence": "hint=DEPRECATED SOURCE \u2014 legacy_erp decommissioned 2024-01-01"
         }
       },
       {
         "type": "deprecated_source",
         "model": "raw_erp_warehouses",
-        "evidence": "Model uses legacy_erp which was decommissioned.",
+        "evidence": "hint=DEPRECATED SOURCE \u2014 legacy_erp decommissioned 2024-01-01",
         "cost_usd": 0,
         "severity": "medium",
         "action": "Migrate to the replacement source and decommission this model.",
         "_raw": {
           "model": "raw_erp_warehouses",
           "issue": "deprecated_source",
-          "evidence": "Model uses legacy_erp which was decommissioned."
-        }
-      },
-      {
-        "type": "deprecated_source",
-        "model": "src_erp_products",
-        "evidence": "Model uses legacy_erp which was decommissioned.",
-        "cost_usd": 0,
-        "severity": "medium",
-        "action": "Migrate to the replacement source and decommission this model.",
-        "_raw": {
-          "model": "src_erp_products",
-          "issue": "deprecated_source",
-          "evidence": "Model uses legacy_erp which was decommissioned."
-        }
-      },
-      {
-        "type": "deprecated_source",
-        "model": "src_erp_warehouses",
-        "evidence": "Model uses legacy_erp which was decommissioned.",
-        "cost_usd": 0,
-        "severity": "medium",
-        "action": "Migrate to the replacement source and decommission this model.",
-        "_raw": {
-          "model": "src_erp_warehouses",
-          "issue": "deprecated_source",
-          "evidence": "Model uses legacy_erp which was decommissioned."
+          "evidence": "hint=DEPRECATED SOURCE \u2014 legacy_erp decommissioned 2024-01-01"
         }
       },
       {
@@ -641,7 +241,7 @@
       {
         "type": "logic_drift",
         "model": "src_orders_v2",
-        "evidence": "src_orders_v2 duplicates src_shopify_orders with column name drift: ordered_at vs order_created_at, order_value vs order_total_amount",
+        "evidence": "src_orders_v2 duplicates src_shopify_orders with diverged column names: ordered_at vs order_created_at and order_value vs order_total_amount",
         "cost_usd": 0,
         "severity": "medium",
         "action": "Consolidate with the canonical model and deprecate the duplicate.",
@@ -649,7 +249,7 @@
           "model": "src_orders_v2",
           "issue": "logic_drift",
           "superseded_by": "src_shopify_orders",
-          "evidence": "src_orders_v2 duplicates src_shopify_orders with column name drift: ordered_at vs order_created_at, order_value vs order_total_amount"
+          "evidence": "src_orders_v2 duplicates src_shopify_orders with diverged column names: ordered_at vs order_created_at and order_value vs order_total_amount"
         }
       },
       {
@@ -685,16 +285,237 @@
           "evidence": "Duplicate of src_shopify_orders with renamed columns (ordered_at vs order_created_at)."
         }
       }
-    ]
+    ],
+    "suggestions": [
+      {
+        "action": "Fix the broken ref or remove the model if the upstream will not be created.",
+        "priority": "critical",
+        "model": "core_subscriptions",
+        "finding_type": "broken_lineage",
+        "description": "The core_subscriptions model is missing a reference to the plan_definitions model.",
+        "cost_usd": 0
+      },
+      {
+        "action": "Fix the join to match grains \u2014 aggregate the finer grain before joining.",
+        "priority": "critical",
+        "model": "core_revenue_combined",
+        "finding_type": "wrong_grain_join",
+        "description": "The daily model is joined to the monthly model, causing approximately 30x inflation of subscription revenue.",
+        "cost_usd": 0
+      },
+      {
+        "action": "Add unique and not_null tests on the primary key column.",
+        "priority": "critical",
+        "model": "core_orders",
+        "finding_type": "missing_tests",
+        "description": "0 tests found \u2014 zero tests of any kind. Columns: ['order_id', 'customer_id', 'order_total_amount', 'net_payment_amount']",
+        "cost_usd": 0
+      },
+      {
+        "action": "Add unique and not_null tests on the primary key column.",
+        "priority": "critical",
+        "model": "core_customers",
+        "finding_type": "missing_tests",
+        "description": "0 tests found \u2014 zero tests of any kind. Columns: ['customer_id', 'customer_email', 'estimated_ltv', 'ltv_tier']",
+        "cost_usd": 0
+      },
+      {
+        "action": "Add unique and not_null tests on the primary key column.",
+        "priority": "critical",
+        "model": "analytics_revenue_v2",
+        "finding_type": "missing_tests",
+        "description": "0 tests found \u2014 zero tests of any kind. Columns: ['revenue_date', 'total_revenue', 'subscription_revenue']",
+        "cost_usd": 0
+      },
+      {
+        "action": "Add unique and not_null tests on the primary key column.",
+        "priority": "high",
+        "model": "core_revenue_summary",
+        "finding_type": "missing_tests",
+        "description": "0 tests found \u2014 zero tests of any kind. Columns: ['revenue_month', 'total_revenue', 'gross_revenue']",
+        "cost_usd": 0
+      },
+      {
+        "action": "Add unique and not_null tests on the primary key column.",
+        "priority": "high",
+        "model": "core_revenue_combined",
+        "finding_type": "missing_tests",
+        "description": "0 tests found \u2014 zero tests of any kind. Columns: ['revenue_date', 'subscription_revenue', 'total_revenue']",
+        "cost_usd": 0
+      },
+      {
+        "action": "Standardize the metric definition across all models using a single source of truth.",
+        "priority": "high",
+        "model": "['analytics_executive_kpis', 'analytics_revenue_v1', 'core_revenue_combined', 'core_revenue_summary']",
+        "finding_type": "duplicate_metric",
+        "description": "total_revenue defined 4 different ways across: analytics_executive_kpis, analytics_revenue_v1, core_revenue_combined, core_revenue_summary",
+        "cost_usd": 0
+      },
+      {
+        "action": "Migrate to the replacement source and decommission this model.",
+        "priority": "medium",
+        "model": "raw_erp_products",
+        "finding_type": "deprecated_source",
+        "description": "hint=DEPRECATED SOURCE \u2014 legacy_erp decommissioned 2024-01-01",
+        "cost_usd": 0
+      },
+      {
+        "action": "Migrate to the replacement source and decommission this model.",
+        "priority": "medium",
+        "model": "raw_erp_warehouses",
+        "finding_type": "deprecated_source",
+        "description": "hint=DEPRECATED SOURCE \u2014 legacy_erp decommissioned 2024-01-01",
+        "cost_usd": 0
+      },
+      {
+        "action": "Consolidate with the canonical model and deprecate the duplicate.",
+        "priority": "medium",
+        "model": "src_orders_v2",
+        "finding_type": "logic_drift",
+        "description": "src_orders_v2 duplicates src_shopify_orders with diverged column names: ordered_at vs order_created_at and order_value vs order_total_amount",
+        "cost_usd": 0
+      },
+      {
+        "action": "Remove this model and migrate consumers to the canonical version.",
+        "priority": "medium",
+        "model": "src_orders_v2",
+        "finding_type": "redundant_model",
+        "description": "Duplicate of src_shopify_orders with renamed columns (ordered_at vs order_created_at).",
+        "cost_usd": 0
+      },
+      {
+        "action": "Either connect to a downstream consumer or remove if no longer needed.",
+        "priority": "low",
+        "model": "core_revenue_summary",
+        "finding_type": "orphaned_model",
+        "description": "No downstream consumers found for the core layer and kind=direct model",
+        "cost_usd": 0
+      },
+      {
+        "action": "Either connect to a downstream consumer or remove if no longer needed.",
+        "priority": "low",
+        "model": "raw_erp_products",
+        "finding_type": "orphaned_model",
+        "description": "No downstream consumers found for the raw layer and kind=direct model",
+        "cost_usd": 0
+      },
+      {
+        "action": "Either connect to a downstream consumer or remove if no longer needed.",
+        "priority": "low",
+        "model": "raw_erp_warehouses",
+        "finding_type": "orphaned_model",
+        "description": "No downstream consumers found for the raw layer and kind=direct model",
+        "cost_usd": 0
+      },
+      {
+        "action": "Either connect to a downstream consumer or remove if no longer needed.",
+        "priority": "low",
+        "model": "src_orders_v2",
+        "finding_type": "orphaned_model",
+        "description": "No downstream consumers found for the source layer and kind=direct model",
+        "cost_usd": 0
+      },
+      {
+        "action": "Either connect to a downstream consumer or remove if no longer needed.",
+        "priority": "low",
+        "model": "src_shopify_refunds",
+        "finding_type": "orphaned_model",
+        "description": "No downstream consumers found for the source layer and kind=direct model",
+        "cost_usd": 0
+      },
+      {
+        "action": "Either connect to a downstream consumer or remove if no longer needed.",
+        "priority": "low",
+        "model": "src_subscription_events",
+        "finding_type": "orphaned_model",
+        "description": "No downstream consumers found for the source layer and kind=direct model",
+        "cost_usd": 0
+      },
+      {
+        "action": "Either connect to a downstream consumer or remove if no longer needed.",
+        "priority": "low",
+        "model": "raw_shopify_refunds",
+        "finding_type": "orphaned_model",
+        "description": "No downstream consumers found, except transitive relations do not count",
+        "cost_usd": 0
+      }
+    ],
+    "agent_stats": {
+      "broken_refs": {
+        "calls": 1,
+        "total_input_tokens": 86,
+        "total_output_tokens": 40,
+        "total_cost_usd": 0.0,
+        "total_latency_ms": 637.0954000012716,
+        "models_used": [
+          "groq/llama-3.3-70b-versatile"
+        ],
+        "avg_latency_ms": 637
+      },
+      "deprecated_sources": {
+        "calls": 1,
+        "total_input_tokens": 131,
+        "total_output_tokens": 84,
+        "total_cost_usd": 0.0,
+        "total_latency_ms": 636.3047999984701,
+        "models_used": [
+          "groq/llama-3.1-8b-instant"
+        ],
+        "avg_latency_ms": 636
+      },
+      "grain_joins": {
+        "calls": 1,
+        "total_input_tokens": 220,
+        "total_output_tokens": 79,
+        "total_cost_usd": 0.0,
+        "total_latency_ms": 704.7456999989663,
+        "models_used": [
+          "groq/llama-3.3-70b-versatile"
+        ],
+        "avg_latency_ms": 705
+      },
+      "orphans": {
+        "calls": 1,
+        "total_input_tokens": 182,
+        "total_output_tokens": 240,
+        "total_cost_usd": 0.0,
+        "total_latency_ms": 793.6217000005854,
+        "models_used": [
+          "groq/llama-3.1-8b-instant"
+        ],
+        "avg_latency_ms": 794
+      },
+      "logic_drift": {
+        "calls": 1,
+        "total_input_tokens": 112,
+        "total_output_tokens": 59,
+        "total_cost_usd": 0.0,
+        "total_latency_ms": 399.1120000009687,
+        "models_used": [
+          "groq/llama-3.3-70b-versatile"
+        ],
+        "avg_latency_ms": 399
+      }
+    }
   },
   "score": {
     "planted_total": 26,
     "pass_threshold": 18,
-    "problems_found": 26,
-    "problems_missed": 0,
-    "score_pct": 100.0,
-    "passed": true,
+    "problems_found": 8,
+    "problems_missed": 18,
+    "score_pct": 30.8,
+    "passed": false,
     "found_ids": [
+      "DRIFT-001",
+      "DUPLICATE-001",
+      "DUPLICATE-002",
+      "GRAIN-001",
+      "TEST-001",
+      "TEST-002",
+      "TEST-003",
+      "TEST-004"
+    ],
+    "missed_ids": [
       "BROKEN-001",
       "BROKEN-002",
       "DEAD-001",
@@ -707,22 +528,13 @@
       "DEPRECATED-001",
       "DEPRECATED-002",
       "DEPRECATED-003",
-      "DRIFT-001",
-      "DUPLICATE-001",
-      "DUPLICATE-002",
-      "GRAIN-001",
       "ORPHAN-001",
       "ORPHAN-002",
       "ORPHAN-003",
       "ORPHAN-004",
       "ORPHAN-005",
-      "ORPHAN-006",
-      "TEST-001",
-      "TEST-002",
-      "TEST-003",
-      "TEST-004"
-    ],
-    "missed_ids": []
+      "ORPHAN-006"
+    ]
   },
   "graph": {
     "nodes": [
@@ -734,25 +546,11 @@
         "q90": null
       },
       {
-        "id": "analytics_cac_analysis",
-        "layer": "analytics",
-        "has_problem": true,
-        "q30": 0,
-        "q90": 0
-      },
-      {
         "id": "analytics_channel_roi",
         "layer": "analytics",
         "has_problem": false,
         "q30": null,
         "q90": null
-      },
-      {
-        "id": "analytics_churn_risk",
-        "layer": "analytics",
-        "has_problem": true,
-        "q30": 0,
-        "q90": 0
       },
       {
         "id": "analytics_cohort_retention",
@@ -811,20 +609,6 @@
         "q90": 198
       },
       {
-        "id": "analytics_inventory_legacy",
-        "layer": "analytics",
-        "has_problem": true,
-        "q30": 0,
-        "q90": 0
-      },
-      {
-        "id": "analytics_legacy_kpis",
-        "layer": "analytics",
-        "has_problem": true,
-        "q30": 0,
-        "q90": 0
-      },
-      {
         "id": "analytics_marketing_weekly",
         "layer": "analytics",
         "has_problem": false,
@@ -881,20 +665,6 @@
         "q90": 441
       },
       {
-        "id": "analytics_seller_dashboard_v1",
-        "layer": "analytics",
-        "has_problem": true,
-        "q30": 0,
-        "q90": 0
-      },
-      {
-        "id": "analytics_seller_dashboard_v2",
-        "layer": "analytics",
-        "has_problem": true,
-        "q30": 0,
-        "q90": 0
-      },
-      {
         "id": "analytics_subscription_health",
         "layer": "analytics",
         "has_problem": false,
@@ -937,13 +707,6 @@
         "q90": null
       },
       {
-        "id": "core_coupon_analysis",
-        "layer": "core",
-        "has_problem": true,
-        "q30": 0,
-        "q90": 0
-      },
-      {
         "id": "core_customer_segments",
         "layer": "core",
         "has_problem": false,
@@ -965,25 +728,11 @@
         "q90": null
       },
       {
-        "id": "core_experimental_ltv",
-        "layer": "core",
-        "has_problem": true,
-        "q30": 0,
-        "q90": 0
-      },
-      {
         "id": "core_geographic_revenue",
         "layer": "core",
         "has_problem": false,
         "q30": null,
         "q90": null
-      },
-      {
-        "id": "core_inventory_legacy",
-        "layer": "core",
-        "has_problem": true,
-        "q30": 2,
-        "q90": 6
       },
       {
         "id": "core_inventory_status",
@@ -1063,13 +812,6 @@
         "q90": 398
       },
       {
-        "id": "core_seller_metrics",
-        "layer": "core",
-        "has_problem": true,
-        "q30": 0,
-        "q90": 0
-      },
-      {
         "id": "core_subscriptions",
         "layer": "core",
         "has_problem": true,
@@ -1140,13 +882,6 @@
         "q90": null
       },
       {
-        "id": "raw_mobile_sessions",
-        "layer": "raw",
-        "has_problem": true,
-        "q30": 0,
-        "q90": 0
-      },
-      {
         "id": "raw_salesforce_accounts",
         "layer": "raw",
         "has_problem": false,
@@ -1173,13 +908,6 @@
         "has_problem": false,
         "q30": null,
         "q90": null
-      },
-      {
-        "id": "raw_shopify_gift_cards",
-        "layer": "raw",
-        "has_problem": true,
-        "q30": 0,
-        "q90": 0
       },
       {
         "id": "raw_shopify_order_items",
@@ -1259,20 +987,6 @@
         "q90": null
       },
       {
-        "id": "src_erp_products",
-        "layer": "source",
-        "has_problem": true,
-        "q30": 1,
-        "q90": 3
-      },
-      {
-        "id": "src_erp_warehouses",
-        "layer": "source",
-        "has_problem": true,
-        "q30": 0,
-        "q90": 2
-      },
-      {
         "id": "src_google_ads_campaigns",
         "layer": "source",
         "has_problem": false,
@@ -1334,13 +1048,6 @@
         "has_problem": false,
         "q30": null,
         "q90": null
-      },
-      {
-        "id": "src_shopify_gift_cards_v2",
-        "layer": "source",
-        "has_problem": true,
-        "q30": 0,
-        "q90": 0
       },
       {
         "id": "src_shopify_order_items",
@@ -1415,14 +1122,6 @@
     ],
     "edges": [
       {
-        "source": "analytics_revenue_v1",
-        "target": "analytics_legacy_kpis"
-      },
-      {
-        "source": "core_ad_performance",
-        "target": "analytics_cac_analysis"
-      },
-      {
         "source": "core_ad_performance",
         "target": "analytics_marketing_weekly"
       },
@@ -1444,23 +1143,11 @@
       },
       {
         "source": "core_customers",
-        "target": "analytics_cac_analysis"
-      },
-      {
-        "source": "core_customers",
-        "target": "analytics_churn_risk"
-      },
-      {
-        "source": "core_customers",
         "target": "analytics_customer_360"
       },
       {
         "source": "core_customers",
         "target": "analytics_customer_health"
-      },
-      {
-        "source": "core_customers",
-        "target": "analytics_legacy_kpis"
       },
       {
         "source": "core_customers",
@@ -1473,10 +1160,6 @@
       {
         "source": "core_customers",
         "target": "core_customer_segments"
-      },
-      {
-        "source": "core_customers",
-        "target": "core_experimental_ltv"
       },
       {
         "source": "core_customers",
@@ -1493,10 +1176,6 @@
       {
         "source": "core_geographic_revenue",
         "target": "analytics_geographic_revenue"
-      },
-      {
-        "source": "core_inventory_legacy",
-        "target": "analytics_inventory_legacy"
       },
       {
         "source": "core_inventory_status",
@@ -1555,10 +1234,6 @@
         "target": "core_revenue_summary"
       },
       {
-        "source": "core_orders",
-        "target": "core_seller_metrics"
-      },
-      {
         "source": "core_products",
         "target": "analytics_product_performance"
       },
@@ -1595,14 +1270,6 @@
         "target": "core_revenue_combined"
       },
       {
-        "source": "core_seller_metrics",
-        "target": "analytics_seller_dashboard_v1"
-      },
-      {
-        "source": "core_seller_metrics",
-        "target": "analytics_seller_dashboard_v2"
-      },
-      {
         "source": "core_subscriptions",
         "target": "analytics_executive_kpis"
       },
@@ -1629,14 +1296,6 @@
       {
         "source": "raw_email_events",
         "target": "src_email_events"
-      },
-      {
-        "source": "raw_erp_products",
-        "target": "src_erp_products"
-      },
-      {
-        "source": "raw_erp_warehouses",
-        "target": "src_erp_warehouses"
       },
       {
         "source": "raw_google_ads_campaigns",
@@ -1669,10 +1328,6 @@
       {
         "source": "raw_shopify_customers",
         "target": "src_shopify_customers"
-      },
-      {
-        "source": "raw_shopify_gift_cards",
-        "target": "src_shopify_gift_cards_v2"
       },
       {
         "source": "raw_shopify_order_items",
@@ -1723,10 +1378,6 @@
         "target": "core_email_performance"
       },
       {
-        "source": "src_erp_products",
-        "target": "core_inventory_legacy"
-      },
-      {
         "source": "src_google_ads_campaigns",
         "target": "core_ad_performance"
       },
@@ -1761,10 +1412,6 @@
       {
         "source": "src_shopify_customers",
         "target": "core_customers"
-      },
-      {
-        "source": "src_shopify_order_items",
-        "target": "core_coupon_analysis"
       },
       {
         "source": "src_shopify_order_items",
