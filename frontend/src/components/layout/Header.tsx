@@ -3,10 +3,11 @@ import { useTheme } from '../../contexts/ThemeContext'
 import type { Tab } from '../../types'
 
 const TABS: { id: Tab; label: string }[] = [
-  { id: 'overview', label: 'Overview' },
-  { id: 'lineage',  label: 'Lineage'  },
-  { id: 'findings', label: 'Findings' },
-  { id: 'models',   label: 'Models'   },
+  { id: 'overview',      label: 'Overview'      },
+  { id: 'lineage',       label: 'Lineage'       },
+  { id: 'findings',      label: 'Findings'      },
+  { id: 'models',        label: 'Models'        },
+  { id: 'integrations',  label: 'Integrations'  },
 ]
 
 interface HeaderProps {
@@ -57,7 +58,6 @@ export function Header({ activeTab, onTabChange, onMenuToggle }: HeaderProps) {
         </button>
 
         <div className="flex items-center gap-2">
-          {/* Logo mark */}
           <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-blue-500 to-blue-700
             flex items-center justify-center shrink-0 shadow-sm">
             <span className="text-white font-bold text-sm select-none">D</span>
@@ -71,13 +71,13 @@ export function Header({ activeTab, onTabChange, onMenuToggle }: HeaderProps) {
       </div>
 
       {/* ── Center: nav tabs ── */}
-      <nav className="flex items-center gap-1">
+      <nav className="flex items-center gap-0.5">
         {TABS.map(tab => (
           <button
             key={tab.id}
             onClick={() => onTabChange(tab.id)}
             className={`
-              px-3 py-1.5 rounded-md text-sm font-medium transition-colors
+              px-3 py-1.5 rounded-md text-sm font-medium transition-colors whitespace-nowrap
               ${activeTab === tab.id
                 ? 'bg-blue-50 text-blue-700 dark:bg-blue-950 dark:text-blue-400'
                 : 'text-slate-500 hover:text-slate-900 hover:bg-slate-100 dark:text-slate-400 dark:hover:text-slate-100 dark:hover:bg-slate-800'
@@ -94,7 +94,6 @@ export function Header({ activeTab, onTabChange, onMenuToggle }: HeaderProps) {
 
       {/* ── Right: search + controls ── */}
       <div className="flex items-center gap-2 shrink-0">
-
         {/* Search */}
         <div
           className={`
@@ -147,7 +146,7 @@ export function Header({ activeTab, onTabChange, onMenuToggle }: HeaderProps) {
   )
 }
 
-/* ─── SVG Icon helpers ─── */
+/* ─── Icons ─── */
 
 function MenuIcon() {
   return (
