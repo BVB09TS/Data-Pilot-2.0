@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useTheme } from '../../contexts/ThemeContext'
 import type { Tab } from '../../types'
 
