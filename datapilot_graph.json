@@ -1,0 +1,943 @@
+{
+  "nodes": [
+    {
+      "id": "analytics_b2b_pipeline",
+      "layer": "analytics",
+      "has_problem": false,
+      "q30": null,
+      "q90": null
+    },
+    {
+      "id": "analytics_channel_roi",
+      "layer": "analytics",
+      "has_problem": false,
+      "q30": null,
+      "q90": null
+    },
+    {
+      "id": "analytics_cohort_retention",
+      "layer": "analytics",
+      "has_problem": false,
+      "q30": null,
+      "q90": null
+    },
+    {
+      "id": "analytics_customer_360",
+      "layer": "analytics",
+      "has_problem": false,
+      "q30": 387,
+      "q90": 1102
+    },
+    {
+      "id": "analytics_customer_health",
+      "layer": "analytics",
+      "has_problem": false,
+      "q30": 201,
+      "q90": 589
+    },
+    {
+      "id": "analytics_email_performance",
+      "layer": "analytics",
+      "has_problem": false,
+      "q30": 58,
+      "q90": 164
+    },
+    {
+      "id": "analytics_executive_kpis",
+      "layer": "analytics",
+      "has_problem": false,
+      "q30": 302,
+      "q90": 890
+    },
+    {
+      "id": "analytics_finance_monthly",
+      "layer": "analytics",
+      "has_problem": false,
+      "q30": 64,
+      "q90": 181
+    },
+    {
+      "id": "analytics_geographic_revenue",
+      "layer": "analytics",
+      "has_problem": false,
+      "q30": null,
+      "q90": null
+    },
+    {
+      "id": "analytics_inventory_current",
+      "layer": "analytics",
+      "has_problem": false,
+      "q30": 71,
+      "q90": 198
+    },
+    {
+      "id": "analytics_marketing_weekly",
+      "layer": "analytics",
+      "has_problem": false,
+      "q30": null,
+      "q90": null
+    },
+    {
+      "id": "analytics_mobile_engagement",
+      "layer": "analytics",
+      "has_problem": false,
+      "q30": null,
+      "q90": null
+    },
+    {
+      "id": "analytics_new_customer_acquisition",
+      "layer": "analytics",
+      "has_problem": false,
+      "q30": null,
+      "q90": null
+    },
+    {
+      "id": "analytics_new_vs_returning",
+      "layer": "analytics",
+      "has_problem": false,
+      "q30": null,
+      "q90": null
+    },
+    {
+      "id": "analytics_product_performance",
+      "layer": "analytics",
+      "has_problem": false,
+      "q30": 98,
+      "q90": 287
+    },
+    {
+      "id": "analytics_refund_analysis",
+      "layer": "analytics",
+      "has_problem": false,
+      "q30": null,
+      "q90": null
+    },
+    {
+      "id": "analytics_revenue_v1",
+      "layer": "analytics",
+      "has_problem": false,
+      "q30": 189,
+      "q90": 534
+    },
+    {
+      "id": "analytics_revenue_v2",
+      "layer": "analytics",
+      "has_problem": true,
+      "q30": 156,
+      "q90": 441
+    },
+    {
+      "id": "analytics_subscription_health",
+      "layer": "analytics",
+      "has_problem": false,
+      "q30": 134,
+      "q90": 389
+    },
+    {
+      "id": "analytics_subscription_mrr_trend",
+      "layer": "analytics",
+      "has_problem": false,
+      "q30": null,
+      "q90": null
+    },
+    {
+      "id": "analytics_web_traffic",
+      "layer": "analytics",
+      "has_problem": false,
+      "q30": null,
+      "q90": null
+    },
+    {
+      "id": "core_ad_performance",
+      "layer": "core",
+      "has_problem": false,
+      "q30": null,
+      "q90": null
+    },
+    {
+      "id": "core_b2b_accounts",
+      "layer": "core",
+      "has_problem": false,
+      "q30": null,
+      "q90": null
+    },
+    {
+      "id": "core_cohort_retention",
+      "layer": "core",
+      "has_problem": false,
+      "q30": null,
+      "q90": null
+    },
+    {
+      "id": "core_customer_segments",
+      "layer": "core",
+      "has_problem": false,
+      "q30": null,
+      "q90": null
+    },
+    {
+      "id": "core_customers",
+      "layer": "core",
+      "has_problem": true,
+      "q30": 289,
+      "q90": 841
+    },
+    {
+      "id": "core_email_performance",
+      "layer": "core",
+      "has_problem": false,
+      "q30": null,
+      "q90": null
+    },
+    {
+      "id": "core_geographic_revenue",
+      "layer": "core",
+      "has_problem": false,
+      "q30": null,
+      "q90": null
+    },
+    {
+      "id": "core_inventory_status",
+      "layer": "core",
+      "has_problem": false,
+      "q30": null,
+      "q90": null
+    },
+    {
+      "id": "core_mobile_engagement",
+      "layer": "core",
+      "has_problem": false,
+      "q30": null,
+      "q90": null
+    },
+    {
+      "id": "core_new_vs_returning",
+      "layer": "core",
+      "has_problem": false,
+      "q30": null,
+      "q90": null
+    },
+    {
+      "id": "core_opportunities",
+      "layer": "core",
+      "has_problem": false,
+      "q30": null,
+      "q90": null
+    },
+    {
+      "id": "core_orders",
+      "layer": "core",
+      "has_problem": true,
+      "q30": 412,
+      "q90": 1204
+    },
+    {
+      "id": "core_products",
+      "layer": "core",
+      "has_problem": false,
+      "q30": null,
+      "q90": null
+    },
+    {
+      "id": "core_refunds",
+      "layer": "core",
+      "has_problem": false,
+      "q30": null,
+      "q90": null
+    },
+    {
+      "id": "core_revenue_combined",
+      "layer": "core",
+      "has_problem": true,
+      "q30": null,
+      "q90": null
+    },
+    {
+      "id": "core_revenue_daily",
+      "layer": "core",
+      "has_problem": false,
+      "q30": null,
+      "q90": null
+    },
+    {
+      "id": "core_revenue_monthly",
+      "layer": "core",
+      "has_problem": false,
+      "q30": null,
+      "q90": null
+    },
+    {
+      "id": "core_revenue_summary",
+      "layer": "core",
+      "has_problem": true,
+      "q30": 143,
+      "q90": 398
+    },
+    {
+      "id": "core_subscriptions",
+      "layer": "core",
+      "has_problem": true,
+      "q30": null,
+      "q90": null
+    },
+    {
+      "id": "core_web_engagement",
+      "layer": "core",
+      "has_problem": false,
+      "q30": null,
+      "q90": null
+    },
+    {
+      "id": "raw_email_campaigns",
+      "layer": "raw",
+      "has_problem": false,
+      "q30": null,
+      "q90": null
+    },
+    {
+      "id": "raw_email_events",
+      "layer": "raw",
+      "has_problem": false,
+      "q30": null,
+      "q90": null
+    },
+    {
+      "id": "raw_erp_products",
+      "layer": "raw",
+      "has_problem": true,
+      "q30": null,
+      "q90": null
+    },
+    {
+      "id": "raw_erp_warehouses",
+      "layer": "raw",
+      "has_problem": true,
+      "q30": null,
+      "q90": null
+    },
+    {
+      "id": "raw_google_ads_campaigns",
+      "layer": "raw",
+      "has_problem": false,
+      "q30": null,
+      "q90": null
+    },
+    {
+      "id": "raw_google_ads_performance",
+      "layer": "raw",
+      "has_problem": false,
+      "q30": null,
+      "q90": null
+    },
+    {
+      "id": "raw_inventory_snapshots",
+      "layer": "raw",
+      "has_problem": false,
+      "q30": null,
+      "q90": null
+    },
+    {
+      "id": "raw_mobile_events",
+      "layer": "raw",
+      "has_problem": false,
+      "q30": null,
+      "q90": null
+    },
+    {
+      "id": "raw_salesforce_accounts",
+      "layer": "raw",
+      "has_problem": false,
+      "q30": null,
+      "q90": null
+    },
+    {
+      "id": "raw_salesforce_contacts",
+      "layer": "raw",
+      "has_problem": false,
+      "q30": null,
+      "q90": null
+    },
+    {
+      "id": "raw_salesforce_opportunities",
+      "layer": "raw",
+      "has_problem": false,
+      "q30": null,
+      "q90": null
+    },
+    {
+      "id": "raw_shopify_customers",
+      "layer": "raw",
+      "has_problem": false,
+      "q30": null,
+      "q90": null
+    },
+    {
+      "id": "raw_shopify_order_items",
+      "layer": "raw",
+      "has_problem": false,
+      "q30": null,
+      "q90": null
+    },
+    {
+      "id": "raw_shopify_orders",
+      "layer": "raw",
+      "has_problem": false,
+      "q30": null,
+      "q90": null
+    },
+    {
+      "id": "raw_shopify_product_variants",
+      "layer": "raw",
+      "has_problem": false,
+      "q30": null,
+      "q90": null
+    },
+    {
+      "id": "raw_shopify_products",
+      "layer": "raw",
+      "has_problem": false,
+      "q30": null,
+      "q90": null
+    },
+    {
+      "id": "raw_shopify_refunds",
+      "layer": "raw",
+      "has_problem": true,
+      "q30": null,
+      "q90": null
+    },
+    {
+      "id": "raw_stripe_payments",
+      "layer": "raw",
+      "has_problem": false,
+      "q30": null,
+      "q90": null
+    },
+    {
+      "id": "raw_stripe_refunds",
+      "layer": "raw",
+      "has_problem": false,
+      "q30": null,
+      "q90": null
+    },
+    {
+      "id": "raw_stripe_subscriptions",
+      "layer": "raw",
+      "has_problem": false,
+      "q30": null,
+      "q90": null
+    },
+    {
+      "id": "raw_web_sessions",
+      "layer": "raw",
+      "has_problem": false,
+      "q30": null,
+      "q90": null
+    },
+    {
+      "id": "src_email_campaigns",
+      "layer": "source",
+      "has_problem": false,
+      "q30": null,
+      "q90": null
+    },
+    {
+      "id": "src_email_events",
+      "layer": "source",
+      "has_problem": false,
+      "q30": null,
+      "q90": null
+    },
+    {
+      "id": "src_google_ads_campaigns",
+      "layer": "source",
+      "has_problem": false,
+      "q30": null,
+      "q90": null
+    },
+    {
+      "id": "src_google_ads_performance",
+      "layer": "source",
+      "has_problem": false,
+      "q30": null,
+      "q90": null
+    },
+    {
+      "id": "src_inventory_snapshots",
+      "layer": "source",
+      "has_problem": false,
+      "q30": null,
+      "q90": null
+    },
+    {
+      "id": "src_mobile_events",
+      "layer": "source",
+      "has_problem": false,
+      "q30": null,
+      "q90": null
+    },
+    {
+      "id": "src_orders_v2",
+      "layer": "source",
+      "has_problem": true,
+      "q30": 3,
+      "q90": 9
+    },
+    {
+      "id": "src_salesforce_accounts",
+      "layer": "source",
+      "has_problem": false,
+      "q30": null,
+      "q90": null
+    },
+    {
+      "id": "src_salesforce_contacts",
+      "layer": "source",
+      "has_problem": false,
+      "q30": null,
+      "q90": null
+    },
+    {
+      "id": "src_salesforce_opportunities",
+      "layer": "source",
+      "has_problem": false,
+      "q30": null,
+      "q90": null
+    },
+    {
+      "id": "src_shopify_customers",
+      "layer": "source",
+      "has_problem": false,
+      "q30": null,
+      "q90": null
+    },
+    {
+      "id": "src_shopify_order_items",
+      "layer": "source",
+      "has_problem": false,
+      "q30": null,
+      "q90": null
+    },
+    {
+      "id": "src_shopify_orders",
+      "layer": "source",
+      "has_problem": false,
+      "q30": null,
+      "q90": null
+    },
+    {
+      "id": "src_shopify_product_variants",
+      "layer": "source",
+      "has_problem": false,
+      "q30": null,
+      "q90": null
+    },
+    {
+      "id": "src_shopify_products",
+      "layer": "source",
+      "has_problem": false,
+      "q30": null,
+      "q90": null
+    },
+    {
+      "id": "src_shopify_refunds",
+      "layer": "source",
+      "has_problem": true,
+      "q30": null,
+      "q90": null
+    },
+    {
+      "id": "src_stripe_payments",
+      "layer": "source",
+      "has_problem": false,
+      "q30": null,
+      "q90": null
+    },
+    {
+      "id": "src_stripe_refunds",
+      "layer": "source",
+      "has_problem": false,
+      "q30": null,
+      "q90": null
+    },
+    {
+      "id": "src_stripe_subscriptions",
+      "layer": "source",
+      "has_problem": false,
+      "q30": null,
+      "q90": null
+    },
+    {
+      "id": "src_subscription_events",
+      "layer": "source",
+      "has_problem": true,
+      "q30": null,
+      "q90": null
+    },
+    {
+      "id": "src_web_sessions",
+      "layer": "source",
+      "has_problem": false,
+      "q30": null,
+      "q90": null
+    }
+  ],
+  "edges": [
+    {
+      "source": "core_ad_performance",
+      "target": "analytics_marketing_weekly"
+    },
+    {
+      "source": "core_b2b_accounts",
+      "target": "analytics_b2b_pipeline"
+    },
+    {
+      "source": "core_cohort_retention",
+      "target": "analytics_cohort_retention"
+    },
+    {
+      "source": "core_customer_segments",
+      "target": "analytics_customer_360"
+    },
+    {
+      "source": "core_customer_segments",
+      "target": "analytics_customer_health"
+    },
+    {
+      "source": "core_customers",
+      "target": "analytics_customer_360"
+    },
+    {
+      "source": "core_customers",
+      "target": "analytics_customer_health"
+    },
+    {
+      "source": "core_customers",
+      "target": "core_b2b_accounts"
+    },
+    {
+      "source": "core_customers",
+      "target": "core_cohort_retention"
+    },
+    {
+      "source": "core_customers",
+      "target": "core_customer_segments"
+    },
+    {
+      "source": "core_customers",
+      "target": "core_geographic_revenue"
+    },
+    {
+      "source": "core_customers",
+      "target": "core_subscriptions"
+    },
+    {
+      "source": "core_email_performance",
+      "target": "analytics_email_performance"
+    },
+    {
+      "source": "core_geographic_revenue",
+      "target": "analytics_geographic_revenue"
+    },
+    {
+      "source": "core_inventory_status",
+      "target": "analytics_inventory_current"
+    },
+    {
+      "source": "core_mobile_engagement",
+      "target": "analytics_customer_360"
+    },
+    {
+      "source": "core_mobile_engagement",
+      "target": "analytics_mobile_engagement"
+    },
+    {
+      "source": "core_new_vs_returning",
+      "target": "analytics_new_customer_acquisition"
+    },
+    {
+      "source": "core_new_vs_returning",
+      "target": "analytics_new_vs_returning"
+    },
+    {
+      "source": "core_opportunities",
+      "target": "analytics_b2b_pipeline"
+    },
+    {
+      "source": "core_orders",
+      "target": "analytics_channel_roi"
+    },
+    {
+      "source": "core_orders",
+      "target": "analytics_executive_kpis"
+    },
+    {
+      "source": "core_orders",
+      "target": "core_cohort_retention"
+    },
+    {
+      "source": "core_orders",
+      "target": "core_customers"
+    },
+    {
+      "source": "core_orders",
+      "target": "core_geographic_revenue"
+    },
+    {
+      "source": "core_orders",
+      "target": "core_refunds"
+    },
+    {
+      "source": "core_orders",
+      "target": "core_revenue_daily"
+    },
+    {
+      "source": "core_orders",
+      "target": "core_revenue_summary"
+    },
+    {
+      "source": "core_products",
+      "target": "analytics_product_performance"
+    },
+    {
+      "source": "core_refunds",
+      "target": "analytics_finance_monthly"
+    },
+    {
+      "source": "core_refunds",
+      "target": "analytics_refund_analysis"
+    },
+    {
+      "source": "core_revenue_combined",
+      "target": "analytics_revenue_v2"
+    },
+    {
+      "source": "core_revenue_daily",
+      "target": "analytics_finance_monthly"
+    },
+    {
+      "source": "core_revenue_daily",
+      "target": "analytics_revenue_v1"
+    },
+    {
+      "source": "core_revenue_daily",
+      "target": "core_revenue_combined"
+    },
+    {
+      "source": "core_revenue_monthly",
+      "target": "analytics_subscription_mrr_trend"
+    },
+    {
+      "source": "core_revenue_monthly",
+      "target": "core_revenue_combined"
+    },
+    {
+      "source": "core_subscriptions",
+      "target": "analytics_executive_kpis"
+    },
+    {
+      "source": "core_subscriptions",
+      "target": "analytics_subscription_health"
+    },
+    {
+      "source": "core_web_engagement",
+      "target": "analytics_channel_roi"
+    },
+    {
+      "source": "core_web_engagement",
+      "target": "analytics_new_customer_acquisition"
+    },
+    {
+      "source": "core_web_engagement",
+      "target": "analytics_web_traffic"
+    },
+    {
+      "source": "raw_email_campaigns",
+      "target": "src_email_campaigns"
+    },
+    {
+      "source": "raw_email_events",
+      "target": "src_email_events"
+    },
+    {
+      "source": "raw_google_ads_campaigns",
+      "target": "src_google_ads_campaigns"
+    },
+    {
+      "source": "raw_google_ads_performance",
+      "target": "src_google_ads_performance"
+    },
+    {
+      "source": "raw_inventory_snapshots",
+      "target": "src_inventory_snapshots"
+    },
+    {
+      "source": "raw_mobile_events",
+      "target": "src_mobile_events"
+    },
+    {
+      "source": "raw_salesforce_accounts",
+      "target": "src_salesforce_accounts"
+    },
+    {
+      "source": "raw_salesforce_contacts",
+      "target": "src_salesforce_contacts"
+    },
+    {
+      "source": "raw_salesforce_opportunities",
+      "target": "src_salesforce_opportunities"
+    },
+    {
+      "source": "raw_shopify_customers",
+      "target": "src_shopify_customers"
+    },
+    {
+      "source": "raw_shopify_order_items",
+      "target": "src_shopify_order_items"
+    },
+    {
+      "source": "raw_shopify_orders",
+      "target": "src_orders_v2"
+    },
+    {
+      "source": "raw_shopify_orders",
+      "target": "src_shopify_orders"
+    },
+    {
+      "source": "raw_shopify_product_variants",
+      "target": "src_shopify_product_variants"
+    },
+    {
+      "source": "raw_shopify_products",
+      "target": "src_shopify_products"
+    },
+    {
+      "source": "raw_shopify_refunds",
+      "target": "src_shopify_refunds"
+    },
+    {
+      "source": "raw_stripe_payments",
+      "target": "src_stripe_payments"
+    },
+    {
+      "source": "raw_stripe_refunds",
+      "target": "src_stripe_refunds"
+    },
+    {
+      "source": "raw_stripe_subscriptions",
+      "target": "src_stripe_subscriptions"
+    },
+    {
+      "source": "raw_web_sessions",
+      "target": "src_web_sessions"
+    },
+    {
+      "source": "src_email_campaigns",
+      "target": "core_email_performance"
+    },
+    {
+      "source": "src_email_events",
+      "target": "core_email_performance"
+    },
+    {
+      "source": "src_google_ads_campaigns",
+      "target": "core_ad_performance"
+    },
+    {
+      "source": "src_google_ads_performance",
+      "target": "core_ad_performance"
+    },
+    {
+      "source": "src_inventory_snapshots",
+      "target": "core_inventory_status"
+    },
+    {
+      "source": "src_mobile_events",
+      "target": "core_mobile_engagement"
+    },
+    {
+      "source": "src_salesforce_accounts",
+      "target": "core_b2b_accounts"
+    },
+    {
+      "source": "src_salesforce_accounts",
+      "target": "core_opportunities"
+    },
+    {
+      "source": "src_salesforce_contacts",
+      "target": "core_b2b_accounts"
+    },
+    {
+      "source": "src_salesforce_opportunities",
+      "target": "core_opportunities"
+    },
+    {
+      "source": "src_shopify_customers",
+      "target": "core_customers"
+    },
+    {
+      "source": "src_shopify_order_items",
+      "target": "core_orders"
+    },
+    {
+      "source": "src_shopify_order_items",
+      "target": "core_products"
+    },
+    {
+      "source": "src_shopify_orders",
+      "target": "core_new_vs_returning"
+    },
+    {
+      "source": "src_shopify_orders",
+      "target": "core_orders"
+    },
+    {
+      "source": "src_shopify_product_variants",
+      "target": "core_inventory_status"
+    },
+    {
+      "source": "src_shopify_product_variants",
+      "target": "core_products"
+    },
+    {
+      "source": "src_shopify_products",
+      "target": "core_inventory_status"
+    },
+    {
+      "source": "src_shopify_products",
+      "target": "core_products"
+    },
+    {
+      "source": "src_stripe_payments",
+      "target": "core_orders"
+    },
+    {
+      "source": "src_stripe_payments",
+      "target": "core_refunds"
+    },
+    {
+      "source": "src_stripe_refunds",
+      "target": "core_refunds"
+    },
+    {
+      "source": "src_stripe_subscriptions",
+      "target": "core_customers"
+    },
+    {
+      "source": "src_stripe_subscriptions",
+      "target": "core_revenue_monthly"
+    },
+    {
+      "source": "src_stripe_subscriptions",
+      "target": "core_subscriptions"
+    },
+    {
+      "source": "src_stripe_subscriptions",
+      "target": "src_subscription_events"
+    },
+    {
+      "source": "src_web_sessions",
+      "target": "core_web_engagement"
+    }
+  ]
+}

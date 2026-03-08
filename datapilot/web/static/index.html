@@ -7,88 +7,124 @@
 <script src="https://d3js.org/d3.v7.min.js"></script>
 <style>
 /* ========== CSS Variables ========== */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap');
 
 :root {
-  --bg: #f3f4f6; --bg2: #ffffff; --bg3: #f9fafb; --surface: rgba(255, 255, 255, 0.85);
-  --border: #e5e7eb; --border2: #d1d5db; --text: #111827; --text2: #4b5563;
-  --text3: #9ca3af; --accent: #4f46e5; --accent-light: #e0e7ff; --accent-hover: #4338ca;
-  --green: #10b981; --green-bg: #d1fae5; --red: #ef4444; --red-bg: #fee2e2;
-  --orange: #f59e0b; --orange-bg: #fef3c7; --yellow: #fbbf24;
-  --purple: #8b5cf6; --sidebar-w: 300px; --header-h: 64px;
-  --raw-color: #8b5cf6; --source-color: #3b82f6; --core-color: #10b981; --analytics-color: #f59e0b;
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-  --shadow-glow: 0 0 15px rgba(79, 70, 229, 0.3);
-  --radius: 8px; --radius-lg: 16px; --radius-xl: 24px;
-  --font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  --mono: 'SF Mono', SFMono-Regular, ui-monospace, Menlo, monospace;
-  --glass: blur(12px);
+  --bg: #edf1f5; --bg2: #ffffff; --bg3: #f7f9fc; --surface: rgba(255, 255, 255, 0.95);
+  --surface-alt: #eef5ff; --border: #d6dee8; --border2: #c2ccd8;
+  --text: #0f172a; --text2: #4f5f78; --text3: #7c8ca5;
+  --accent: #0f8ad8; --accent-hover: #0a6ab0; --accent-light: rgba(15, 138, 216, 0.12);
+  --accent-2: #0ec0a2; --accent-2-light: rgba(14, 192, 162, 0.15);
+  --green: #0fbc88; --green-bg: #d6f5ea; --red: #d94848; --red-bg: #fde2e1;
+  --orange: #ff9f1c; --orange-bg: #ffe9d0; --yellow: #f2c744;
+  --sidebar-w: 320px; --header-h: 64px;
+  --raw-color: #1d6de0; --source-color: #06b6d4; --core-color: #0fbc88; --analytics-color: #f2994a;
+  --shadow-sm: 0 1px 3px rgba(13, 31, 53, 0.08);
+  --shadow: 0 12px 25px rgba(15, 31, 53, 0.07);
+  --shadow-lg: 0 25px 55px rgba(15, 31, 53, 0.12);
+  --shadow-glow: 0 0 25px rgba(15, 138, 216, 0.35);
+  --radius: 10px; --radius-lg: 18px; --radius-xl: 28px;
+  --font: 'Space Grotesk', 'Segoe UI', 'Avenir Next', sans-serif;
+  --mono: 'IBM Plex Mono', SFMono-Regular, ui-monospace, Menlo, monospace;
+  --glass: blur(18px);
   --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 [data-theme="dark"] {
-  --bg: #0f172a; --bg2: #1e293b; --bg3: #334155; --surface: rgba(30, 41, 59, 0.85);
-  --border: #334155; --border2: #475569; --text: #f8fafc; --text2: #94a3b8;
-  --text3: #64748b; --accent: #6366f1; --accent-light: rgba(99, 102, 241, 0.15); --accent-hover: #818cf8;
-  --green: #34d399; --green-bg: rgba(16, 185, 129, 0.15); --red: #f87171; --red-bg: rgba(239, 68, 68, 0.15);
-  --orange: #fbbf24; --orange-bg: rgba(245, 158, 11, 0.15); --yellow: #fde047;
-  --raw-color: #a78bfa; --source-color: #60a5fa; --core-color: #34d399; --analytics-color: #fbbf24;
-  --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5); --shadow-lg: 0 15px 25px -5px rgba(0, 0, 0, 0.6);
-  --shadow-glow: 0 0 20px rgba(99, 102, 241, 0.3);
+  --bg: #081120; --bg2: #0f192b; --bg3: #162338; --surface: rgba(19, 31, 54, 0.92);
+  --surface-alt: #0f1d33; --border: #1f304a; --border2: #2a3d59;
+  --text: #f4f7fb; --text2: #9fb1c9; --text3: #70829f;
+  --accent: #41c1ff; --accent-hover: #1e9ad8; --accent-light: rgba(65, 193, 255, 0.16);
+  --accent-2: #2ee6c5; --accent-2-light: rgba(46, 230, 197, 0.18);
+  --green: #32e0a1; --green-bg: rgba(50, 224, 161, 0.15); --red: #ff6b6b; --red-bg: rgba(255, 107, 107, 0.15);
+  --orange: #ffb347; --orange-bg: rgba(255, 179, 71, 0.18); --yellow: #ffe266;
+  --raw-color: #5aa2ff; --source-color: #34d5f5; --core-color: #41e2b9; --analytics-color: #ffb347;
+  --shadow: 0 18px 40px rgba(0, 0, 0, 0.55); --shadow-lg: 0 30px 60px rgba(0, 0, 0, 0.5);
+  --shadow-glow: 0 0 35px rgba(65, 193, 255, 0.4);
 }
 
 /* ========== Reset & Base ========== */
 *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-html, body { height: 100%; font-family: var(--font); font-size: 14px; color: var(--text); background: var(--bg); -webkit-font-smoothing: antialiased; transition: background-color 0.3s ease, color 0.3s ease; }
+html, body { height: 100%; font-family: var(--font); font-size: 14px; color: var(--text); background: var(--bg); -webkit-font-smoothing: antialiased; transition: background-color 0.3s ease, color 0.3s ease; position: relative; }
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(circle at 20% 20%, rgba(15,138,216,0.25), transparent 45%),
+              radial-gradient(circle at 80% 0%, rgba(14,192,162,0.18), transparent 30%),
+              radial-gradient(circle at 70% 80%, rgba(251,153,74,0.15), transparent 35%);
+  pointer-events: none;
+  z-index: 0;
+}
 a { color: var(--accent); text-decoration: none; transition: var(--transition); }
 a:hover { color: var(--accent-hover); text-decoration: none; }
 button { cursor: pointer; font-family: var(--font); transition: var(--transition); }
 
 /* ========== Layout ========== */
-.app { display: flex; flex-direction: column; height: 100vh; }
+
+.app { display: flex; flex-direction: column; height: 100vh; position: relative; z-index: 1; }
+.app::after {
+  content: "";
+  position: absolute; inset: 20px; border-radius: var(--radius-xl);
+  border: 1px solid rgba(255,255,255,0.2); pointer-events: none;
+}
 
 /* --- Header --- */
 .header {
-  height: var(--header-h); display: flex; align-items: center; justify-content: space-between;
-  padding: 0 24px; background: var(--surface); border-bottom: 1px solid var(--border);
-  position: sticky; top: 0; z-index: 100; flex-shrink: 0; backdrop-filter: var(--glass); -webkit-backdrop-filter: var(--glass);
-  box-shadow: var(--shadow-sm);
+  height: var(--header-h); display: grid; grid-template-columns: auto 1fr auto;
+  align-items: center; padding: 0 32px; background: var(--surface);
+  border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100;
+  flex-shrink: 0; backdrop-filter: var(--glass); -webkit-backdrop-filter: var(--glass); box-shadow: var(--shadow-sm);
 }
-.header-left { display: flex; align-items: center; gap: 20px; }
-.logo { font-size: 22px; font-weight: 800; letter-spacing: -0.5px; color: var(--text); display: flex; align-items: center; gap: 8px;}
-.logo span { background: linear-gradient(135deg, var(--accent), #e81cff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-.ai-badge {
-  font-size: 10px; background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
-  color: white; padding: 4px 10px; border-radius: 12px; font-weight: 700;
-  text-transform: uppercase; letter-spacing: 0.05em; box-shadow: 0 2px 4px rgba(99, 102, 241, 0.3);
+.header-left { display: flex; align-items: center; gap: 16px; }
+.logo { font-size: 24px; font-weight: 800; letter-spacing: -0.4px; color: var(--text); display: flex; align-items: center; gap: 10px; }
+.logo span { background: linear-gradient(130deg, var(--accent), var(--accent-2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.status-group { display: flex; align-items: center; gap: 8px; }
+.status-chip {
+  font-size: 11px; padding: 4px 10px; border-radius: 999px; border: 1px solid rgba(255,255,255,0.15);
+  background: var(--surface-alt); color: var(--text2); font-weight: 600; letter-spacing: 0.03em; text-transform: uppercase;
 }
-.version-badge { font-size: 11px; background: var(--accent-light); color: var(--accent); padding: 2px 8px; border-radius: 10px; font-weight: 600; }
+.status-live { color: var(--accent); border-color: rgba(15,138,216,0.3); }
+.status-sync { color: var(--accent-2); border-color: rgba(14,192,162,0.3); }
+.header-center { display: flex; justify-content: center; }
 .header-right { display: flex; align-items: center; gap: 12px; }
+.primary-btn {
+  padding: 8px 16px; border-radius: var(--radius); background: var(--accent);
+  color: white; border: none; font-size: 13px; font-weight: 600; box-shadow: var(--shadow-sm);
+}
+.primary-btn:hover { background: var(--accent-hover); }
+.ghost-btn {
+  padding: 8px 14px; border-radius: var(--radius); border: 1px solid var(--border);
+  background: transparent; color: var(--text2); font-size: 13px; font-weight: 600;
+}
+.ghost-btn:hover { border-color: var(--accent); color: var(--accent); }
 
 /* Navigation tabs */
-.nav-tabs { display: flex; gap: 4px; height: 100%; align-items: stretch; padding-top: 12px; }
+.nav-tabs { display: flex; gap: 6px; height: 100%; align-items: center; justify-content: center; }
 .nav-tab {
-  display: flex; align-items: center; gap: 8px; padding: 0 20px; font-size: 14px; font-weight: 600;
-  color: var(--text2); border: none; background: transparent; border-bottom: 3px solid transparent;
-  transition: var(--transition); border-radius: 8px 8px 0 0;
+  display: flex; align-items: center; gap: 8px; padding: 10px 18px; font-size: 13px; font-weight: 600;
+  color: var(--text2); border: 1px solid transparent; background: transparent; border-radius: 999px;
+  transition: var(--transition);
 }
-.nav-tab:hover { color: var(--text); background: var(--bg2); }
-.nav-tab.active { color: var(--accent); border-bottom-color: var(--accent); background: var(--accent-light); }
+.nav-tab:hover { color: var(--text); background: var(--bg3); }
+.nav-tab.active { color: var(--accent); border-color: rgba(15,138,216,0.3); background: var(--accent-light); }
 .nav-tab svg { width: 16px; height: 16px; }
 
 /* Search box */
 .search-box {
-  display: flex; align-items: center; gap: 6px; background: var(--bg2);
-  border: 1px solid var(--border); border-radius: var(--radius); padding: 6px 12px; width: 240px;
+  display: flex; align-items: center; gap: 8px; background: var(--bg3);
+  border: 1px solid var(--border); border-radius: 999px; padding: 6px 14px; width: 260px;
+  position: relative;
 }
 .search-box input {
   border: none; background: none; outline: none; font-size: 13px; color: var(--text);
   width: 100%; font-family: var(--font);
 }
 .search-box input::placeholder { color: var(--text3); }
-.search-box { width: 280px; }
+.command-hint {
+  font-size: 11px; color: var(--text3); border: 1px solid var(--border); border-radius: 6px;
+  padding: 1px 6px; background: var(--surface);
+}
 .search-box svg { width: 14px; height: 14px; color: var(--text3); flex-shrink: 0; }
 
 /* Theme toggle */
@@ -99,26 +135,63 @@ button { cursor: pointer; font-family: var(--font); transition: var(--transition
 .theme-toggle:hover { background: var(--bg3); color: var(--text); }
 
 /* --- Main content area --- */
-.main { display: flex; flex: 1; overflow: hidden; }
+.main { display: flex; flex: 1; overflow: hidden; position: relative; }
+
+.activity-bar {
+  width: 60px; background: var(--surface); border-right: 1px solid var(--border);
+  display: flex; flex-direction: column; align-items: center; padding: 12px 0;
+  gap: 10px; box-shadow: var(--shadow-sm);
+}
+.activity-item {
+  width: 40px; height: 40px; border-radius: 12px; border: 1px solid transparent;
+  background: transparent; color: var(--text2); display: flex; align-items: center; justify-content: center;
+}
+.activity-item.active { background: var(--accent-light); color: var(--accent); border-color: rgba(15,138,216,0.3); }
+.workspace-body { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+.workspace-toolbar {
+  padding: 20px 28px 12px; border-bottom: 1px solid var(--border);
+  background: var(--surface); display: flex; align-items: center; justify-content: space-between; gap: 12px;
+}
+.workspace-context { display: flex; flex-direction: column; gap: 4px; }
+.workspace-breadcrumb { font-size: 12px; text-transform: uppercase; letter-spacing: 0.16em; color: var(--text3); }
+.workspace-heading { font-size: 22px; font-weight: 700; letter-spacing: -0.3px; }
+.workspace-subheading { font-size: 13px; color: var(--text2); }
+.workspace-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 4px; }
+.workspace-tag {
+  font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em;
+  padding: 2px 8px; border-radius: 999px; border: 1px solid var(--border); color: var(--text3);
+}
+.workspace-actions { display: flex; align-items: center; gap: 10px; }
 
 /* --- Sidebar --- */
 .sidebar {
-  width: var(--sidebar-w); background: var(--bg2); border-right: 1px solid var(--border);
-  overflow-y: auto; flex-shrink: 0; display: flex; flex-direction: column;
+  width: var(--sidebar-w); background: var(--surface); border-right: 1px solid var(--border);
+  overflow-y: auto; flex-shrink: 0; display: flex; flex-direction: column; backdrop-filter: var(--glass);
 }
-.sidebar-tabs { display: flex; border-bottom: 1px solid var(--border); }
+.sidebar-tabs { display: grid; grid-template-columns: repeat(3, 1fr); border-bottom: 1px solid var(--border); }
 .sidebar-tab {
-  flex: 1; padding: 10px 12px; font-size: 12px; font-weight: 600; color: var(--text2);
-  border: none; background: none; cursor: pointer; border-bottom: 2px solid transparent;
+  padding: 12px 0; font-size: 11px; font-weight: 600; color: var(--text3);
+  border: none; background: none; cursor: pointer; letter-spacing: 0.05em;
 }
-.sidebar-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
-.sidebar-header {
-  padding: 12px 16px; font-size: 11px; font-weight: 600; text-transform: uppercase;
-  letter-spacing: 0.05em; color: var(--text2); border-bottom: 1px solid var(--border);
-  display: flex; align-items: center; justify-content: space-between;
+.sidebar-tab.active { color: var(--accent); border-bottom: 2px solid var(--accent); }
+.sidebar-top { padding: 14px 16px 8px; border-bottom: 1px solid var(--border); display: flex; flex-direction: column; gap: 10px; }
+.sidebar-heading { display: flex; justify-content: space-between; align-items: baseline; font-size: 13px; font-weight: 700; }
+.sidebar-heading .count { font-size: 11px; color: var(--text3); }
+.sidebar-search {
+  display: flex; align-items: center; gap: 6px; border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 6px 10px; background: var(--bg3);
 }
-.sidebar-header .count { background: var(--bg3); padding: 1px 6px; border-radius: 8px; font-size: 10px; }
+.sidebar-search input {
+  border: none; background: none; outline: none; font-size: 12px; width: 100%; color: var(--text);
+}
+.sidebar-filters { display: flex; gap: 6px; flex-wrap: wrap; }
+.sidebar-filter-chip {
+  font-size: 11px; padding: 4px 10px; border-radius: 999px; border: 1px solid var(--border);
+  background: transparent; color: var(--text3); font-weight: 600;
+}
+.sidebar-filter-chip.active { border-color: var(--accent); color: var(--accent); background: var(--accent-light); }
 .sidebar-content { flex: 1; overflow-y: auto; padding: 4px 0; }
+.sidebar-empty { padding: 24px 16px; font-size: 12px; color: var(--text3); text-align: center; }
 
 /* Tree */
 .tree-group { margin-bottom: 2px; }
@@ -147,7 +220,7 @@ button { cursor: pointer; font-family: var(--font); transition: var(--transition
 .content { flex: 1; overflow-y: auto; background: var(--bg); }
 
 /* ========== Overview Tab ========== */
-.overview { padding: 24px; max-width: 1400px; }
+.overview { padding: 28px; max-width: 1400px; }
 .overview h2 { font-size: 20px; font-weight: 700; margin-bottom: 20px; }
 
 .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px; }
@@ -320,23 +393,68 @@ button { cursor: pointer; font-family: var(--font); transition: var(--transition
 .model-finding .mf-evidence { font-size: 12px; color: var(--text2); margin-bottom: 4px; }
 .model-finding .mf-action { font-size: 12px; color: var(--green); font-style: italic; }
 
+/* Models hub */
+.models-hub { padding: 28px; max-width: 1400px; display: flex; flex-direction: column; gap: 24px; }
+.models-hub-header { display: flex; flex-wrap: wrap; align-items: center; gap: 16px; justify-content: space-between; }
+.models-hub-header h2 { font-size: 20px; font-weight: 700; }
+.models-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; }
+.model-layer-card {
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg);
+  padding: 18px; box-shadow: var(--shadow-sm); display: flex; flex-direction: column; gap: 8px;
+}
+.model-layer-card h3 { font-size: 14px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text3); }
+.model-layer-card .layer-count { font-size: 28px; font-weight: 700; }
+.model-layer-card ul { list-style: none; margin-top: 8px; display: flex; flex-direction: column; gap: 6px; }
+.model-layer-card li { font-size: 12px; display: flex; justify-content: space-between; color: var(--text2); }
+.layer-pill { display: flex; align-items: center; gap: 6px; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text3); }
+.layer-pill .dot { width: 10px; height: 10px; border-radius: 50%; }
+.models-table-wrapper { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 16px; box-shadow: var(--shadow-sm); }
+.models-table-wrapper table { width: 100%; border-collapse: collapse; }
+.models-table-wrapper th { text-align: left; padding: 10px 12px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.04em; border-bottom: 1px solid var(--border); color: var(--text3); }
+.models-table-wrapper td { padding: 10px 12px; border-bottom: 1px solid var(--border); font-size: 13px; }
+.models-table-wrapper tr:hover { background: var(--bg3); cursor: pointer; }
+
 /* ========== Lineage Graph Tab ========== */
 .lineage-page { height: 100%; display: flex; flex-direction: column; }
 .lineage-toolbar {
-  display: flex; align-items: center; gap: 12px; padding: 12px 20px;
+  display: flex; flex-wrap: wrap; align-items: center; gap: 12px; padding: 14px 20px;
   border-bottom: 1px solid var(--border); background: var(--surface); flex-shrink: 0;
 }
 .lineage-toolbar button {
-  padding: 5px 12px; border-radius: var(--radius); border: 1px solid var(--border);
-  background: var(--surface); font-size: 12px; color: var(--text2); font-weight: 500;
+  padding: 6px 12px; border-radius: var(--radius); border: 1px solid var(--border);
+  background: var(--bg3); font-size: 12px; color: var(--text2); font-weight: 600;
 }
 .lineage-toolbar button:hover { background: var(--bg2); color: var(--text); }
-.lineage-legend { display: flex; gap: 16px; margin-left: auto; font-size: 11px; color: var(--text2); }
+.lineage-toolbar button.active { border-color: var(--accent); color: var(--accent); background: var(--accent-light); }
+.lineage-legend { display: flex; gap: 16px; margin-left: auto; font-size: 11px; color: var(--text2); flex-wrap: wrap; }
 .lineage-legend span { display: flex; align-items: center; gap: 4px; }
 .lineage-legend .dot { width: 10px; height: 10px; border-radius: 50%; }
-
-#lineage-canvas { flex: 1; overflow: hidden; }
+#lineage-canvas { flex: 1; overflow: hidden; background: var(--bg3); border-radius: var(--radius-lg); border: 1px solid var(--border); min-height: 420px; }
 #lineage-canvas svg { width: 100%; height: 100%; }
+
+.lineage-split { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 16px; flex: 1; padding: 16px 20px 24px; }
+.lineage-inspector {
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg);
+  padding: 18px; display: flex; flex-direction: column; gap: 16px; box-shadow: var(--shadow-sm);
+}
+.lineage-inspector h3 { font-size: 14px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text3); }
+.inspector-meta { font-size: 13px; color: var(--text2); line-height: 1.5; }
+.inspector-list { list-style: none; display: flex; flex-direction: column; gap: 8px; font-size: 12px; }
+.inspector-list li { padding: 8px 10px; border: 1px solid var(--border); border-radius: var(--radius); display: flex; justify-content: space-between; }
+.inspector-empty { font-size: 12px; color: var(--text3); text-align: center; }
+.lineage-aux {
+  padding: 0 20px 24px; display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px;
+}
+.lineage-minimap {
+  border: 1px dashed var(--border2); border-radius: var(--radius-lg);
+  padding: 16px; min-height: 150px; background: var(--surface-alt);
+  display: flex; align-items: center; justify-content: center; color: var(--text3); font-size: 12px;
+}
+.lineage-metrics { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 16px; }
+.lineage-metrics h4 { font-size: 13px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text3); margin-bottom: 10px; }
+.lineage-metrics dl { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; font-size: 13px; }
+.lineage-metrics dt { color: var(--text3); }
+.lineage-metrics dd { font-weight: 600; }
 
 /* Graph node styling */
 .graph-node rect { rx: 6; ry: 6; stroke-width: 1.5; cursor: pointer; transition: all 0.15s; }
@@ -457,29 +575,38 @@ button { cursor: pointer; font-family: var(--font); transition: var(--transition
   <header class="header">
     <div class="header-left">
       <div class="logo"><span>Data</span>Pilot</div>
-      <span class="ai-badge">AI-Powered</span>
-      <span class="version-badge">v2.0</span>
-      <nav class="nav-tabs">
-        <button class="nav-tab active" data-tab="overview">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
-          Overview
-        </button>
-        <button class="nav-tab" data-tab="lineage">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="5" cy="12" r="2"/><circle cx="19" cy="6" r="2"/><circle cx="19" cy="18" r="2"/><line x1="7" y1="12" x2="17" y2="6"/><line x1="7" y1="12" x2="17" y2="18"/></svg>
-          Lineage
-        </button>
-        <button class="nav-tab" data-tab="findings">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-          Findings
-        </button>
-      </nav>
+      <div class="status-group">
+        <span class="status-chip status-live">ShopMesh • Production</span>
+        <span class="status-chip status-sync">Audit synced · 12m ago</span>
+      </div>
     </div>
+    <nav class="nav-tabs header-center">
+      <button class="nav-tab active" data-tab="overview">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        Overview
+      </button>
+      <button class="nav-tab" data-tab="lineage">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="5" cy="12" r="2"/><circle cx="19" cy="6" r="2"/><circle cx="19" cy="18" r="2"/><line x1="7" y1="12" x2="17" y2="6"/><line x1="7" y1="12" x2="17" y2="18"/></svg>
+        Lineage
+      </button>
+      <button class="nav-tab" data-tab="findings">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        Findings
+      </button>
+      <button class="nav-tab" data-tab="models">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7l9-4 9 4-9 4-9-4z"/><path d="M3 17l9 4 9-4"/><path d="M3 12l9 4 9-4"/></svg>
+        Models
+      </button>
+    </nav>
     <div class="header-right">
-      <div class="search-box" style="position:relative">
+      <div class="search-box">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-        <input type="text" id="global-search" placeholder="Search for models..." autocomplete="off">
+        <input type="text" id="global-search" placeholder="Search models, columns, tags" autocomplete="off">
+        <span class="command-hint">⌘K</span>
         <div class="search-results" id="search-results"></div>
       </div>
+      <button class="ghost-btn" onclick="switchTab('lineage')">Lineage</button>
+      <button class="primary-btn" onclick="switchTab('findings')">Export</button>
       <button class="theme-toggle" id="theme-toggle" title="Toggle theme">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
       </button>
@@ -487,20 +614,62 @@ button { cursor: pointer; font-family: var(--font); transition: var(--transition
   </header>
 
   <div class="main">
+    <nav class="activity-bar">
+      <button class="activity-item active" title="Overview" data-activity-tab="overview" onclick="switchTab('overview')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18"/><path d="M12 3v18"/></svg>
+      </button>
+      <button class="activity-item" title="Models" data-activity-tab="models" onclick="switchTab('models')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      </button>
+      <button class="activity-item" title="Lineage" data-activity-tab="lineage" onclick="switchTab('lineage')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="5" cy="12" r="2"/><circle cx="19" cy="6" r="2"/><circle cx="19" cy="18" r="2"/><line x1="7" y1="12" x2="17" y2="6"/><line x1="7" y1="12" x2="17" y2="18"/></svg>
+      </button>
+      <button class="activity-item" title="Findings" data-activity-tab="findings" onclick="switchTab('findings')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l7 7-7 7-7-7z"/></svg>
+      </button>
+    </nav>
+
     <!-- Sidebar (dbt-style) -->
     <aside class="sidebar" id="sidebar">
       <div class="sidebar-tabs">
-        <button class="sidebar-tab active">Project</button>
+        <button class="sidebar-tab active">Models</button>
+        <button class="sidebar-tab">Sources</button>
+        <button class="sidebar-tab">Tests</button>
       </div>
-      <div class="sidebar-header">
-        <span>Overview</span>
-        <span class="count" id="model-count">0</span>
+      <div class="sidebar-top">
+        <div class="sidebar-heading">
+          <span>Explorer</span>
+          <span class="count" id="model-count">0 models</span>
+        </div>
+        <div class="sidebar-search">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" id="sidebar-search" placeholder="Filter by name, tag" autocomplete="off" />
+        </div>
+        <div class="sidebar-filters">
+          <button class="sidebar-filter-chip" id="sidebar-issues" onclick="toggleSidebarIssues()">Issues</button>
+          <button class="sidebar-filter-chip" onclick="switchTab('lineage')">Lineage</button>
+          <button class="sidebar-filter-chip" onclick="switchTab('findings')">Findings</button>
+        </div>
       </div>
       <div class="sidebar-content" id="model-tree"></div>
     </aside>
 
     <!-- Content -->
-    <main class="content" id="content"></main>
+    <div class="workspace-body">
+      <div class="workspace-toolbar">
+        <div class="workspace-context">
+          <div class="workspace-breadcrumb" id="workspace-breadcrumb">Project • ShopMesh</div>
+          <div class="workspace-heading" id="workspace-heading">Project Health</div>
+          <div class="workspace-subheading" id="workspace-subheading">Monitoring entire dbt estate</div>
+          <div class="workspace-tags" id="workspace-tags"></div>
+        </div>
+        <div class="workspace-actions">
+          <button class="ghost-btn" onclick="switchTab('lineage')">View Lineage</button>
+          <button class="primary-btn" onclick="switchTab('findings')">Run Diagnostics</button>
+        </div>
+      </div>
+      <main class="content" id="content"></main>
+    </div>
   </div>
 </div>
 
@@ -526,6 +695,9 @@ let state = {
   activeTab: 'overview', selectedModel: null,
   findingsFilter: 'all', theme: localStorage.getItem('dp-theme') || 'light',
   allModelsFlat: [],
+  sidebarFilter: '',
+  sidebarOnlyIssues: false,
+  lineageIssuesOnly: false,
 };
 
 // ==================== Init ====================
@@ -549,7 +721,8 @@ async function init() {
     }
   }
 
-  document.getElementById('model-count').textContent = state.allModelsFlat.length;
+  const countEl = document.getElementById('model-count');
+  if (countEl) countEl.textContent = `${state.allModelsFlat.length} models`;
   renderSidebar();
   renderContent();
 }
@@ -577,6 +750,7 @@ function setupEventListeners() {
       state.activeTab = tab.dataset.tab;
       state.selectedModel = null;
       hideLineageOverlay();
+       updateLineageInspector(null);
       renderContent();
     });
   });
@@ -622,32 +796,60 @@ function setupEventListeners() {
 // ==================== Sidebar ====================
 function renderSidebar() {
   const tree = document.getElementById('model-tree');
+  if (!tree || !state.models) return;
   const layers = ['raw', 'source', 'core', 'analytics'];
   const layerColors = { raw: 'var(--raw-color)', source: 'var(--source-color)', core: 'var(--core-color)', analytics: 'var(--analytics-color)' };
   const layerIcons = { raw: '&#9671;', source: '&#9651;', core: '&#9679;', analytics: '&#9733;' };
 
-  tree.innerHTML = layers.filter(l => state.models[l]).map(layer => {
-    const models = state.models[layer];
+  const filterText = state.sidebarFilter;
+  let visibleCount = 0;
+
+  const groups = layers.map(layer => {
+    const models = state.models[layer] || [];
+    const filtered = models.filter(m => {
+      const blob = `${m.name} ${(m.description || '')} ${(m.tags || []).join(' ')}`.toLowerCase();
+      const matchesText = !filterText || blob.includes(filterText);
+      const matchesIssues = !state.sidebarOnlyIssues || m.has_problem;
+      return matchesText && matchesIssues;
+    });
+    visibleCount += filtered.length;
+    if (!filtered.length) return '';
     return `
       <div class="tree-group">
         <div class="tree-group-header" onclick="toggleTreeGroup(this)">
           <span class="arrow open">&#9654;</span>
           <span class="layer-dot" style="background:${layerColors[layer]}"></span>
           <span>models/${layer}</span>
-          <span class="layer-count">${models.length}</span>
+          <span class="layer-count">${filtered.length}</span>
         </div>
         <div class="tree-items open">
-          ${models.map(m => `
+          ${filtered.map(m => `
             <div class="tree-item ${state.selectedModel === m.name ? 'active' : ''}" onclick="selectModel('${m.name}')">
               <span class="model-icon">${layerIcons[layer]}</span>
-              <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${m.name}</span>
+              <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${m.description || ''}">${m.name}</span>
               ${m.has_problem ? '<span class="problem-dot"></span>' : ''}
             </div>
           `).join('')}
         </div>
       </div>
     `;
-  }).join('');
+  }).filter(Boolean);
+
+  tree.innerHTML = groups.length ? groups.join('') : '<div class="sidebar-empty">No models match your filters.</div>';
+
+  const countEl = document.getElementById('model-count');
+  if (countEl) countEl.textContent = `${visibleCount} models`;
+
+  const searchInput = document.getElementById('sidebar-search');
+  if (searchInput) {
+    searchInput.value = state.sidebarFilter;
+    searchInput.oninput = (e) => {
+      state.sidebarFilter = e.target.value.toLowerCase();
+      renderSidebar();
+    };
+  }
+  const issuesBtn = document.getElementById('sidebar-issues');
+  if (issuesBtn) issuesBtn.classList.toggle('active', state.sidebarOnlyIssues);
 }
 
 function toggleTreeGroup(el) {
@@ -657,9 +859,47 @@ function toggleTreeGroup(el) {
   arrow.classList.toggle('open');
 }
 
+function toggleSidebarIssues() {
+  state.sidebarOnlyIssues = !state.sidebarOnlyIssues;
+  renderSidebar();
+}
+
+async function updateLineageInspector(modelName) {
+  const inspector = document.getElementById('lineage-inspector');
+  if (!inspector) return;
+  if (!modelName) {
+    inspector.innerHTML = '<h3>Lineage Inspector</h3><div class="inspector-empty">Select a node to inspect upstream/downstream.</div>';
+    return;
+  }
+  const model = state.allModelsFlat.find(m => m.name === modelName);
+  inspector.innerHTML = '<h3>Lineage Inspector</h3><div class="inspector-empty">Loading metadata...</div>';
+  try {
+    const linResp = await fetch(`/api/models/${modelName}/lineage`);
+    const lin = await linResp.json();
+    inspector.innerHTML = `
+      <h3>Lineage Inspector</h3>
+      <div class="inspector-meta">
+        <strong>${modelName}</strong><br/>
+        Layer: ${model?.layer || '—'} · Columns: ${model?.columns.length || 0} · Findings: ${model?.findings_count || 0}
+      </div>
+      <div>
+        <strong style="font-size:12px;color:var(--text3);text-transform:uppercase">Upstream (${lin.upstream?.length || 0})</strong>
+        ${lin.upstream?.length ? `<ul class="inspector-list">${lin.upstream.slice(0,5).map(u => `<li><span>${u}</span><button class="ghost-btn" style="padding:2px 6px;font-size:11px" onclick=\"selectModel('${u}')\">Open</button></li>`).join('')}</ul>` : '<div class="inspector-empty">None</div>'}
+      </div>
+      <div>
+        <strong style="font-size:12px;color:var(--text3);text-transform:uppercase">Downstream (${lin.downstream?.length || 0})</strong>
+        ${lin.downstream?.length ? `<ul class="inspector-list">${lin.downstream.slice(0,5).map(d => `<li><span>${d}</span><button class="ghost-btn" style="padding:2px 6px;font-size:11px" onclick=\"selectModel('${d}')\">Open</button></li>`).join('')}</ul>` : '<div class="inspector-empty">None</div>'}
+      </div>
+    `;
+  } catch (e) {
+    inspector.innerHTML = '<h3>Lineage Inspector</h3><div class="inspector-empty">Unable to load lineage.</div>';
+  }
+}
+
 // ==================== Content Router ====================
 function renderContent() {
   const content = document.getElementById('content');
+  if (!content) return;
   if (state.selectedModel) {
     renderModelDetail(content);
   } else {
@@ -667,8 +907,24 @@ function renderContent() {
       case 'overview': renderOverview(content); break;
       case 'lineage': renderLineage(content); break;
       case 'findings': renderFindings(content); break;
+      case 'models': renderModelsHub(content); break;
+      default: renderOverview(content); break;
     }
   }
+  updateWorkspaceContext();
+  syncActivityBar();
+}
+
+function switchTab(tabName) {
+  const tab = document.querySelector(`.nav-tab[data-tab="${tabName}"]`);
+  if (tab) tab.click();
+}
+
+function syncActivityBar() {
+  document.querySelectorAll('.activity-item').forEach(btn => {
+    const target = btn.getAttribute('data-activity-tab');
+    btn.classList.toggle('active', target === state.activeTab || (state.selectedModel && target === 'models' && state.activeTab !== 'lineage' && state.activeTab !== 'findings'));
+  });
 }
 
 // ==================== Select Model ====================
@@ -682,6 +938,7 @@ function selectModel(name) {
   document.getElementById('global-search').value = '';
   renderContent();
   updateLineageOverlay(name);
+  updateLineageInspector(name);
   document.getElementById('lineage-overlay').classList.add('show');
 }
 
@@ -729,6 +986,31 @@ function toggleLineageFullscreen() {
   } else {
     ov.style.cssText = '';
   }
+}
+
+function toggleLineageIssues() {
+  state.lineageIssuesOnly = !state.lineageIssuesOnly;
+  const btn = document.getElementById('lineage-issues-btn');
+  if (btn) btn.classList.toggle('active', state.lineageIssuesOnly);
+  applyLineageIssueFilter();
+}
+
+function applyLineageIssueFilter() {
+  if (!state.graph) return;
+  const issueMap = {};
+  (state.graph.nodes || []).forEach(n => { issueMap[n.id] = n.has_problem; });
+  const nodes = d3.selectAll('.graph-node');
+  const edges = d3.selectAll('.graph-edge');
+  nodes.classed('dimmed', d => state.lineageIssuesOnly && !d.has_problem);
+  if (!state.lineageIssuesOnly) {
+    edges.classed('dimmed', false);
+    return;
+  }
+  edges.classed('dimmed', function() {
+    const s = this.getAttribute('data-source');
+    const t = this.getAttribute('data-target');
+    return !(issueMap[s] || issueMap[t]);
+  });
 }
 
 // ==================== Overview ====================
@@ -845,6 +1127,138 @@ function renderOverview(container) {
       </div>
     </div>
   `;
+}
+
+function renderModelsHub(container) {
+  const layers = ['raw', 'source', 'core', 'analytics'];
+  const layerColors = { raw: 'var(--raw-color)', source: 'var(--source-color)', core: 'var(--core-color)', analytics: 'var(--analytics-color)' };
+  const layerStats = layers.map(layer => {
+    const models = state.models?.[layer] || [];
+    return {
+      layer,
+      models,
+      total: models.length,
+      issues: models.filter(m => m.has_problem).length,
+      highlighted: models.slice(0, 4),
+    };
+  }).filter(meta => meta.total > 0);
+
+  const busiest = [...state.allModelsFlat]
+    .sort((a, b) => (b.q30 || 0) - (a.q30 || 0))
+    .slice(0, 12);
+
+  container.innerHTML = `
+    <div class="models-hub">
+      <div class="models-hub-header">
+        <h2>Model Catalog</h2>
+        <div class="workspace-tags">
+          <span class="workspace-tag">${state.allModelsFlat.length} models</span>
+          <span class="workspace-tag">${state.graph?.edges?.length || 0} edges</span>
+          <span class="workspace-tag">${state.report?.report?.total_findings || 0} findings</span>
+        </div>
+      </div>
+      <div class="models-grid">
+        ${layerStats.length ? layerStats.map(meta => `
+          <div class="model-layer-card">
+            <div class="layer-pill"><span class="dot" style="background:${layerColors[meta.layer]}"></span>${meta.layer}</div>
+            <div class="layer-count">${meta.total}</div>
+            <div style="font-size:12px;color:${meta.issues ? 'var(--red)' : 'var(--text3)'}">
+              ${meta.issues} with issues
+            </div>
+            <ul>
+              ${meta.highlighted.map(m => `
+                <li onclick="selectModel('${m.name}')">
+                  <span style="font-family:var(--mono);font-size:12px">${m.name}</span>
+                  <span style="color:${m.has_problem ? 'var(--red)' : 'var(--text3)'}">${m.columns.length} cols</span>
+                </li>
+              `).join('')}
+            </ul>
+          </div>
+        `).join('') : '<div class="sidebar-empty" style="width:100%">Models loading...</div>'}
+      </div>
+      <div class="models-table-wrapper">
+        <table>
+          <thead>
+            <tr><th>Model</th><th>Layer</th><th>Queries 30d</th><th>Columns</th><th>Status</th></tr>
+          </thead>
+          <tbody>
+            ${busiest.map(m => `
+              <tr onclick="selectModel('${m.name}')">
+                <td style="font-family:var(--mono);font-weight:600">${m.name}</td>
+                <td>${m.layer}</td>
+                <td>${m.q30 != null ? m.q30 : '—'}</td>
+                <td>${m.columns.length}</td>
+                <td style="color:${m.has_problem ? 'var(--red)' : 'var(--green)'}">${m.has_problem ? 'Needs attention' : 'Healthy'}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  `;
+}
+
+function updateWorkspaceContext() {
+  const headingEl = document.getElementById('workspace-heading');
+  const subEl = document.getElementById('workspace-subheading');
+  const crumbEl = document.getElementById('workspace-breadcrumb');
+  const tagsEl = document.getElementById('workspace-tags');
+  if (!headingEl || !subEl || !crumbEl || !tagsEl) return;
+
+  if (state.selectedModel) {
+    const model = state.allModelsFlat.find(m => m.name === state.selectedModel);
+    headingEl.textContent = state.selectedModel;
+    subEl.textContent = model?.description || 'Model detail overview';
+    crumbEl.textContent = `Model • ${model?.layer || 'dbt'}`;
+    tagsEl.innerHTML = model ? `
+      <span class="workspace-tag">Layer: ${model.layer}</span>
+      <span class="workspace-tag">${model.columns.length} columns</span>
+      <span class="workspace-tag">Findings: ${model.findings_count}</span>
+    ` : '';
+    return;
+  }
+
+  const tabMeta = {
+    overview: { title: 'Project Health', desc: 'LLM-powered audit summary' },
+    models: { title: 'Model Catalog', desc: 'Browse layers, owners, tags' },
+    lineage: { title: 'Lineage Graph', desc: 'Interactive dependency explorer' },
+    findings: { title: 'Audit Findings', desc: 'Remediate quality issues fast' },
+  };
+  const meta = tabMeta[state.activeTab] || tabMeta.overview;
+  headingEl.textContent = meta.title;
+  subEl.textContent = meta.desc;
+  crumbEl.textContent = `Project • ${meta.title}`;
+
+  const counts = {
+    models: state.allModelsFlat.length,
+    edges: state.graph?.edges?.length || 0,
+    findings: state.report?.report?.total_findings || 0,
+  };
+
+  let tagsHtml = '';
+  if (state.activeTab === 'lineage') {
+    tagsHtml = `
+      <span class="workspace-tag">${counts.models} nodes</span>
+      <span class="workspace-tag">${counts.edges} edges</span>
+    `;
+  } else if (state.activeTab === 'models') {
+    const layerCount = state.models ? Object.values(state.models).filter(arr => arr.length).length : 0;
+    tagsHtml = `
+      <span class="workspace-tag">Layers: ${layerCount}</span>
+      <span class="workspace-tag">Issues: ${state.report?.report?.total_findings || 0}</span>
+    `;
+  } else if (state.activeTab === 'findings') {
+    tagsHtml = `
+      <span class="workspace-tag">${counts.findings} findings</span>
+      <span class="workspace-tag">${counts.models} models</span>
+    `;
+  } else {
+    tagsHtml = `
+      <span class="workspace-tag">${counts.models} models</span>
+      <span class="workspace-tag">${counts.edges} dependencies</span>
+    `;
+  }
+  tagsEl.innerHTML = tagsHtml;
 }
 
 // ==================== Findings ====================
@@ -1014,7 +1428,7 @@ async function renderModelDetail(container) {
       </div>
 
       <div style="margin-top:16px">
-        <button onclick="state.selectedModel=null;hideLineageOverlay();renderSidebar();renderContent();"
+        <button onclick="state.selectedModel=null;hideLineageOverlay();updateLineageInspector(null);renderSidebar();renderContent();"
                 style="padding:6px 14px;border:1px solid var(--border);border-radius:var(--radius);background:var(--surface);color:var(--text2);font-size:12px">
           &#8592; Back to ${state.activeTab}
         </button>
@@ -1052,23 +1466,49 @@ function highlightSQL(sql) {
 
 // ==================== Lineage Graph ====================
 function renderLineage(container) {
+  const nodesCount = (state.graph?.nodes || []).length;
+  const edgesCount = (state.graph?.edges || []).length;
+  const issueCount = (state.graph?.nodes || []).filter(n => n.has_problem).length;
+  const avgDegree = nodesCount ? ((edgesCount * 2) / nodesCount).toFixed(1) : 0;
+
   container.innerHTML = `
     <div class="lineage-page">
       <div class="lineage-toolbar">
         <button onclick="resetLineageView()">Reset View</button>
         <button onclick="fitLineage()">Fit to Screen</button>
+        <button id="lineage-issues-btn" class="${state.lineageIssuesOnly ? 'active' : ''}" onclick="toggleLineageIssues()">Highlight Issues</button>
+        <button onclick="hideLineageOverlay()">Hide Overlay</button>
         <div class="lineage-legend">
           <span><span class="dot" style="background:var(--raw-color)"></span> Raw</span>
           <span><span class="dot" style="background:var(--source-color)"></span> Source</span>
           <span><span class="dot" style="background:var(--core-color)"></span> Core</span>
           <span><span class="dot" style="background:var(--analytics-color)"></span> Analytics</span>
-          <span><span class="dot" style="background:var(--red)"></span> Has Issues</span>
+          <span><span class="dot" style="background:var(--red)"></span> Issues</span>
         </div>
       </div>
-      <div id="lineage-canvas"></div>
+      <div class="lineage-split">
+        <div id="lineage-canvas"></div>
+        <aside class="lineage-inspector" id="lineage-inspector">
+          <h3>Lineage Inspector</h3>
+          <div class="inspector-empty">Select a node to inspect upstream/downstream relationships.</div>
+        </aside>
+      </div>
+      <div class="lineage-aux">
+        <div class="lineage-minimap" id="lineage-minimap">Mini-map view coming soon. Use zoom controls to explore.</div>
+        <div class="lineage-metrics">
+          <h4>Graph Metrics</h4>
+          <dl>
+            <dt>Nodes</dt><dd>${nodesCount}</dd>
+            <dt>Edges</dt><dd>${edgesCount}</dd>
+            <dt>Avg. degree</dt><dd>${avgDegree}</dd>
+            <dt>Issues</dt><dd>${issueCount}</dd>
+          </dl>
+        </div>
+      </div>
     </div>
   `;
   setTimeout(() => drawLineageGraph(), 50);
+  updateLineageInspector(state.selectedModel);
 }
 
 let lineageSvg, lineageG, lineageZoom;
@@ -1169,6 +1609,7 @@ function drawLineageGraph() {
     .attr('cx', nodeW - 10).attr('cy', nodeH / 2)
     .attr('r', 4).attr('fill', 'var(--red)');
 
+  applyLineageIssueFilter();
   // Fit to screen
   setTimeout(fitLineage, 100);
 }
