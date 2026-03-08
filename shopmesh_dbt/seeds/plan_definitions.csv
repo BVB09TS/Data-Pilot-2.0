@@ -1,5 +1,0 @@
-plan_id,plan_name,plan_tier,monthly_price_usd,annual_price_usd,max_seats
-plan_starter,Starter,starter,9.99,99.00,1
-plan_growth,Growth,growth,29.99,299.00,5
-plan_pro,Pro,pro,79.99,799.00,20
-plan_enterprise,Enterprise,enterprise,199.99,1999.00,999

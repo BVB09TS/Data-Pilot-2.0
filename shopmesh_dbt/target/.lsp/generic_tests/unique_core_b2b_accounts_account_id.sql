@@ -1,1 +1,0 @@
-{{ test_unique(column_name="account_id", model=get_where_subquery(ref('core_b2b_accounts'))) }}

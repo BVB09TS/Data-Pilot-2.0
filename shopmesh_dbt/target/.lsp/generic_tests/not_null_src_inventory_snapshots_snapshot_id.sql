@@ -1,1 +1,0 @@
-{{ test_not_null(column_name="snapshot_id", model=get_where_subquery(ref('src_inventory_snapshots'))) }}

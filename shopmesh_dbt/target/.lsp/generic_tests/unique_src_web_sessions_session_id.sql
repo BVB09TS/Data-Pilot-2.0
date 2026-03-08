@@ -1,1 +1,0 @@
-{{ test_unique(column_name="session_id", model=get_where_subquery(ref('src_web_sessions'))) }}

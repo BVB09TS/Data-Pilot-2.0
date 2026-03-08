@@ -1,1 +1,0 @@
-{{ test_not_null(column_name="performance_date", model=get_where_subquery(ref('src_google_ads_performance'))) }}

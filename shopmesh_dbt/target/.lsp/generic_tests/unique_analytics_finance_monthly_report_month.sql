@@ -1,1 +1,0 @@
-{{ test_unique(column_name="report_month", model=get_where_subquery(ref('analytics_finance_monthly'))) }}

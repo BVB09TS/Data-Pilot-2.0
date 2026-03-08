@@ -1,1 +1,0 @@
-{{ test_unique(column_name="revenue_date", model=get_where_subquery(ref('core_revenue_daily'))) }}

@@ -1,1 +1,0 @@
-{{ test_not_null(column_name="variant_id", model=get_where_subquery(ref('core_inventory_status'))) }}

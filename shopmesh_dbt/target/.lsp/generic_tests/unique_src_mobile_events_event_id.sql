@@ -1,1 +1,0 @@
-{{ test_unique(column_name="event_id", model=get_where_subquery(ref('src_mobile_events'))) }}

@@ -1,9 +1,0 @@
-version: 2
-models:
-  - name: analytics_inventory_legacy
-    description: "DEAD MODEL + DEPRECATED SOURCE CHAIN: core_inventory_legacy -> src_erp_products -> legacy_erp (decommissioned). Replaced by analytics_inventory_current. Still costing $31/month."
-    config:
-      tags: ["analytics"]
-    columns:
-      - name: legacy_product_id
-        description: "DEPRECATED — use analytics_inventory_current"

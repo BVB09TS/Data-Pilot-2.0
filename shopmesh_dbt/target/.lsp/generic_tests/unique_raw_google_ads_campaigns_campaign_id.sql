@@ -1,1 +1,0 @@
-{{ test_unique(column_name="campaign_id", model=get_where_subquery(ref('raw_google_ads_campaigns'))) }}

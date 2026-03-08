@@ -1,1 +1,0 @@
-{{ test_not_null(column_name="event_at", model=get_where_subquery(ref('src_mobile_events'))) }}

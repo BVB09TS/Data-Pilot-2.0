@@ -1,1 +1,0 @@
-{{ test_unique(column_name="variant_id", model=get_where_subquery(ref('src_shopify_product_variants'))) }}
