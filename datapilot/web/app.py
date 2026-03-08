@@ -27,7 +27,12 @@ def create_app(report_path: str | None = None, graph_path: str | None = None,
                project_path: str | None = None) -> Flask:
     """Create the web dashboard application."""
     base = os.path.dirname(os.path.abspath(__file__))
-    static_dir = os.path.join(base, "static")
+
+    # Prefer the React/Vite build output; fall back to the legacy single-file UI.
+    repo_root = Path(base).parent.parent
+    dist_dir = repo_root / "frontend" / "dist"
+    static_dir = str(dist_dir) if dist_dir.exists() else os.path.join(base, "static")
+
     report_path = report_path or os.path.join(base, "..", "..", "datapilot_report.json")
     graph_path = graph_path or os.path.join(base, "..", "..", "datapilot_graph.json")
     project_path = project_path or os.path.join(base, "..", "..", "shopmesh_dbt")
@@ -287,6 +292,16 @@ def create_app(report_path: str | None = None, graph_path: str | None = None,
                 "cost_usd": response.cost_usd,
             }
         )
+
+    # Serve Vite-built JS/CSS chunks (lives in dist/assets/)
+    @app.route("/assets/<path:filename>")
+    def serve_vite_assets(filename: str):
+        return send_from_directory(os.path.join(static_dir, "assets"), filename)
+
+    # SPA catch-all — any non-API path returns index.html so React Router works
+    @app.route("/<path:path>")
+    def spa_fallback(path: str):
+        return send_from_directory(static_dir, "index.html")
 
     return app
 
