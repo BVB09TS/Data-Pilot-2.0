@@ -414,6 +414,54 @@ button { cursor: pointer; font-family: var(--font); transition: var(--transition
 .models-table-wrapper td { padding: 10px 12px; border-bottom: 1px solid var(--border); font-size: 13px; }
 .models-table-wrapper tr:hover { background: var(--bg3); cursor: pointer; }
 
+/* AI Copilot */
+.ai-chat-backdrop {
+  position: fixed; inset: 0; background: rgba(10, 24, 42, 0.45);
+  opacity: 0; pointer-events: none; transition: var(--transition); z-index: 180;
+}
+.ai-chat-backdrop.show { opacity: 1; pointer-events: auto; }
+.ai-chat {
+  position: fixed; bottom: 28px; right: 28px; width: min(380px, calc(100vw - 32px));
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius-xl); box-shadow: var(--shadow-lg);
+  display: flex; flex-direction: column; gap: 12px; padding: 18px;
+  transform: translateY(20px); opacity: 0; pointer-events: none; z-index: 200;
+  transition: var(--transition);
+}
+.ai-chat.open { opacity: 1; transform: translateY(0); pointer-events: auto; }
+.ai-chat-header { display: flex; justify-content: space-between; align-items: center; }
+.ai-chat-title { font-size: 16px; font-weight: 700; }
+.ai-chat-subtitle { font-size: 12px; color: var(--text3); margin-top: 2px; }
+.ai-chat-close {
+  width: 28px; height: 28px; border-radius: 50%; border: 1px solid var(--border);
+  background: transparent; color: var(--text2); font-size: 18px; line-height: 1;
+}
+.ai-chat-close:hover { background: var(--bg3); }
+.ai-chat-messages {
+  max-height: 360px; overflow-y: auto; display: flex; flex-direction: column;
+  gap: 10px; padding-right: 6px;
+}
+.ai-message { padding: 10px 12px; border-radius: var(--radius); border: 1px solid var(--border); background: var(--bg3); }
+.ai-message.user { background: var(--accent-light); border-color: rgba(15,138,216,0.3); }
+.ai-message.assistant { background: var(--surface); }
+.ai-message .meta { font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text3); margin-bottom: 4px; }
+.ai-message .body { font-size: 13px; line-height: 1.5; color: var(--text); white-space: pre-wrap; word-break: break-word; }
+.ai-message .foot { font-size: 11px; color: var(--text3); margin-top: 6px; }
+.ai-chat-input { display: flex; flex-direction: column; gap: 8px; }
+.ai-chat-input textarea {
+  width: 100%; border-radius: var(--radius); border: 1px solid var(--border);
+  padding: 8px 10px; resize: vertical; min-height: 60px; font-family: var(--font); font-size: 13px;
+  background: var(--bg2); color: var(--text);
+}
+.ai-chat-input textarea:focus { border-color: var(--accent); outline: none; }
+.ai-chat-actions { display: flex; align-items: center; justify-content: space-between; }
+.ai-chat-footnote { font-size: 11px; color: var(--text3); }
+.ai-chat-send {
+  border: none; background: var(--accent); color: white; font-weight: 600;
+  padding: 8px 16px; border-radius: 999px; font-size: 13px;
+}
+.ai-chat-send:disabled { opacity: 0.6; cursor: not-allowed; }
+
 /* ========== Lineage Graph Tab ========== */
 .lineage-page { height: 100%; display: flex; flex-direction: column; }
 .lineage-toolbar {
@@ -606,7 +654,8 @@ button { cursor: pointer; font-family: var(--font); transition: var(--transition
         <div class="search-results" id="search-results"></div>
       </div>
       <button class="ghost-btn" onclick="switchTab('lineage')">Lineage</button>
-      <button class="primary-btn" onclick="switchTab('findings')">Export</button>
+      <button class="ghost-btn" onclick="switchTab('findings')">Export</button>
+      <button class="primary-btn" id="chat-toggle">AI Copilot</button>
       <button class="theme-toggle" id="theme-toggle" title="Toggle theme">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
       </button>
@@ -688,6 +737,26 @@ button { cursor: pointer; font-family: var(--font); transition: var(--transition
 <!-- Tooltip -->
 <div class="tooltip" id="tooltip"></div>
 
+<!-- AI Copilot Panel -->
+<div class="ai-chat-backdrop" id="ai-chat-backdrop"></div>
+<section class="ai-chat" id="ai-chat" aria-hidden="true">
+  <div class="ai-chat-header">
+    <div>
+      <div class="ai-chat-title">DataPilot Copilot</div>
+      <div class="ai-chat-subtitle">Groq • Llama 3.3 70B</div>
+    </div>
+    <button class="ai-chat-close" id="ai-chat-close" title="Close chat">&times;</button>
+  </div>
+  <div class="ai-chat-messages" id="ai-chat-messages"></div>
+  <form class="ai-chat-input" id="ai-chat-form">
+    <textarea id="ai-chat-input-field" rows="2" placeholder="Ask about a model, lineage impact, or findings..."></textarea>
+    <div class="ai-chat-actions">
+      <span class="ai-chat-footnote" id="ai-chat-status">Connected</span>
+      <button type="submit" class="ai-chat-send">Send</button>
+    </div>
+  </form>
+</section>
+
 <script>
 // ==================== State ====================
 let state = {
@@ -698,6 +767,18 @@ let state = {
   sidebarFilter: '',
   sidebarOnlyIssues: false,
   lineageIssuesOnly: false,
+};
+
+const chatState = {
+  open: false,
+  sending: false,
+  messages: [
+    {
+      role: 'assistant',
+      content: 'Hi! I\'m your DataPilot Copilot. Select a model or ask about lineage, quality findings, or opportunities to optimize.',
+      meta: { timestamp: new Date().toISOString() },
+    },
+  ],
 };
 
 // ==================== Init ====================
@@ -789,8 +870,14 @@ function setupEventListeners() {
   // Ctrl+K shortcut
   document.addEventListener('keydown', (e) => {
     if ((e.ctrlKey || e.metaKey) && e.key === 'k') { e.preventDefault(); searchInput.focus(); }
-    if (e.key === 'Escape') { searchInput.blur(); searchResults.classList.remove('show'); }
+    if (e.key === 'Escape') {
+      searchInput.blur();
+      searchResults.classList.remove('show');
+      if (chatState.open) closeChat();
+    }
   });
+
+  setupChatUI();
 }
 
 // ==================== Sidebar ====================
@@ -1215,6 +1302,7 @@ function updateWorkspaceContext() {
       <span class="workspace-tag">${model.columns.length} columns</span>
       <span class="workspace-tag">Findings: ${model.findings_count}</span>
     ` : '';
+    updateChatStatus();
     return;
   }
 
@@ -1259,6 +1347,7 @@ function updateWorkspaceContext() {
     `;
   }
   tagsEl.innerHTML = tagsHtml;
+  updateChatStatus();
 }
 
 // ==================== Findings ====================
@@ -1462,6 +1551,129 @@ function highlightSQL(sql) {
     .replace(/\b(select|from|where|join|left|right|inner|outer|on|as|with|group\s+by|order\s+by|having|union|all|distinct|case|when|then|else|end|and|or|not|in|is|null|true|false|between|like|limit|offset|insert|update|delete|create|drop|alter|into|values|set|exists|cast|coalesce|if|date_trunc|sum|count|avg|min|max|row_number|rank|dense_rank|over|partition\s+by|asc|desc)\b/gi,
       m => `<span class="kw">${m}</span>`)
     ;
+}
+
+function escapeHtml(str) {
+  return (str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+// ==================== AI Copilot ====================
+function setupChatUI() {
+  const toggle = document.getElementById('chat-toggle');
+  const chat = document.getElementById('ai-chat');
+  const closeBtn = document.getElementById('ai-chat-close');
+  const backdrop = document.getElementById('ai-chat-backdrop');
+  const form = document.getElementById('ai-chat-form');
+  if (!toggle || !chat || !closeBtn || !form || !backdrop) return;
+
+  toggle.addEventListener('click', () => openChat());
+  closeBtn.addEventListener('click', () => closeChat());
+  backdrop.addEventListener('click', () => closeChat());
+  form.addEventListener('submit', sendChatMessage);
+  renderChatMessages();
+  updateChatStatus();
+}
+
+function openChat() {
+  chatState.open = true;
+  document.getElementById('ai-chat').classList.add('open');
+  document.getElementById('ai-chat-backdrop').classList.add('show');
+  setTimeout(() => document.getElementById('ai-chat-input-field').focus(), 50);
+}
+
+function closeChat() {
+  chatState.open = false;
+  document.getElementById('ai-chat').classList.remove('open');
+  document.getElementById('ai-chat-backdrop').classList.remove('show');
+}
+
+function appendChatMessage(role, content, meta = {}) {
+  chatState.messages.push({ role, content, meta: { ...meta, timestamp: meta.timestamp || new Date().toISOString() } });
+  renderChatMessages();
+}
+
+function renderChatMessages() {
+  const container = document.getElementById('ai-chat-messages');
+  if (!container) return;
+  container.innerHTML = chatState.messages.map(msg => {
+    const meta = msg.meta || {};
+    const foot = [];
+    if (meta.model) foot.push(`${meta.model}`);
+    if (typeof meta.latency_ms === 'number') foot.push(`${Math.round(meta.latency_ms)}ms`);
+    if (typeof meta.cost_usd === 'number') foot.push(`$${meta.cost_usd.toFixed(4)}`);
+    if (meta.error) foot.push('error');
+    return `
+      <div class="ai-message ${msg.role}">
+        <div class="meta">${msg.role === 'user' ? 'You' : 'Copilot'}</div>
+        <div class="body">${escapeHtml(msg.content)}</div>
+        ${foot.length ? `<div class="foot">${foot.join(' • ')}</div>` : ''}
+      </div>
+    `;
+  }).join('');
+  container.scrollTop = container.scrollHeight;
+}
+
+function updateChatStatus(text) {
+  const statusEl = document.getElementById('ai-chat-status');
+  if (!statusEl) return;
+  if (text) {
+    statusEl.textContent = text;
+    return;
+  }
+  statusEl.textContent = state.selectedModel ? `Context: ${state.selectedModel}` : 'Ready for questions';
+}
+
+function buildChatContext() {
+  if (!state.selectedModel) return '';
+  const model = state.allModelsFlat.find(m => m.name === state.selectedModel);
+  if (!model) return '';
+  const columnSnippets = (model.columns || []).slice(0, 10).map(c => `${c.name}: ${c.description || ''}`).join('\n');
+  const findingsSnippets = (model.findings || []).slice(0, 5).map(f => `${f.type || 'finding'} (${f.severity}): ${f.evidence || ''}`).join('\n');
+  return [
+    `Model Description: ${model.description || 'n/a'}`,
+    columnSnippets ? `Columns:\n${columnSnippets}` : '',
+    findingsSnippets ? `Findings:\n${findingsSnippets}` : '',
+  ].filter(Boolean).join('\n\n');
+}
+
+async function sendChatMessage(event) {
+  event.preventDefault();
+  if (chatState.sending) return;
+  const input = document.getElementById('ai-chat-input-field');
+  const text = input.value.trim();
+  if (!text) return;
+  appendChatMessage('user', text, {});
+  input.value = '';
+  chatState.sending = true;
+  updateChatStatus('Thinking...');
+  const sendBtn = document.querySelector('.ai-chat-send');
+  if (sendBtn) sendBtn.disabled = true;
+  const payload = {
+    message: text,
+    model: state.selectedModel,
+    context: buildChatContext(),
+  };
+  try {
+    const res = await fetch('/api/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'AI request failed');
+    appendChatMessage('assistant', data.reply || 'No response', {
+      model: `${data.provider}/${data.model}`,
+      latency_ms: data.latency_ms,
+      cost_usd: data.cost_usd,
+    });
+  } catch (err) {
+    appendChatMessage('assistant', err.message || 'Unable to reach AI copilot.', { error: true });
+  } finally {
+    chatState.sending = false;
+    updateChatStatus();
+    const sendBtn2 = document.querySelector('.ai-chat-send');
+    if (sendBtn2) sendBtn2.disabled = false;
+  }
 }
 
 // ==================== Lineage Graph ====================
