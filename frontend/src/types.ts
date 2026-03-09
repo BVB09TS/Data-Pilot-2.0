@@ -11,7 +11,6 @@ export interface Finding {
   model: string
   evidence: string
   recommendation?: string
-  cost_usd?: number
 }
 
 export interface Model {
@@ -27,9 +26,24 @@ export interface Model {
   findings: Finding[]
 }
 
+export interface ReportData {
+  findings: Finding[]
+  by_severity: Record<string, number>
+  by_type: Record<string, number>
+  total_findings: number
+  suggestions?: unknown[]
+  metadata?: { project_name?: string; run_at?: string; [k: string]: unknown }
+}
+
+export interface IntegrationsResponse {
+  available: string[]
+  configured: string[]
+}
+
 export type ModelsData = Record<string, Model[]>
 
-export type Tab = 'overview' | 'lineage' | 'findings' | 'models'
+/** All top-level tab identifiers */
+export type Tab = 'overview' | 'lineage' | 'findings' | 'models' | 'integrations'
 
 export type Theme = 'light' | 'dark'
 
