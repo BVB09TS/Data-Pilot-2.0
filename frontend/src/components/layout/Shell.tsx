@@ -3,6 +3,7 @@ import { Header } from './Header'
 import { Sidebar } from './Sidebar'
 import { OverviewTab } from '../overview/OverviewTab'
 import { IntegrationsTab } from '../integrations/IntegrationsTab'
+import { LineageTab } from '../lineage/LineageTab'
 import type { ModelsData, Tab } from '../../types'
 
 export function Shell() {
@@ -37,7 +38,7 @@ export function Shell() {
         />
 
         <main className={`
-          flex-1 overflow-auto
+          flex-1 overflow-hidden
           transition-[margin] duration-200 ease-in-out
           ${sidebarOpen ? 'ml-72' : 'ml-0'}
         `}>
@@ -71,10 +72,7 @@ function TabContent({
       return <IntegrationsTab />
 
     case 'lineage':
-      return (
-        <Placeholder icon="🕸️" title="Lineage Graph"
-          sub="Interactive DAG visualization — Phase 3" />
-      )
+      return <LineageTab />
 
     case 'findings':
       return (
