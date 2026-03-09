@@ -4,6 +4,7 @@ import { Sidebar } from './Sidebar'
 import { OverviewTab } from '../overview/OverviewTab'
 import { IntegrationsTab } from '../integrations/IntegrationsTab'
 import { LineageTab } from '../lineage/LineageTab'
+import { FindingsTab } from '../findings/FindingsTab'
 import type { ModelsData, Tab } from '../../types'
 
 export function Shell() {
@@ -75,10 +76,7 @@ function TabContent({
       return <LineageTab />
 
     case 'findings':
-      return (
-        <Placeholder icon="🔍" title="Findings"
-          sub="Full findings browser with filtering — Phase 4" />
-      )
+      return <FindingsTab />
 
     case 'models':
       return (
