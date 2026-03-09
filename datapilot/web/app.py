@@ -57,6 +57,14 @@ def create_app(report_path: str | None = None, graph_path: str | None = None,
     # Mount REST API v1 (trigger audit, metrics, integrations)
     app.register_blueprint(api_bp)
 
+    # Mount AI Gateway (multi-tenant proxy)
+    from datapilot.gateway.routes import gateway_bp
+    output_dir = str(Path(report_path).parent)
+    app.config["DATAPILOT_OUTPUT_DIR"] = output_dir
+    app.config["GATEWAY_TENANT_STORE"] = os.path.join(output_dir, "datapilot_tenants.json")
+    app.config["GATEWAY_LOG_DIR"] = os.path.join(output_dir, "gateway_logs")
+    app.register_blueprint(gateway_bp)
+
     def _load_json(path: str) -> dict:
         if os.path.exists(path):
             with open(path, encoding="utf-8") as f:

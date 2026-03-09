@@ -194,20 +194,12 @@ def audit(project, output, config, no_score, parallel, format, serve, port, fix,
 
     print(f"\n  Pipeline: {result.duration_ms:.0f}ms, {result.issues_found} issues")
 
-    # Auto-Remediation (Pillar 4)
+    # Auto-Remediation (Pillar 4) — not yet implemented
     if fix:
-        print("\n[6/6] Auto-Remediation Initiated...")
-        try:
-            from datapilot.core.remediator import apply_fixes
-            fix_results = apply_fixes(report, dbt_root)
-            print(f"  Fixed: {fix_results['fixes_applied']} issues.")
-            for action in fix_results.get("actions_taken", []):
-                if action['status'] == 'success':
-                    print(f"  ✔ {action['action']} for {action['model']}")
-                else:
-                    print(f"  ✖ Failed to fix {action['model']}: {action.get('error')}")
-        except Exception as e:
-            print(f"  Failed to apply fixes: {e}")
+        print("\n[6/6] Auto-Remediation (--fix flag)")
+        print("  Note: auto-remediation is not yet implemented in this release.")
+        print("  Review findings above and apply manual fixes via your dbt project.")
+        print("  Roadmap: https://github.com/BVB09TS/Data-Pilot-2.0/issues")
 
     # Shift-Left IDE Watch Mode (Pillar 3)
     if watch:
@@ -221,21 +213,49 @@ def audit(project, output, config, no_score, parallel, format, serve, port, fix,
         class DbtProjectHandler(PatternMatchingEventHandler):
             def __init__(self):
                 super().__init__(patterns=["*.sql", "*.yml"], ignore_patterns=[".*"])
-                self.last_run = 0
-                
+                self.last_run = 0.0
+
             def on_modified(self, event):
                 now = time.time()
-                # Debounce fast saves
-                if now - self.last_run < 3: 
+                # Debounce rapid saves (e.g. auto-formatters)
+                if now - self.last_run < 3:
                     return
                 self.last_run = now
-                
-                print(f"\n[Watch] Detected change in {event.src_path}")
-                print("[Watch] Re-running targeted analysis...")
-                # Note: For full shift-left, we would run a targeted subset here.
-                # For this MVP, we just notify that the watch mode caught the save.
-                # A VS Code extension would parse these terminal bursts or read a fast-refresh JSON.
-                print("[Watch] Analysis complete. 0 new defects introduced.")
+
+                changed = event.src_path
+                print(f"\n[Watch] Detected change in {changed}")
+                print("[Watch] Re-running targeted static analysis...")
+                try:
+                    from datapilot.core.parser import parse_project
+                    from datapilot.core.graph import (
+                        build_graph,
+                        find_all_dead,
+                        find_orphans,
+                        find_broken_refs,
+                    )
+
+                    _pd = parse_project(dbt_root)
+                    _G = build_graph(_pd)
+                    _broken = find_broken_refs(_G, _pd["models"])
+                    _dead = find_all_dead(_G, _pd["models"], _pd["query_history"])
+                    _orphans = find_orphans(_G, _pd["models"])
+
+                    issues: list[str] = []
+                    for b in _broken:
+                        issues.append(f"  broken_ref: {b.get('model')} -> {b.get('missing_ref')}")
+                    for d in _dead:
+                        issues.append(f"  dead_model: {d}")
+                    for o in _orphans:
+                        issues.append(f"  orphan: {o}")
+
+                    if issues:
+                        print(f"[Watch] {len(issues)} static issue(s) found:")
+                        for msg in issues:
+                            print(msg)
+                    else:
+                        print("[Watch] No static issues detected.")
+                except Exception as exc:
+                    print(f"[Watch] Analysis error: {exc}")
 
         observer = Observer()
         observer.schedule(DbtProjectHandler(), path=dbt_root, recursive=True)

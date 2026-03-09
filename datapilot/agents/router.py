@@ -13,6 +13,7 @@ from __future__ import annotations
 import hashlib
 import json
 import os
+import threading
 import time
 from dataclasses import dataclass, field
 from enum import Enum
@@ -21,6 +22,9 @@ from typing import Any
 import structlog
 
 from datapilot.core.config import DataPilotConfig, LLMProviderConfig, ModelTier
+
+# HTTP status codes that must NOT be retried (auth/client errors)
+_NO_RETRY_STATUS_CODES = {400, 401, 403, 404, 422}
 
 logger = structlog.get_logger()
 
@@ -56,6 +60,7 @@ class AgentRouter:
     config: DataPilotConfig
     _cache: dict[str, LLMResponse] = field(default_factory=dict)
     _call_stats: dict[str, dict[str, Any]] = field(default_factory=dict)
+    _lock: threading.Lock = field(default_factory=threading.Lock)
 
     def classify_task(self, task_type: str) -> TaskComplexity:
         """Classify a task's complexity for routing."""
@@ -90,11 +95,12 @@ class AgentRouter:
         if provider:
             return provider
 
-        # Fallback chain: premium → standard → free
+        # Fallback chain: strictly downward to avoid circular loops.
+        # PREMIUM → STANDARD → FREE (never escalate on fallback).
         fallback_order = {
             ModelTier.PREMIUM: [ModelTier.STANDARD, ModelTier.FREE],
-            ModelTier.STANDARD: [ModelTier.FREE, ModelTier.PREMIUM],
-            ModelTier.FREE: [ModelTier.STANDARD, ModelTier.PREMIUM],
+            ModelTier.STANDARD: [ModelTier.FREE],
+            ModelTier.FREE: [],
         }
 
         for fallback_tier in fallback_order.get(target_tier, []):
@@ -233,25 +239,27 @@ class AgentRouter:
                 tier=target_tier,
             )
 
-        # Check cache
+        # Check cache (thread-safe read)
         if self.config.pipeline.enable_cache:
             key = self._cache_key(system, user)
-            if key in self._cache:
-                cached = self._cache[key]
-                cached.cached = True
-                return cached
+            with self._lock:
+                cached_resp = self._cache.get(key)
+            if cached_resp is not None:
+                cached_resp.cached = True
+                return cached_resp
 
-        # Call with retries
+        # Call with retries — skip on non-transient HTTP errors
         last_error = None
         for attempt in range(self.config.pipeline.retry_attempts):
             try:
                 response = self._call_provider(provider, system, user, max_tokens)
 
-                # Cache result
+                # Cache result (thread-safe write)
                 if self.config.pipeline.enable_cache:
-                    self._cache[self._cache_key(system, user)] = response
+                    with self._lock:
+                        self._cache[self._cache_key(system, user)] = response
 
-                # Track stats
+                # Track stats (thread-safe)
                 self._track_call(task_type, provider, response)
 
                 logger.info(
@@ -266,6 +274,18 @@ class AgentRouter:
                 return response
             except Exception as e:
                 last_error = e
+                # Do not retry auth/client errors — they will not self-resolve
+                status = getattr(e, "status_code", None) or getattr(
+                    getattr(e, "response", None), "status_code", None
+                )
+                if status in _NO_RETRY_STATUS_CODES:
+                    logger.error(
+                        "llm_non_transient_error",
+                        task=task_type,
+                        status=status,
+                        error=str(e),
+                    )
+                    break
                 wait = self.config.pipeline.retry_delay * (2**attempt)
                 logger.warning(
                     "llm_retry",
@@ -286,28 +306,34 @@ class AgentRouter:
     def _track_call(
         self, task_type: str, provider: LLMProviderConfig, response: LLMResponse
     ) -> None:
-        """Track call statistics for observability."""
-        if task_type not in self._call_stats:
-            self._call_stats[task_type] = {
-                "calls": 0,
-                "total_input_tokens": 0,
-                "total_output_tokens": 0,
-                "total_cost_usd": 0,
-                "total_latency_ms": 0,
-                "models_used": set(),
-            }
-        stats = self._call_stats[task_type]
-        stats["calls"] += 1
-        stats["total_input_tokens"] += response.input_tokens
-        stats["total_output_tokens"] += response.output_tokens
-        stats["total_cost_usd"] += response.cost_usd
-        stats["total_latency_ms"] += response.latency_ms
-        stats["models_used"].add(f"{provider.provider}/{provider.model}")
+        """Track call statistics for observability (thread-safe)."""
+        with self._lock:
+            if task_type not in self._call_stats:
+                self._call_stats[task_type] = {
+                    "calls": 0,
+                    "total_input_tokens": 0,
+                    "total_output_tokens": 0,
+                    "total_cost_usd": 0,
+                    "total_latency_ms": 0,
+                    "models_used": set(),
+                }
+            stats = self._call_stats[task_type]
+            stats["calls"] += 1
+            stats["total_input_tokens"] += response.input_tokens
+            stats["total_output_tokens"] += response.output_tokens
+            stats["total_cost_usd"] += response.cost_usd
+            stats["total_latency_ms"] += response.latency_ms
+            stats["models_used"].add(f"{provider.provider}/{provider.model}")
 
     def get_stats(self) -> dict[str, Any]:
-        """Return call statistics for reporting."""
+        """Return call statistics for reporting (thread-safe snapshot)."""
+        with self._lock:
+            snapshot = {
+                task: {**data, "models_used": set(data["models_used"])}
+                for task, data in self._call_stats.items()
+            }
         stats = {}
-        for task, data in self._call_stats.items():
+        for task, data in snapshot.items():
             stats[task] = {
                 **data,
                 "models_used": list(data["models_used"]),

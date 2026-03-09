@@ -13,6 +13,7 @@ from __future__ import annotations
 import json
 import os
 import time
+from pathlib import Path
 from typing import Any
 
 from flask import Blueprint, Flask, current_app, jsonify, request
@@ -24,28 +25,66 @@ logger = structlog.get_logger()
 api_bp = Blueprint("api", __name__, url_prefix="/api/v1")
 
 
-def _get_report_path() -> str:
-    """Get report path from app config or request args."""
-    path = request.args.get("path")
-    if path:
-        return path
-    return current_app.config.get("DATAPILOT_REPORT_PATH", "datapilot_report.json")
+def _safe_resolve(requested: str | None, default: str, config_key: str) -> str | None:
+    """Resolve a file path, rejecting traversal outside the output directory.
+
+    Returns the resolved path string, or None if the request is rejected.
+    The *default* is always trusted (comes from server-side config).
+    The *requested* path from query args is validated against the output dir.
+    """
+    if not requested:
+        return current_app.config.get(config_key, default)
+
+    output_dir = current_app.config.get("DATAPILOT_OUTPUT_DIR", "")
+    if not output_dir:
+        # No output dir configured — reject user-supplied paths entirely
+        logger.warning("path_param_rejected_no_output_dir", requested=requested)
+        return None
+
+    try:
+        resolved = Path(requested).resolve()
+        allowed_root = Path(output_dir).resolve()
+        resolved.relative_to(allowed_root)  # raises ValueError if outside
+        return str(resolved)
+    except (ValueError, OSError):
+        logger.warning("path_traversal_blocked", requested=requested)
+        return None
 
 
-def _get_graph_path() -> str:
-    """Get graph path from app config or request args."""
-    path = request.args.get("path")
-    if path:
-        return path
-    return current_app.config.get("DATAPILOT_GRAPH_PATH", "datapilot_graph.json")
+def _get_report_path() -> str | None:
+    """Get report path from app config or validated request args."""
+    return _safe_resolve(
+        request.args.get("path"),
+        "datapilot_report.json",
+        "DATAPILOT_REPORT_PATH",
+    )
 
 
-def create_api_app(config: Any = None) -> Flask:
+def _get_graph_path() -> str | None:
+    """Get graph path from app config or validated request args."""
+    return _safe_resolve(
+        request.args.get("path"),
+        "datapilot_graph.json",
+        "DATAPILOT_GRAPH_PATH",
+    )
+
+
+def create_api_app(config: Any = None, output_dir: str | None = None) -> Flask:
     """Create the Flask API application."""
+    import os as _os
+
     app = Flask(__name__)
     app.config["DATAPILOT_CONFIG"] = config
 
+    _out = output_dir or _os.getcwd()
+    app.config["DATAPILOT_OUTPUT_DIR"] = _out
+    app.config["GATEWAY_TENANT_STORE"] = _os.path.join(_out, "datapilot_tenants.json")
+    app.config["GATEWAY_LOG_DIR"] = _os.path.join(_out, "gateway_logs")
+
     app.register_blueprint(api_bp)
+
+    from datapilot.gateway.routes import gateway_bp
+    app.register_blueprint(gateway_bp)
 
     @app.after_request
     def add_cors_headers(response):
@@ -73,6 +112,8 @@ def health_check():
 def get_report():
     """Get the latest audit report."""
     report_path = _get_report_path()
+    if report_path is None:
+        return jsonify({"error": "Access denied"}), 403
     if os.path.exists(report_path):
         with open(report_path, encoding="utf-8") as f:
             data = json.load(f)
@@ -88,6 +129,8 @@ def get_findings():
     finding_type = request.args.get("type")
     model = request.args.get("model")
 
+    if report_path is None:
+        return jsonify({"error": "Access denied"}), 403
     if not os.path.exists(report_path):
         return jsonify({"error": "Report not found"}), 404
 
@@ -115,6 +158,8 @@ def get_findings():
 def get_graph():
     """Get the lineage graph data."""
     graph_path = _get_graph_path()
+    if graph_path is None:
+        return jsonify({"error": "Access denied"}), 403
     if os.path.exists(graph_path):
         with open(graph_path, encoding="utf-8") as f:
             data = json.load(f)
@@ -180,6 +225,8 @@ def trigger_audit():
 def get_metrics():
     """Get audit metrics in Prometheus-compatible format."""
     report_path = _get_report_path()
+    if report_path is None:
+        return jsonify({"error": "Access denied"}), 403
     if not os.path.exists(report_path):
         return jsonify({"error": "No report available"}), 404
 

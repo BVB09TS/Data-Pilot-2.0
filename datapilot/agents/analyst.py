@@ -391,21 +391,28 @@ def analyze_deprecated_sources(router: AgentRouter, models: dict) -> list[dict]:
 
 
 def analyze_missing_tests(models: dict) -> list[dict]:
-    """Fully deterministic — no LLM needed."""
-    priority = [
-        ("core_orders", "critical"),
-        ("core_customers", "critical"),
-        ("analytics_revenue_v2", "critical"),
-        ("core_revenue_summary", "high"),
-        ("core_revenue_combined", "high"),
-    ]
+    """Fully deterministic — scans every model for missing unique/not_null tests.
+
+    Severity rules:
+      - core/* or analytics/* → high (business-critical layers)
+      - everything else       → medium
+    Hardcoded priority overrides for known critical models stay as a fast-path
+    to ensure they surface even when YAML is missing entirely.
+    """
+    # Fast-path: known critical models always get severity=critical
+    critical_models = {
+        "core_orders",
+        "core_customers",
+        "analytics_revenue_v2",
+        "core_revenue_summary",
+        "core_revenue_combined",
+    }
+
     findings = []
 
-    for name, severity in priority:
-        if name not in models:
-            continue
-        m = models[name]
+    for name, m in models.items():
         yml = m.get("yml", {})
+        layer = m.get("layer", "")
 
         all_tests: list[str] = []
         col_names: list[str] = []
@@ -413,8 +420,7 @@ def analyze_missing_tests(models: dict) -> list[dict]:
             if mod_def.get("name") == name:
                 for col in mod_def.get("columns", []):
                     col_names.append(col["name"])
-                    tests = col.get("tests", [])
-                    for t in tests:
+                    for t in col.get("tests", []):
                         all_tests.append(t if isinstance(t, str) else list(t.keys())[0])
 
         total = len(all_tests)
@@ -422,6 +428,13 @@ def analyze_missing_tests(models: dict) -> list[dict]:
         has_not_null = "not_null" in all_tests
 
         if total == 0 or not has_unique or not has_not_null:
+            if name in critical_models:
+                severity = "critical"
+            elif layer in ("core", "analytics"):
+                severity = "high"
+            else:
+                severity = "medium"
+
             if total == 0:
                 missing_desc = "zero tests of any kind"
             else:

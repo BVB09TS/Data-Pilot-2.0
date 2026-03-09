@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import json
 import os
+import sys
 import uuid
 from datetime import datetime, timezone
 from pathlib import Path
@@ -74,10 +75,20 @@ class FeedbackStore:
             return json.load(f)
 
     def _save(self, records: list[dict]) -> None:
-        """Save records to the store."""
+        """Save records atomically with an exclusive file lock."""
         self.store_path.parent.mkdir(parents=True, exist_ok=True)
-        with open(self.store_path, "w", encoding="utf-8") as f:
-            json.dump(records, f, indent=2, default=_default)
+        tmp = self.store_path.with_suffix(".tmp")
+        with open(tmp, "w", encoding="utf-8") as f:
+            # Acquire exclusive lock before writing (POSIX; no-op on Windows)
+            if sys.platform != "win32":
+                import fcntl
+                fcntl.flock(f, fcntl.LOCK_EX)
+            try:
+                json.dump(records, f, indent=2, default=_default)
+            finally:
+                if sys.platform != "win32":
+                    fcntl.flock(f, fcntl.LOCK_UN)
+        tmp.replace(self.store_path)  # atomic rename
 
     def get_last_n(self, n: int = 10) -> list[dict]:
         """Get the last N run records (most recent first)."""
