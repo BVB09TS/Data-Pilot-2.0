@@ -5,6 +5,7 @@ import { OverviewTab } from '../overview/OverviewTab'
 import { IntegrationsTab } from '../integrations/IntegrationsTab'
 import { LineageTab } from '../lineage/LineageTab'
 import { FindingsTab } from '../findings/FindingsTab'
+import { ModelsTab } from '../models/ModelsTab'
 import type { ModelsData, Tab } from '../../types'
 
 export function Shell() {
@@ -79,14 +80,7 @@ function TabContent({
       return <FindingsTab />
 
     case 'models':
-      return (
-        <Placeholder icon="🗂️" title="Model Catalog"
-          sub="Full model browser with SQL viewer — Phase 5"
-          detail={selectedModel
-            ? <span>Selected: <code className="font-mono text-blue-600 dark:text-blue-400">{selectedModel}</code></span>
-            : undefined}
-        />
-      )
+      return <ModelsTab initialModel={selectedModel} />
   }
 }
 
