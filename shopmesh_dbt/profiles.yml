@@ -1,0 +1,7 @@
+shopmesh:
+  target: dev
+  outputs:
+    dev:
+      type: duckdb
+      path: "shopmesh.duckdb"
+      threads: 4

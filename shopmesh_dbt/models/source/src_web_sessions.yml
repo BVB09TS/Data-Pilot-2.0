@@ -1,0 +1,16 @@
+version: 2
+models:
+  - name: src_web_sessions
+    description: "Web sessions with typed timestamps and derived duration."
+    config:
+      tags: ["source"]
+    columns:
+      - name: session_id
+        description: "Session PK"
+        tests:
+          - unique
+          - not_null
+      - name: traffic_source
+        description: "organic/paid/email/direct"
+      - name: session_duration_seconds
+        description: "Derived session length"

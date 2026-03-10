@@ -1,0 +1,16 @@
+version: 2
+models:
+  - name: analytics_product_performance
+    description: "Product performance dashboard for merchandising team."
+    config:
+      tags: ["analytics"]
+    columns:
+      - name: product_id
+        description: "Product PK"
+        tests:
+          - unique
+          - not_null
+      - name: gross_product_revenue
+        description: "Total gross sales"
+      - name: stock_status
+        description: "Inventory classification"

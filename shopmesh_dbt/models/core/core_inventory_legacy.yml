@@ -1,0 +1,11 @@
+version: 2
+models:
+  - name: core_inventory_legacy
+    description: "DEPRECATED SOURCE CHAIN: src_erp_products -> legacy_erp (decommissioned 2024-01-01). Migration to core_inventory_status overdue since 2024-03-01."
+    config:
+      tags: ["core"]
+    columns:
+      - name: legacy_product_id
+        description: "DEPRECATED: ERP product ID"
+      - name: data_source
+        description: "Always legacy_erp — use core_inventory_status instead"

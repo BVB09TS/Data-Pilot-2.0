@@ -1,0 +1,16 @@
+version: 2
+models:
+  - name: analytics_b2b_pipeline
+    description: "B2B pipeline for sales team with account tier classification."
+    config:
+      tags: ["analytics"]
+    columns:
+      - name: account_id
+        description: "Account PK"
+        tests:
+          - unique
+          - not_null
+      - name: wallet_share
+        description: "ShopMesh / account annual revenue"
+      - name: account_tier
+        description: "growth_opportunity/expanding/strategic"

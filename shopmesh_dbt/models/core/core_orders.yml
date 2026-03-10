@@ -1,0 +1,28 @@
+version: 2
+models:
+  - name: core_orders
+    description: "Enriched orders joined with payments and item aggregates. Grain: one row per order."
+    config:
+      tags: ["core"]
+    columns:
+      - name: order_id
+        description: "Order PK"
+        tests:
+          - unique
+          - not_null
+      - name: customer_id
+        description: "FK to core_customers"
+        tests:
+          - not_null
+      - name: order_total_amount
+        description: "Total value USD"
+        tests:
+          - not_null
+      - name: net_payment_amount
+        description: "payment_amount - refunded_amount"
+      - name: is_cancelled
+        description: "Boolean cancellation flag"
+      - name: order_date
+        description: "Truncated to day"
+      - name: order_month
+        description: "Truncated to month"

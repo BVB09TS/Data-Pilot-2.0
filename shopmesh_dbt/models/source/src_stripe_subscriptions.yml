@@ -1,0 +1,18 @@
+version: 2
+models:
+  - name: src_stripe_subscriptions
+    description: "Stripe subscriptions with amounts in dollars and typed timestamps."
+    config:
+      tags: ["source"]
+    columns:
+      - name: subscription_id
+        description: "Subscription PK"
+        tests:
+          - unique
+          - not_null
+      - name: subscription_status
+        description: "active/cancelled/trialing"
+      - name: monthly_amount
+        description: "Monthly charge USD"
+      - name: is_active
+        description: "Boolean active flag"

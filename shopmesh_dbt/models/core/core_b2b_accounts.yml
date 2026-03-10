@@ -1,0 +1,16 @@
+version: 2
+models:
+  - name: core_b2b_accounts
+    description: "B2B revenue — joins Salesforce accounts to Shopify revenue via email matching."
+    config:
+      tags: ["core"]
+    columns:
+      - name: account_id
+        description: "Salesforce account PK"
+        tests:
+          - unique
+          - not_null
+      - name: total_shopmesh_revenue
+        description: "Sum of Shopify revenue"
+      - name: wallet_share
+        description: "shopmesh revenue / annual_revenue"

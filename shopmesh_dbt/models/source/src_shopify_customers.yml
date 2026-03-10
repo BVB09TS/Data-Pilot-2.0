@@ -1,0 +1,20 @@
+version: 2
+models:
+  - name: src_shopify_customers
+    description: "Shopify customers with typed fields and derived full name."
+    config:
+      tags: ["source"]
+    columns:
+      - name: customer_id
+        description: "Customer PK"
+        tests:
+          - unique
+          - not_null
+      - name: customer_email
+        description: "Email address"
+        tests:
+          - not_null
+      - name: lifetime_spend_shopify
+        description: "Typed LTS"
+      - name: is_email_verified
+        description: "Boolean email verification"

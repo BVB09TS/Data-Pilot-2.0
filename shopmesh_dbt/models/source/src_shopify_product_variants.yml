@@ -1,0 +1,16 @@
+version: 2
+models:
+  - name: src_shopify_product_variants
+    description: "Product variants with typed price and inventory."
+    config:
+      tags: ["source"]
+    columns:
+      - name: variant_id
+        description: "Variant PK"
+        tests:
+          - unique
+          - not_null
+      - name: variant_price
+        description: "Typed decimal price"
+      - name: inventory_quantity
+        description: "Typed integer stock"

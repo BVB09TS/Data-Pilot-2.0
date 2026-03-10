@@ -1,0 +1,16 @@
+version: 2
+models:
+  - name: analytics_inventory_current
+    description: "Current inventory status for operations team."
+    config:
+      tags: ["analytics"]
+    columns:
+      - name: variant_id
+        description: "Variant PK"
+        tests:
+          - unique
+          - not_null
+      - name: stock_status
+        description: "out_of_stock/below_reorder/healthy/overstock"
+      - name: inventory_value
+        description: "variant_price * quantity_on_hand"

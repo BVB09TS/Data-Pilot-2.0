@@ -419,8 +419,10 @@ def analyze_missing_tests(models: dict) -> list[dict]:
         for mod_def in yml.get("models", []):
             if mod_def.get("name") == name:
                 for col in mod_def.get("columns", []):
-                    col_names.append(col["name"])
-                    for t in col.get("tests", []):
+                    if col is None:
+                        continue
+                    col_names.append(col.get("name", ""))
+                    for t in (col.get("tests") or []):
                         all_tests.append(t if isinstance(t, str) else list(t.keys())[0])
 
         total = len(all_tests)

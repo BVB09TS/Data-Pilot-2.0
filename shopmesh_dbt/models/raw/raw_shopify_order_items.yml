@@ -1,0 +1,44 @@
+version: 2
+models:
+  - name: raw_shopify_order_items
+    description: "Raw Shopify order line items."
+    config:
+      tags: ["raw", "shopify"]
+    columns:
+      - name: line_item_id
+        description: "Line item PK"
+        tests:
+          - unique
+          - not_null
+      - name: order_id
+        description: "FK to orders"
+        tests:
+
+      - name: product_id
+        description: "FK to products"
+        tests:
+
+      - name: variant_id
+        description: "FK to variants"
+        tests:
+
+      - name: quantity
+        description: "Units ordered"
+        tests:
+
+      - name: price
+        description: "Unit price string"
+        tests:
+
+      - name: discount_amount
+        description: "Discount applied"
+        tests:
+
+      - name: sku
+        description: "SKU code"
+        tests:
+
+      - name: product_title
+        description: "Product title at purchase time"
+        tests:
+

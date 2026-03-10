@@ -1,0 +1,33 @@
+name: 'shopmesh'
+version: '1.0.0'
+config-version: 2
+profile: 'shopmesh'
+model-paths:  ["models"]
+seed-paths:   ["seeds"]
+test-paths:   ["tests"]
+macro-paths:  ["macros"]
+docs-paths:   ["docs"]
+target-path:  "target"
+clean-targets: ["target", "dbt_packages"]
+models:
+  shopmesh:
+    raw:
+      +materialized: view
+      +schema: raw
+      +tags: ["raw"]
+    source:
+      +materialized: view
+      +schema: source
+      +tags: ["source"]
+    core:
+      +materialized: table
+      +schema: core
+      +tags: ["core"]
+    analytics:
+      +materialized: table
+      +schema: analytics
+      +tags: ["analytics"]
+seeds:
+  shopmesh:
+    +schema: seeds
+    +quote_columns: false

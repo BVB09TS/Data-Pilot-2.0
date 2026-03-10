@@ -1,0 +1,16 @@
+version: 2
+models:
+  - name: src_stripe_refunds
+    description: "Stripe refund transactions with amounts in dollars."
+    config:
+      tags: ["source"]
+    columns:
+      - name: refund_id
+        description: "Refund PK"
+        tests:
+          - unique
+          - not_null
+      - name: refund_amount
+        description: "Refund in USD"
+      - name: refund_reason
+        description: "duplicate/fraudulent/requested_by_customer"

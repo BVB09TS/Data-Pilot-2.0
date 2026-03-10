@@ -1,0 +1,14 @@
+version: 2
+models:
+  - name: analytics_customer_health
+    description: "Customer health for Customer Success team. Includes churn risk and LTV."
+    config:
+      tags: ["analytics"]
+    columns:
+      - name: customer_id
+        description: "Customer PK"
+        tests:
+          - unique
+          - not_null
+      - name: churn_status
+        description: "active/at_risk/churning/churned"

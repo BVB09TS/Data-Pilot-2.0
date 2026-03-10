@@ -1,0 +1,36 @@
+version: 2
+models:
+  - name: raw_salesforce_contacts
+    description: "Raw Salesforce contact records."
+    config:
+      tags: ["raw", "salesforce"]
+    columns:
+      - name: contact_id
+        description: "Contact PK"
+        tests:
+          - unique
+          - not_null
+      - name: account_id
+        description: "FK to accounts"
+        tests:
+
+      - name: email
+        description: "Contact email"
+        tests:
+
+      - name: first_name
+        description: "First name"
+        tests:
+
+      - name: last_name
+        description: "Last name"
+        tests:
+
+      - name: created_at
+        description: "Creation timestamp"
+        tests:
+
+      - name: job_title
+        description: "Job title"
+        tests:
+

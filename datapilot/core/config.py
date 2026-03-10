@@ -212,6 +212,10 @@ class DataPilotConfig(BaseSettings):
         if path.exists():
             with open(path) as f:
                 data = yaml.safe_load(f) or {}
+            # Replace None list values with [] so Pydantic doesn't reject them
+            for key, val in list(data.items()):
+                if val is None:
+                    data[key] = []
             return cls(**data)
         return cls()
 

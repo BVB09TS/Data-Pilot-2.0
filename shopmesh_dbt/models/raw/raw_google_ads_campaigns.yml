@@ -1,0 +1,32 @@
+version: 2
+models:
+  - name: raw_google_ads_campaigns
+    description: "Raw Google Ads campaign definitions."
+    config:
+      tags: ["raw", "google_ads"]
+    columns:
+      - name: campaign_id
+        description: "Campaign PK"
+        tests:
+          - unique
+          - not_null
+      - name: campaign_name
+        description: "Display name"
+        tests:
+
+      - name: status
+        description: "ENABLED/PAUSED/REMOVED"
+        tests:
+
+      - name: daily_budget_cents
+        description: "Daily budget cents"
+        tests:
+
+      - name: start_date
+        description: "Campaign start"
+        tests:
+
+      - name: channel_type
+        description: "SEARCH/DISPLAY/SHOPPING"
+        tests:
+

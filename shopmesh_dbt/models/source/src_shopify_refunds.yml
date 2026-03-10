@@ -1,0 +1,16 @@
+version: 2
+models:
+  - name: src_shopify_refunds
+    description: "Shopify refunds with typed timestamps."
+    config:
+      tags: ["source"]
+    columns:
+      - name: refund_id
+        description: "Refund PK"
+        tests:
+          - unique
+          - not_null
+      - name: order_id
+        description: "FK to src_shopify_orders"
+      - name: refunded_at
+        description: "Typed timestamp"

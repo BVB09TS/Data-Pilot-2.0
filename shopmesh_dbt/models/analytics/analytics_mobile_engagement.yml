@@ -1,0 +1,13 @@
+version: 2
+models:
+  - name: analytics_mobile_engagement
+    description: "Mobile app engagement by platform."
+    config:
+      tags: ["analytics"]
+    columns:
+      - name: platform
+        description: "ios/android/web"
+      - name: dau_7d_users
+        description: "Users active in last 7 days"
+      - name: avg_session_duration_seconds
+        description: "Average session length"

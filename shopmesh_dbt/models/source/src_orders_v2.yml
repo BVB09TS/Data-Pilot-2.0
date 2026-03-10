@@ -1,0 +1,13 @@
+version: 2
+models:
+  - name: src_orders_v2
+    description: "DUPLICATE: Near-identical to src_shopify_orders with different column names. ordered_at vs order_created_at causes downstream confusion. Never resolved."
+    config:
+      tags: ["source"]
+    columns:
+      - name: order_id
+        description: "Order PK"
+      - name: ordered_at
+        description: "DIFFERENT NAME from src_shopify_orders.order_created_at"
+      - name: order_value
+        description: "DIFFERENT NAME from src_shopify_orders.order_total_amount"

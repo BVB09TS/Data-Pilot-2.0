@@ -1,0 +1,18 @@
+version: 2
+models:
+  - name: core_subscriptions
+    description: "Subscriptions enriched with plan details and customer LTV tier."
+    config:
+      tags: ["core"]
+    columns:
+      - name: subscription_id
+        description: "Subscription PK"
+        tests:
+          - unique
+          - not_null
+      - name: subscription_status
+        description: "active/cancelled/trialing"
+      - name: monthly_amount
+        description: "Monthly charge USD"
+      - name: subscription_age_days
+        description: "Days since start"

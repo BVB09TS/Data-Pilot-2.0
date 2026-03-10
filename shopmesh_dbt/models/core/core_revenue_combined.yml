@@ -1,0 +1,13 @@
+version: 2
+models:
+  - name: core_revenue_combined
+    description: "PLANTED — Joins DAILY (core_revenue_daily) to MONTHLY (core_revenue_monthly). Wrong grain causes subscription_revenue to be inflated ~30x."
+    config:
+      tags: ["core"]
+    columns:
+      - name: revenue_date
+        description: "Daily grain date"
+      - name: subscription_revenue
+        description: "INFLATED: full month MRR applied to each day"
+      - name: total_revenue
+        description: "WRONG: order + inflated subscription revenue"

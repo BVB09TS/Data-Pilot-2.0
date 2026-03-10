@@ -95,8 +95,6 @@ def audit(project, output, config, no_score, parallel, format, serve, port, fix,
     dbt_root = str(Path(dbt_root).resolve())
 
     out_dir = output or cfg.output_dir
-    if out_dir == "./output":
-        out_dir = str(root.parent)
     out_dir = str(Path(out_dir).resolve())
     os.makedirs(out_dir, exist_ok=True)
 

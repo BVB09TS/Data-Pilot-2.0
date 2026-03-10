@@ -1,0 +1,11 @@
+version: 2
+models:
+  - name: core_coupon_analysis
+    description: "ORPHANED: Built for Q2 2023 promo analysis. No downstream models. Safe to delete."
+    config:
+      tags: ["core"]
+    columns:
+      - name: order_id
+        description: "Order reference"
+      - name: discount_rate
+        description: "total_discount / pre_discount_value"

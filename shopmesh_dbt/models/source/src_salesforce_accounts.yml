@@ -1,0 +1,16 @@
+version: 2
+models:
+  - name: src_salesforce_accounts
+    description: "Salesforce accounts with typed revenue."
+    config:
+      tags: ["source"]
+    columns:
+      - name: account_id
+        description: "Salesforce account PK"
+        tests:
+          - unique
+          - not_null
+      - name: account_name
+        description: "Company name"
+      - name: account_type
+        description: "Customer/Partner/Prospect"
