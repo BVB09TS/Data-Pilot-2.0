@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect } from 'react'
+import { useCallback, useEffect, useRef } from 'react'
 import {
   ReactFlow,
   Background,
@@ -9,7 +9,7 @@ import {
   useEdgesState,
   type Edge,
   type NodeTypes,
-  type OnNodeClick,
+  type NodeMouseHandler,
 } from '@xyflow/react'
 import '@xyflow/react/dist/style.css'
 import dagre from '@dagrejs/dagre'
@@ -35,8 +35,8 @@ export interface RawEdge {
 
 /* ─── Dagre layout ─── */
 
-const NODE_W = 170
-const NODE_H = 52
+const NODE_W = 180
+const NODE_H = 56
 
 function applyLayout(
   nodes: ModelNodeType[],
@@ -45,7 +45,7 @@ function applyLayout(
 ): ModelNodeType[] {
   const g = new dagre.graphlib.Graph()
   g.setDefaultEdgeLabel(() => ({}))
-  g.setGraph({ rankdir: direction, nodesep: 40, ranksep: 90, align: 'UL' })
+  g.setGraph({ rankdir: direction, nodesep: 50, ranksep: 100, align: 'UL' })
   nodes.forEach(n => g.setNode(n.id, { width: NODE_W, height: NODE_H }))
   edges.forEach(e => g.setEdge(e.source, e.target))
   dagre.layout(g)
@@ -85,9 +85,14 @@ export function LineageGraph({
   const [nodes, setNodes, onNodesChange] = useNodesState<ModelNodeType>([])
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([])
 
-  // Rebuild and re-layout whenever inputs change
+  // Track last search so we can apply it after layout
+  const searchRef = useRef(searchText)
+  searchRef.current = searchText
+
+  // ── Effect 1: Full re-layout when graph structure changes ──
+  // searchText intentionally excluded — it only drives highlighting, not positions
   useEffect(() => {
-    const lc = searchText.toLowerCase().trim()
+    const lc = searchRef.current.toLowerCase().trim()
 
     const rfNodes: ModelNodeType[] = rawNodes
       .filter(n => !layerFilter || n.layer === layerFilter)
@@ -95,6 +100,7 @@ export function LineageGraph({
         id:       n.id,
         type:     'modelNode' as const,
         position: { x: 0, y: 0 },
+        draggable: true,
         data: {
           name:        n.id,
           layer:       n.layer,
@@ -109,19 +115,37 @@ export function LineageGraph({
     const rfEdges: Edge[] = rawEdges
       .filter(e => visible.has(e.source) && visible.has(e.target))
       .map(e => ({
-        id:     `${e.source}→${e.target}`,
-        source: e.source,
-        target: e.target,
-        type:   'smoothstep',
-        style:  { stroke: '#94a3b8', strokeWidth: 1.5 },
+        id:              `${e.source}→${e.target}`,
+        source:          e.source,
+        target:          e.target,
+        type:            'smoothstep',
+        animated:        false,
+        style:           { stroke: '#475569', strokeWidth: 1.5 },
+        selectedStyle:   { stroke: '#3b82f6', strokeWidth: 2.5 },
       }))
 
     const laid = applyLayout(rfNodes, rfEdges, direction)
     setNodes(laid)
     setEdges(rfEdges)
-  }, [rawNodes, rawEdges, searchText, layerFilter, direction, setNodes, setEdges])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [rawNodes, rawEdges, direction, layerFilter, setNodes, setEdges])
 
-  const handleNodeClick: OnNodeClick = useCallback((_e, node) => {
+  // ── Effect 2: Update search highlighting WITHOUT resetting positions ──
+  // This preserves user-dragged node positions while typing
+  useEffect(() => {
+    const lc = searchText.toLowerCase().trim()
+    setNodes(nds =>
+      nds.map(n => ({
+        ...n,
+        data: {
+          ...n.data,
+          matched: lc.length > 0 && n.id.toLowerCase().includes(lc),
+        },
+      })),
+    )
+  }, [searchText, setNodes])
+
+  const handleNodeClick: NodeMouseHandler = useCallback((_e, node) => {
     onSelectNode(node.id === selectedNodeId ? null : node.id)
   }, [onSelectNode, selectedNodeId])
 
@@ -135,15 +159,18 @@ export function LineageGraph({
       onPaneClick={() => onSelectNode(null)}
       nodeTypes={NODE_TYPES}
       colorMode={theme === 'dark' ? 'dark' : 'light'}
+      nodesDraggable={true}
+      nodesConnectable={false}
       fitView
       fitViewOptions={{ padding: 0.15 }}
-      minZoom={0.08}
-      maxZoom={2.5}
+      minZoom={0.05}
+      maxZoom={3}
       proOptions={{ hideAttribution: true }}
     >
       <Background variant={BackgroundVariant.Dots} gap={20} size={1} />
 
-      <Controls showInteractive={false} />
+      {/* showInteractive=true shows the lock/unlock toggle */}
+      <Controls showInteractive={true} />
 
       <MiniMap
         nodeColor={n => LAYER_COLORS[(n.data as ModelNodeData).layer] ?? '#94a3b8'}

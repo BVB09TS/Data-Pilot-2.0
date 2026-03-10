@@ -43,7 +43,7 @@ export interface IntegrationsResponse {
 export type ModelsData = Record<string, Model[]>
 
 /** All top-level tab identifiers */
-export type Tab = 'overview' | 'lineage' | 'findings' | 'models' | 'integrations'
+export type Tab = 'home' | 'overview' | 'lineage' | 'findings' | 'models' | 'integrations' | 'settings'
 
 export type Theme = 'light' | 'dark'
 

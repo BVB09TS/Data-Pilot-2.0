@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import type { Model, ModelsData } from '../../types'
 import { LAYER_ORDER, LAYER_COLORS } from '../../types'
 

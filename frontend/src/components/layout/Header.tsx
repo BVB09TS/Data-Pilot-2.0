@@ -1,13 +1,15 @@
-import React, { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useTheme } from '../../contexts/ThemeContext'
 import type { Tab } from '../../types'
 
 const TABS: { id: Tab; label: string }[] = [
+  { id: 'home',          label: 'Home'          },
   { id: 'overview',      label: 'Overview'      },
   { id: 'lineage',       label: 'Lineage'       },
   { id: 'findings',      label: 'Findings'      },
   { id: 'models',        label: 'Models'        },
   { id: 'integrations',  label: 'Integrations'  },
+  { id: 'settings',      label: 'Settings'      },
 ]
 
 interface HeaderProps {

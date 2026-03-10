@@ -1,4 +1,4 @@
-import React from 'react'
+import { } from 'react'
 import { ThemeProvider } from './contexts/ThemeContext'
 import { Shell } from './components/layout/Shell'
 

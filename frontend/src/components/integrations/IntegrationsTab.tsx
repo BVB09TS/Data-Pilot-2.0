@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import type { IntegrationsResponse } from '../../types'
 
 /* ─── Integration catalogue ─── */
@@ -186,10 +186,6 @@ export function IntegrationsTab() {
             { id: 'openai',    name: 'OpenAI',    icon: '🟢', desc: 'GPT-4o-mini / GPT-4o',     env: 'OPENAI_API_KEY',    tier: 'Standard tier' },
             { id: 'anthropic', name: 'Anthropic', icon: '🔴', desc: 'Claude Sonnet / Opus',      env: 'ANTHROPIC_API_KEY', tier: 'Premium tier'  },
           ].map(p => {
-            const isSet = Boolean(
-              /* runtime check not available in browser — just show env hint */
-              false
-            )
             return (
               <div key={p.id}
                 className="bg-white dark:bg-slate-900 rounded-xl
@@ -220,11 +216,11 @@ export function IntegrationsTab() {
 /* ─── Sub-components ─── */
 
 function IntegrationCard({
-  meta, configured, available, hint, loading,
+  meta, configured, hint, loading,
 }: {
   meta: IntegrationMeta
   configured: boolean
-  available: boolean
+  available?: boolean
   hint: string
   loading: boolean
 }) {

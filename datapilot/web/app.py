@@ -301,6 +301,134 @@ def create_app(report_path: str | None = None, graph_path: str | None = None,
             }
         )
 
+    # ---------- Settings API ----------
+
+    _SETTINGS_FILE = os.path.join(str(repo_root), "datapilot_settings.json")
+    _ENV_FILE = os.path.join(str(repo_root), ".env")
+    _LLM_KEYS = ["GROQ_API_KEY", "ANTHROPIC_API_KEY", "OPENAI_API_KEY"]
+
+    def _load_env_keys() -> dict:
+        """Read LLM API keys from .env file (masked for display)."""
+        keys = {}
+        if os.path.exists(_ENV_FILE):
+            with open(_ENV_FILE, encoding="utf-8") as f:
+                for line in f:
+                    line = line.strip()
+                    if "=" in line and not line.startswith("#"):
+                        k, _, v = line.partition("=")
+                        if k.strip() in _LLM_KEYS:
+                            keys[k.strip()] = v.strip()
+        # Also check environment (overrides .env)
+        for k in _LLM_KEYS:
+            if os.environ.get(k):
+                keys[k] = os.environ[k]
+        return keys
+
+    def _save_env_keys(new_keys: dict) -> None:
+        """Update .env file with new API keys (creates if missing)."""
+        lines: list[str] = []
+        if os.path.exists(_ENV_FILE):
+            with open(_ENV_FILE, encoding="utf-8") as f:
+                lines = f.readlines()
+
+        updated = set()
+        result = []
+        for line in lines:
+            stripped = line.strip()
+            if "=" in stripped and not stripped.startswith("#"):
+                k = stripped.split("=", 1)[0].strip()
+                if k in new_keys:
+                    result.append(f"{k}={new_keys[k]}\n")
+                    updated.add(k)
+                    continue
+            result.append(line)
+
+        for k, v in new_keys.items():
+            if k not in updated and v:
+                result.append(f"{k}={v}\n")
+
+        with open(_ENV_FILE, "w", encoding="utf-8") as f:
+            f.writelines(result)
+
+    @app.route("/api/settings", methods=["GET"])
+    def api_settings_get():
+        raw_keys = _load_env_keys()
+        masked = {k: ("*" * 8 + v[-4:] if len(v) > 4 else "****") for k, v in raw_keys.items()}
+        configured = {k: bool(v) for k in _LLM_KEYS}
+        for k, v in raw_keys.items():
+            configured[k] = bool(v)
+
+        settings = {}
+        if os.path.exists(_SETTINGS_FILE):
+            with open(_SETTINGS_FILE, encoding="utf-8") as f:
+                settings = json.load(f)
+
+        return jsonify({
+            "llm_keys": masked,
+            "llm_configured": configured,
+            "mcp_connections": settings.get("mcp_connections", []),
+            "project_root": app.config.get("DATAPILOT_PROJECT_PATH", ""),
+        })
+
+    @app.route("/api/settings", methods=["POST"])
+    def api_settings_post():
+        payload = request.get_json(silent=True) or {}
+
+        # Save API keys to .env
+        new_keys = {k: v for k, v in payload.get("llm_keys", {}).items() if k in _LLM_KEYS and v and not v.startswith("****")}
+        if new_keys:
+            _save_env_keys(new_keys)
+            # Also set in current process
+            for k, v in new_keys.items():
+                os.environ[k] = v
+
+        # Save MCP + other settings to JSON
+        settings = {}
+        if os.path.exists(_SETTINGS_FILE):
+            with open(_SETTINGS_FILE, encoding="utf-8") as f:
+                settings = json.load(f)
+
+        if "mcp_connections" in payload:
+            settings["mcp_connections"] = payload["mcp_connections"]
+
+        with open(_SETTINGS_FILE, "w", encoding="utf-8") as f:
+            json.dump(settings, f, indent=2)
+
+        return jsonify({"status": "saved"})
+
+    @app.route("/api/settings/test-key", methods=["POST"])
+    def api_settings_test_key():
+        payload = request.get_json(silent=True) or {}
+        provider = payload.get("provider", "").lower()
+        key = payload.get("key", "").strip()
+        if not key or key.startswith("****"):
+            return jsonify({"ok": False, "error": "No key provided"})
+
+        try:
+            if provider == "groq":
+                import httpx
+                r = httpx.get("https://api.groq.com/openai/v1/models",
+                              headers={"Authorization": f"Bearer {key}"}, timeout=8)
+                return jsonify({"ok": r.status_code == 200})
+            elif provider == "anthropic":
+                import httpx
+                r = httpx.post("https://api.anthropic.com/v1/messages",
+                               headers={"x-api-key": key, "anthropic-version": "2023-06-01",
+                                        "content-type": "application/json"},
+                               json={"model": "claude-haiku-4-5-20251001", "max_tokens": 1,
+                                     "messages": [{"role": "user", "content": "hi"}]},
+                               timeout=8)
+                return jsonify({"ok": r.status_code in (200, 400)})
+            elif provider == "openai":
+                import httpx
+                r = httpx.get("https://api.openai.com/v1/models",
+                              headers={"Authorization": f"Bearer {key}"}, timeout=8)
+                return jsonify({"ok": r.status_code == 200})
+        except Exception as e:
+            return jsonify({"ok": False, "error": str(e)})
+
+        return jsonify({"ok": False, "error": "Unknown provider"})
+
     # Serve Vite-built JS/CSS chunks (lives in dist/assets/)
     @app.route("/assets/<path:filename>")
     def serve_vite_assets(filename: str):

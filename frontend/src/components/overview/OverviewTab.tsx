@@ -386,7 +386,7 @@ function Skeleton() {
   )
 }
 
-function Banner({ type, children }: { type: 'error'; children: React.ReactNode }) {
+function Banner({ children }: { type?: 'error'; children: React.ReactNode }) {
   return (
     <div className="flex items-center justify-center h-full">
       <div className="text-sm text-red-500 dark:text-red-400 bg-red-50 dark:bg-red-950/30
