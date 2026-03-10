@@ -2,6 +2,15 @@
 
 > AI assistant guide for the DataPilot 2.0 codebase. Read this before making changes.
 
+## Token efficiency rules — follow these strictly
+
+- Never re-read a file you already have in context
+- Use str_replace for edits — never rewrite an entire file
+- When running bash, pipe long outputs: `command | head -50`
+- After completing a task, summarize what you did in 2 sentences max
+- Ask before doing anything that touches more than 3 files at once
+- Do not explore files speculatively — only read what you need
+
 ---
 
 ## What Is DataPilot?
