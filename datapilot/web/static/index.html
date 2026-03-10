@@ -653,8 +653,7 @@ button { cursor: pointer; font-family: var(--font); transition: var(--transition
         <span class="command-hint">⌘K</span>
         <div class="search-results" id="search-results"></div>
       </div>
-      <button class="ghost-btn" onclick="switchTab('lineage')">Lineage</button>
-      <button class="ghost-btn" onclick="switchTab('findings')">Export</button>
+      <button class="ghost-btn" onclick="switchTab('findings')">Findings</button>
       <button class="primary-btn" id="chat-toggle">AI Copilot</button>
       <button class="theme-toggle" id="theme-toggle" title="Toggle theme">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
@@ -681,9 +680,9 @@ button { cursor: pointer; font-family: var(--font); transition: var(--transition
     <!-- Sidebar (dbt-style) -->
     <aside class="sidebar" id="sidebar">
       <div class="sidebar-tabs">
-        <button class="sidebar-tab active">Models</button>
-        <button class="sidebar-tab">Sources</button>
-        <button class="sidebar-tab">Tests</button>
+        <button class="sidebar-tab active" onclick="setSidebarTab(this, null)">Models</button>
+        <button class="sidebar-tab" onclick="setSidebarTab(this, 'source')">Sources</button>
+        <button class="sidebar-tab" onclick="setSidebarTab(this, 'tests')">Tests</button>
       </div>
       <div class="sidebar-top">
         <div class="sidebar-heading">
@@ -709,12 +708,12 @@ button { cursor: pointer; font-family: var(--font); transition: var(--transition
         <div class="workspace-context">
           <div class="workspace-breadcrumb" id="workspace-breadcrumb">Project • ShopMesh</div>
           <div class="workspace-heading" id="workspace-heading">Project Health</div>
-          <div class="workspace-subheading" id="workspace-subheading">Monitoring entire dbt estate</div>
+          <div class="workspace-subheading" id="workspace-subheading">Audit summary for your dbt project</div>
           <div class="workspace-tags" id="workspace-tags"></div>
         </div>
         <div class="workspace-actions">
           <button class="ghost-btn" onclick="switchTab('lineage')">View Lineage</button>
-          <button class="primary-btn" onclick="switchTab('findings')">Run Diagnostics</button>
+          <button class="primary-btn" onclick="switchTab('findings')">View Findings</button>
         </div>
       </div>
       <main class="content" id="content"></main>
@@ -766,6 +765,7 @@ let state = {
   allModelsFlat: [],
   sidebarFilter: '',
   sidebarOnlyIssues: false,
+  sidebarLayerFilter: null,   // null = all, 'source' = source layer only, 'tests' = models with test findings
   lineageIssuesOnly: false,
 };
 
@@ -897,7 +897,10 @@ function renderSidebar() {
       const blob = `${m.name} ${(m.description || '')} ${(m.tags || []).join(' ')}`.toLowerCase();
       const matchesText = !filterText || blob.includes(filterText);
       const matchesIssues = !state.sidebarOnlyIssues || m.has_problem;
-      return matchesText && matchesIssues;
+      const matchesLayer = !state.sidebarLayerFilter
+        || (state.sidebarLayerFilter === 'source' && layer === 'source')
+        || (state.sidebarLayerFilter === 'tests' && m.findings_count > 0);
+      return matchesText && matchesIssues && matchesLayer;
     });
     visibleCount += filtered.length;
     if (!filtered.length) return '';
@@ -951,36 +954,39 @@ function toggleSidebarIssues() {
   renderSidebar();
 }
 
-async function updateLineageInspector(modelName) {
+function setSidebarTab(btn, layerFilter) {
+  document.querySelectorAll('.sidebar-tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  state.sidebarLayerFilter = layerFilter;
+  renderSidebar();
+}
+
+function updateLineageInspector(modelName) {
   const inspector = document.getElementById('lineage-inspector');
   if (!inspector) return;
   if (!modelName) {
-    inspector.innerHTML = '<h3>Lineage Inspector</h3><div class="inspector-empty">Select a node to inspect upstream/downstream.</div>';
+    inspector.innerHTML = '<h3>Lineage Inspector</h3><div class="inspector-empty">Select a node to inspect upstream and downstream dependencies.</div>';
     return;
   }
   const model = state.allModelsFlat.find(m => m.name === modelName);
-  inspector.innerHTML = '<h3>Lineage Inspector</h3><div class="inspector-empty">Loading metadata...</div>';
-  try {
-    const linResp = await fetch(`/api/models/${modelName}/lineage`);
-    const lin = await linResp.json();
-    inspector.innerHTML = `
-      <h3>Lineage Inspector</h3>
-      <div class="inspector-meta">
-        <strong>${modelName}</strong><br/>
-        Layer: ${model?.layer || '—'} · Columns: ${model?.columns.length || 0} · Findings: ${model?.findings_count || 0}
-      </div>
-      <div>
-        <strong style="font-size:12px;color:var(--text3);text-transform:uppercase">Upstream (${lin.upstream?.length || 0})</strong>
-        ${lin.upstream?.length ? `<ul class="inspector-list">${lin.upstream.slice(0,5).map(u => `<li><span>${u}</span><button class="ghost-btn" style="padding:2px 6px;font-size:11px" onclick=\"selectModel('${u}')\">Open</button></li>`).join('')}</ul>` : '<div class="inspector-empty">None</div>'}
-      </div>
-      <div>
-        <strong style="font-size:12px;color:var(--text3);text-transform:uppercase">Downstream (${lin.downstream?.length || 0})</strong>
-        ${lin.downstream?.length ? `<ul class="inspector-list">${lin.downstream.slice(0,5).map(d => `<li><span>${d}</span><button class="ghost-btn" style="padding:2px 6px;font-size:11px" onclick=\"selectModel('${d}')\">Open</button></li>`).join('')}</ul>` : '<div class="inspector-empty">None</div>'}
-      </div>
-    `;
-  } catch (e) {
-    inspector.innerHTML = '<h3>Lineage Inspector</h3><div class="inspector-empty">Unable to load lineage.</div>';
-  }
+  const edges = state.graph?.edges || [];
+  const upstream = edges.filter(e => e.target === modelName).map(e => e.source);
+  const downstream = edges.filter(e => e.source === modelName).map(e => e.target);
+  inspector.innerHTML = `
+    <h3>Lineage Inspector</h3>
+    <div class="inspector-meta">
+      <strong>${modelName}</strong><br/>
+      Layer: ${model?.layer || '—'} &middot; Columns: ${model?.columns?.length || 0} &middot; Findings: ${model?.findings_count || 0}
+    </div>
+    <div>
+      <strong style="font-size:12px;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em">Upstream (${upstream.length})</strong>
+      ${upstream.length ? `<ul class="inspector-list">${upstream.slice(0,6).map(u => `<li><span>${u}</span><button class="ghost-btn" style="padding:2px 6px;font-size:11px" onclick="selectModel('${u}')">Open</button></li>`).join('')}</ul>` : '<div class="inspector-empty">No upstream dependencies</div>'}
+    </div>
+    <div>
+      <strong style="font-size:12px;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em">Downstream (${downstream.length})</strong>
+      ${downstream.length ? `<ul class="inspector-list">${downstream.slice(0,6).map(d => `<li><span>${d}</span><button class="ghost-btn" style="padding:2px 6px;font-size:11px" onclick="selectModel('${d}')">Open</button></li>`).join('')}</ul>` : '<div class="inspector-empty">No downstream consumers</div>'}
+    </div>
+  `;
 }
 
 // ==================== Content Router ====================
@@ -1032,33 +1038,31 @@ function selectModel(name) {
 function updateLineageOverlay(modelName) {
   const body = document.getElementById('lineage-overlay-body');
   if (!body) return;
-  fetch(`/api/models/${modelName}/lineage`).then(r => r.json()).then(lin => {
-    const upstream = lin.upstream || [];
-    const downstream = lin.downstream || [];
-    const hasAny = upstream.length > 0 || downstream.length > 0;
-    body.innerHTML = hasAny ? `
-      <div class="lineage-overlay-graph">
-        ${upstream.slice(0, 3).map(u => `
-          <div class="lineage-overlay-node" onclick="selectModel('${u}')">
-            <span class="node-dot" style="background:${getLayerColor(u)}"></span>
-            <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${u}</span>
-          </div>
-        `).join('')}
-        ${upstream.length > 0 ? '<div class="lineage-overlay-arrow">&#8595;</div>' : ''}
-        <div class="lineage-overlay-node current">
-          <span class="node-dot" style="background:${getLayerColor(modelName)}"></span>
-          <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${modelName}</span>
-        </div>
-        ${downstream.length > 0 ? '<div class="lineage-overlay-arrow">&#8595;</div>' : ''}
-        ${downstream.slice(0, 3).map(d => `
-          <div class="lineage-overlay-node" onclick="selectModel('${d}')">
-            <span class="node-dot" style="background:${getLayerColor(d)}"></span>
-            <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${d}</span>
-          </div>
-        `).join('')}
-      </div>
-    ` : '<div class="lineage-overlay-empty">No lineage data for this model.</div>';
-  }).catch(() => { body.innerHTML = '<div class="lineage-overlay-empty">Could not load lineage.</div>'; });
+  const edges = state.graph?.edges || [];
+  const upstream = edges.filter(e => e.target === modelName).map(e => e.source);
+  const downstream = edges.filter(e => e.source === modelName).map(e => e.target);
+  const hasAny = upstream.length > 0 || downstream.length > 0;
+  const rows = [];
+  if (upstream.length) {
+    rows.push(`<div style="font-size:10px;text-transform:uppercase;letter-spacing:0.1em;color:rgba(255,255,255,0.4);margin-bottom:6px">Upstream · ${upstream.length}</div>`);
+    upstream.slice(0, 3).forEach(u => {
+      rows.push(`<div class="lineage-overlay-node" onclick="selectModel('${u}')"><span class="node-dot" style="background:${getLayerColor(u)}"></span><span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${u}</span></div>`);
+    });
+    if (upstream.length > 3) rows.push(`<div style="font-size:11px;color:rgba(255,255,255,0.35);text-align:center;padding:4px">+${upstream.length - 3} more</div>`);
+    rows.push('<div class="lineage-overlay-arrow">&#8595;</div>');
+  }
+  rows.push(`<div class="lineage-overlay-node current"><span class="node-dot" style="background:${getLayerColor(modelName)}"></span><span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:600">${modelName}</span></div>`);
+  if (downstream.length) {
+    rows.push('<div class="lineage-overlay-arrow">&#8595;</div>');
+    rows.push(`<div style="font-size:10px;text-transform:uppercase;letter-spacing:0.1em;color:rgba(255,255,255,0.4);margin-top:2px;margin-bottom:6px">Downstream · ${downstream.length}</div>`);
+    downstream.slice(0, 3).forEach(d => {
+      rows.push(`<div class="lineage-overlay-node" onclick="selectModel('${d}')"><span class="node-dot" style="background:${getLayerColor(d)}"></span><span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${d}</span></div>`);
+    });
+    if (downstream.length > 3) rows.push(`<div style="font-size:11px;color:rgba(255,255,255,0.35);text-align:center;padding:4px">+${downstream.length - 3} more</div>`);
+  }
+  body.innerHTML = hasAny
+    ? `<div class="lineage-overlay-graph">${rows.join('')}</div>`
+    : '<div class="lineage-overlay-empty">No lineage connections for this model.</div>';
 }
 
 function hideLineageOverlay() {
@@ -1131,17 +1135,12 @@ function renderOverview(container) {
         <div class="stat-card">
           <div class="label">Total Findings</div>
           <div class="value" style="color:var(--orange)">${r.total_findings || 0}</div>
-          <div class="sub">issues detected</div>
-        </div>
-        <div class="stat-card">
-          <div class="label">Monthly Waste</div>
-          <div class="value" style="color:var(--red)">$${r.total_monthly_waste_usd || 0}</div>
-          <div class="sub">estimated savings</div>
+          <div class="sub">findings across all models</div>
         </div>
         <div class="stat-card">
           <div class="label">Lineage Edges</div>
           <div class="value">${(state.graph?.edges || []).length}</div>
-          <div class="sub">model dependencies</div>
+          <div class="sub">lineage connections</div>
         </div>
       </div>
 
@@ -1155,16 +1154,13 @@ function renderOverview(container) {
       ${(() => {
     const astats = r.agent_stats || {};
     const totalCalls = Object.values(astats).reduce((s, x) => s + (x.calls || 0), 0);
-    const totalCost = Object.values(astats).reduce((s, x) => s + (x.total_cost_usd || x.cost_usd || 0), 0);
     const hasFindings = (r.total_findings || 0) > 0;
-    if (totalCalls > 0 || totalCost > 0) {
+    if (totalCalls > 0) {
       return `
       <div class="ai-section">
         <div class="ai-section-title"><span>&#9881;</span> AI Analysis</div>
         <div class="ai-section-stats">
-          <span class="ai-stat">Findings analyzed by AI agents</span>
-          <span class="ai-stat">LLM calls: <strong>${totalCalls}</strong></span>
-          <span class="ai-stat">Cost: <strong>$${totalCost.toFixed(4)}</strong></span>
+          <span class="ai-stat">Findings reviewed by <strong>${totalCalls}</strong> AI agent call${totalCalls !== 1 ? 's' : ''} across 8 specialist agents</span>
         </div>
       </div>`;
     }
@@ -1173,7 +1169,7 @@ function renderOverview(container) {
       <div class="ai-section" style="border-color: rgba(99,102,241,0.3)">
         <div class="ai-section-title"><span>&#9881;</span> AI Analysis</div>
         <div class="ai-section-stats">
-          <span class="ai-stat">Add <code>GROQ_API_KEY</code> to <code>.env</code> to enable AI-powered analysis.</span>
+          <span class="ai-stat">Set <code>GROQ_API_KEY</code> in <code>.env</code> to enable AI-assisted analysis.</span>
         </div>
       </div>`;
     }
@@ -1275,7 +1271,7 @@ function renderModelsHub(container) {
                 <td>${m.layer}</td>
                 <td>${m.q30 != null ? m.q30 : '—'}</td>
                 <td>${m.columns.length}</td>
-                <td style="color:${m.has_problem ? 'var(--red)' : 'var(--green)'}">${m.has_problem ? 'Needs attention' : 'Healthy'}</td>
+                <td style="color:${m.has_problem ? 'var(--red)' : 'var(--green)'}">${m.has_problem ? 'Issues detected' : 'No issues'}</td>
               </tr>
             `).join('')}
           </tbody>
@@ -1307,10 +1303,10 @@ function updateWorkspaceContext() {
   }
 
   const tabMeta = {
-    overview: { title: 'Project Health', desc: 'LLM-powered audit summary' },
-    models: { title: 'Model Catalog', desc: 'Browse layers, owners, tags' },
-    lineage: { title: 'Lineage Graph', desc: 'Interactive dependency explorer' },
-    findings: { title: 'Audit Findings', desc: 'Remediate quality issues fast' },
+    overview: { title: 'Project Health', desc: 'Audit summary for your dbt project' },
+    models: { title: 'Model Catalog', desc: 'Browse models by layer, tag, and status' },
+    lineage: { title: 'Lineage Graph', desc: 'Explore model dependencies and data flow' },
+    findings: { title: 'Audit Findings', desc: 'Review and remediate quality issues' },
   };
   const meta = tabMeta[state.activeTab] || tabMeta.overview;
   headingEl.textContent = meta.title;
@@ -1368,7 +1364,7 @@ function renderFindings(container) {
       </div>
       <table class="findings-table">
         <thead>
-          <tr><th>Severity</th><th>Model</th><th>Type</th><th>Evidence</th><th>Cost</th><th>Action</th></tr>
+          <tr><th>Severity</th><th>Model</th><th>Type</th><th>Evidence</th><th>Recommended Action</th></tr>
         </thead>
         <tbody id="findings-tbody"></tbody>
       </table>
@@ -1396,7 +1392,6 @@ function showFilteredFindings(findings) {
       <td style="font-weight:500;font-family:var(--mono);font-size:12px">${f.model}</td>
       <td><span class="type-badge">${(f.type || '').replace(/_/g, ' ')}</span></td>
       <td style="font-size:12px;color:var(--text2);max-width:300px">${f.evidence || ''}</td>
-      <td style="font-weight:600;color:var(--orange)">${f.cost_usd ? '$' + f.cost_usd + '/mo' : '-'}</td>
       <td style="font-size:12px;color:var(--text2);max-width:250px">${f.action || ''}</td>
     </tr>
   `).join('');
@@ -1508,7 +1503,6 @@ async function renderModelDetail(container) {
             <div class="mf-header">
               <span class="sev-badge ${f.severity}">${f.severity}</span>
               <span class="type-badge">${(f.type || '').replace(/_/g, ' ')}</span>
-              ${f.cost_usd ? `<span style="font-size:12px;color:var(--orange);font-weight:600">$${f.cost_usd}/mo</span>` : ''}
             </div>
             <div class="mf-evidence">${f.evidence || ''}</div>
             <div class="mf-action">&#8594; ${f.action || ''}</div>
@@ -1600,7 +1594,6 @@ function renderChatMessages() {
     const foot = [];
     if (meta.model) foot.push(`${meta.model}`);
     if (typeof meta.latency_ms === 'number') foot.push(`${Math.round(meta.latency_ms)}ms`);
-    if (typeof meta.cost_usd === 'number') foot.push(`$${meta.cost_usd.toFixed(4)}`);
     if (meta.error) foot.push('error');
     return `
       <div class="ai-message ${msg.role}">
