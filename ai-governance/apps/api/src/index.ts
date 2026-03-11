@@ -20,8 +20,16 @@ app.use(cookieParser());
 
 // ── Passport (stateless — no session store) ───────────────────────────────────
 
-passport.use('github', buildGitHubStrategy());
-passport.use('google', buildGoogleStrategy());
+if (process.env.GITHUB_CLIENT_ID && process.env.GITHUB_CLIENT_SECRET) {
+  passport.use('github', buildGitHubStrategy());
+} else {
+  console.warn('⚠️  GITHUB_CLIENT_ID / GITHUB_CLIENT_SECRET not set — GitHub OAuth disabled');
+}
+if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
+  passport.use('google', buildGoogleStrategy());
+} else {
+  console.warn('⚠️  GOOGLE_CLIENT_ID / GOOGLE_CLIENT_SECRET not set — Google OAuth disabled');
+}
 app.use(passport.initialize());
 
 // ── Routes ────────────────────────────────────────────────────────────────────
