@@ -7,6 +7,7 @@ import 'dotenv/config';
 import { buildGitHubStrategy } from './auth/github.strategy.js';
 import { buildGoogleStrategy } from './auth/google.strategy.js';
 import authRouter from './auth/routes.js';
+import connectionsRouter from './routes/connections.js';
 
 const app = express();
 const PORT = process.env.PORT ?? 3000;
@@ -39,6 +40,7 @@ app.get('/api/health', (_req, res) => {
 });
 
 app.use('/auth', authRouter);
+app.use('/api/workspaces/:workspaceId/connections', connectionsRouter);
 
 // ── Start ─────────────────────────────────────────────────────────────────────
 
