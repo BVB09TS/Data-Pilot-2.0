@@ -21,7 +21,7 @@ async function migrate() {
     `);
 
     // Get all migration files
-    const migrationsDir = join(process.cwd(), '../../db/migrations');
+    const migrationsDir = join(process.cwd(), 'db/migrations');
     const files = (await readdir(migrationsDir)).sort();
 
     for (const file of files) {
