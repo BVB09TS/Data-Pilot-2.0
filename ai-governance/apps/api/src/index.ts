@@ -44,7 +44,8 @@ app.get('/api/health', (_req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
-app.use('/auth', authRouter);
+app.use('/auth', authRouter);       // OAuth browser redirects: /auth/github, /auth/google
+app.use('/api/auth', authRouter);  // Axios API calls: /api/auth/me, /api/auth/dev-login, /api/auth/logout
 app.use('/api/workspaces/:workspaceId/connections', connectionsRouter);
 app.use('/api/workspaces/:workspaceId/nodes', nodesRouter);
 app.use('/api/workspaces/:workspaceId/edges', edgesRouter);
