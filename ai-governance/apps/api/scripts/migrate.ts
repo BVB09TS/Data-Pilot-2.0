@@ -26,6 +26,15 @@ async function migrate() {
       .filter(f => f.endsWith('.sql'))
       .sort();
 
+    // Postgres error codes for "object already exists" situations
+    const ALREADY_EXISTS_CODES = new Set([
+      '42P07', // duplicate_table
+      '42710', // duplicate_object
+      '42701', // duplicate_column
+      '42P16', // invalid_table_definition (e.g. constraint already exists)
+      '23505', // unique_violation (duplicate index)
+    ]);
+
     for (const file of files) {
       const { rows } = await client.query(
         'SELECT 1 FROM _migrations WHERE filename = $1',
@@ -45,7 +54,14 @@ async function migrate() {
         console.log(`  apply ${file}`);
       } catch (err) {
         await client.query('ROLLBACK');
-        throw new Error(`Failed on ${file}: ${(err as Error).message}`);
+        const pgErr = err as { code?: string; message: string };
+        if (pgErr.code && ALREADY_EXISTS_CODES.has(pgErr.code)) {
+          // Migration was already applied outside this tool — record it and move on
+          await client.query('INSERT INTO _migrations (filename) VALUES ($1) ON CONFLICT DO NOTHING', [file]);
+          console.log(`  baseline ${file} (objects already exist)`);
+        } else {
+          throw new Error(`Failed on ${file}: ${pgErr.message}`);
+        }
       }
     }
 
