@@ -11,6 +11,8 @@ import connectionsRouter from './routes/connections.js';
 import nodesRouter from './routes/nodes.js';
 import edgesRouter from './routes/edges.js';
 import lineageRouter from './routes/lineage.js';
+import environmentsRouter from './routes/environments.js';
+import runsRouter from './routes/runs.js';
 
 const app = express();
 const PORT = process.env.PORT ?? 3000;
@@ -47,6 +49,8 @@ app.use('/api/workspaces/:workspaceId/connections', connectionsRouter);
 app.use('/api/workspaces/:workspaceId/nodes', nodesRouter);
 app.use('/api/workspaces/:workspaceId/edges', edgesRouter);
 app.use('/api/workspaces/:workspaceId/lineage', lineageRouter);
+app.use('/api/workspaces/:workspaceId/environments', environmentsRouter);
+app.use('/api/workspaces/:workspaceId/runs', runsRouter);
 
 // ── Start ─────────────────────────────────────────────────────────────────────
 
