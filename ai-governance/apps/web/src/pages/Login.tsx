@@ -1,4 +1,17 @@
+import { useState } from 'react';
+import { api } from '../lib/api';
+
+const IS_DEV = import.meta.env.DEV;
+
 export default function Login() {
+  const [loading, setLoading] = useState(false);
+
+  async function devLogin() {
+    setLoading(true);
+    await api.post('/auth/dev-login').catch(() => {});
+    window.location.href = '/';
+  }
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-950">
       <div className="card w-full max-w-sm space-y-6">
@@ -37,6 +50,26 @@ export default function Login() {
             Continue with Google
           </a>
         </div>
+
+        {IS_DEV && (
+          <>
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-gray-700" />
+              </div>
+              <div className="relative flex justify-center text-xs">
+                <span className="px-2 bg-gray-900 text-gray-500">dev only</span>
+              </div>
+            </div>
+            <button
+              onClick={devLogin}
+              disabled={loading}
+              className="btn-ghost w-full justify-center border border-gray-700"
+            >
+              {loading ? 'Signing in…' : '⚡ Dev Login (no OAuth)'}
+            </button>
+          </>
+        )}
 
         <p className="text-center text-xs text-gray-500">
           By signing in you agree to our terms of service.

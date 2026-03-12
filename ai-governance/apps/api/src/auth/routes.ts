@@ -59,6 +59,46 @@ router.get(
   }
 );
 
+// ── Dev login (only in development — creates a seed user + workspace) ─────────
+
+router.post('/dev-login', async (req: Request, res: Response): Promise<void> => {
+  if (process.env.NODE_ENV === 'production') {
+    res.status(404).json({ error: 'Not found' });
+    return;
+  }
+
+  // Upsert a dev user (conflict on email — the only unique constraint on users)
+  const userResult = await pool.query<{ id: string }>(
+    `INSERT INTO users (email, name, provider, provider_id)
+     VALUES ('dev@localhost', 'Dev User', 'dev', 'dev')
+     ON CONFLICT (email) DO UPDATE SET name = EXCLUDED.name
+     RETURNING id`,
+    []
+  );
+  const userId = userResult.rows[0].id;
+
+  // Upsert a dev workspace
+  const wsResult = await pool.query<{ id: string }>(
+    `INSERT INTO workspaces (name, slug)
+     VALUES ('Dev Workspace', 'dev')
+     ON CONFLICT (slug) DO UPDATE SET name = EXCLUDED.name
+     RETURNING id`,
+    []
+  );
+  const workspaceId = wsResult.rows[0].id;
+
+  // Ensure membership
+  await pool.query(
+    `INSERT INTO workspace_members (workspace_id, user_id, role)
+     VALUES ($1, $2, 'owner')
+     ON CONFLICT (workspace_id, user_id) DO NOTHING`,
+    [workspaceId, userId]
+  );
+
+  issueSessionCookie(res, userId);
+  res.json({ ok: true });
+});
+
 // ── Logout ────────────────────────────────────────────────────────────────────
 
 router.post('/logout', async (req: Request, res: Response): Promise<void> => {
