@@ -64,3 +64,17 @@ export const environmentsApi = {
   update: (wid: string, id: string, body: Record<string, unknown>) => api.patch(`/workspaces/${wid}/environments/${id}`, body),
   delete: (wid: string, id: string) => api.delete(`/workspaces/${wid}/environments/${id}`),
 };
+
+export const policiesApi = {
+  list:        (wid: string) => api.get(`/workspaces/${wid}/policies`),
+  get:         (wid: string, id: string) => api.get(`/workspaces/${wid}/policies/${id}`),
+  create:      (wid: string, body: Record<string, unknown>) => api.post(`/workspaces/${wid}/policies`, body),
+  update:      (wid: string, id: string, body: Record<string, unknown>) => api.patch(`/workspaces/${wid}/policies/${id}`, body),
+  delete:      (wid: string, id: string) => api.delete(`/workspaces/${wid}/policies/${id}`),
+  evaluate:    (wid: string, id: string, body: Record<string, unknown>) => api.post(`/workspaces/${wid}/policies/${id}/evaluate`, body),
+  evaluations: (wid: string, id: string) => api.get(`/workspaces/${wid}/policies/${id}/evaluations`),
+};
+
+export const auditApi = {
+  list: (wid: string, params?: Record<string, unknown>) => api.get(`/workspaces/${wid}/audit`, { params }),
+};

@@ -14,6 +14,8 @@ import Connections from './pages/Connections';
 import Nodes from './pages/Nodes';
 import Lineage from './pages/Lineage';
 import Runs from './pages/Runs';
+import Policies from './pages/Policies';
+import AuditLog from './pages/AuditLog';
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
@@ -32,6 +34,8 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
             <Route path="nodes"       element={<Nodes />} />
             <Route path="lineage"     element={<Lineage />} />
             <Route path="runs"        element={<Runs />} />
+            <Route path="policies"    element={<Policies />} />
+            <Route path="audit"       element={<AuditLog />} />
           </Route>
 
           <Route path="*" element={<Navigate to="/" replace />} />
