@@ -68,9 +68,9 @@ router.get('/', async (req: Request, res: Response): Promise<void> => {
     values
   );
 
-  // Return count for pagination
+  // Return count for pagination (same conditions, without the LIMIT/OFFSET params)
   const countResult = await pool.query(
-    `SELECT COUNT(*) FROM runs r WHERE ${conditions.slice(0, -0).join(' AND ')}`,
+    `SELECT COUNT(*) FROM runs r WHERE ${conditions.join(' AND ')}`,
     values.slice(0, i - 1)
   );
 
