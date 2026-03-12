@@ -363,85 +363,122 @@ function buildFlow(modelNodes: ModelNode[], edgePairs: [string, string][], selec
   };
 }
 
-// ── Lineage popup (triggered by FAB) ─────────────────────────────────────────
+// ── Selector parser (dbt-style: +2model_name+3) ───────────────────────────────
 
-function LineagePopup({ selectedId, onExpand, onNavigate, onClose }: {
-  selectedId: string; onExpand: () => void;
-  onNavigate: (id: string) => void; onClose: () => void;
-}) {
-  const { T, theme } = useTheme();
-  const { nodes: mn, edges: me } = getFocusedGraph(selectedId, 1);
-  const { nodes: fn, edges: fe } = buildFlow(mn, me, selectedId, theme);
-  const [nodes, , onNC] = useNodesState<Node>(fn);
-  const [edges, , onEC] = useEdgesState<Edge>(fe);
+interface Selector { nodeId: string; upDepth: number; downDepth: number; }
 
-  return (
-    <div
-      className="absolute bottom-20 right-4 w-80 h-60 rounded-2xl shadow-2xl overflow-hidden z-20 border"
-      style={{ background: T.panel, borderColor: T.border }}
-    >
-      <div className="flex items-center justify-between px-3 py-2 border-b" style={{ borderColor: T.border, background: T.secondary }}>
-        <span className="text-xs font-semibold" style={{ color: T.text }}>Lineage Graph</span>
-        <div className="flex gap-2">
-          <button onClick={onExpand} title="Expand" style={{ color: T.muted }} className="hover:opacity-80 transition-opacity">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/>
-            </svg>
-          </button>
-          <button onClick={onClose} style={{ color: T.muted }} className="hover:opacity-80 transition-opacity">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
-            </svg>
-          </button>
-        </div>
-      </div>
-      <ReactFlow nodes={nodes} edges={edges} onNodesChange={onNC} onEdgesChange={onEC}
-        onNodeClick={(_, n) => { onNavigate(n.id); onClose(); }}
-        fitView fitViewOptions={{ padding: 0.2 }}
-        proOptions={{ hideAttribution: true }} nodesDraggable={false} zoomOnScroll={false} panOnDrag={false}
-        style={{ background: T.rfBg }}>
-        <Background variant={BackgroundVariant.Dots} color={T.rfDot} gap={16} />
-      </ReactFlow>
-    </div>
-  );
+function parseSelector(raw: string): Selector | null {
+  let s = raw.trim();
+  let upDepth = 0, downDepth = 0;
+  const pre = s.match(/^\+(\d*)/);
+  if (pre) { upDepth = pre[1] ? parseInt(pre[1]) : 99; s = s.slice(pre[0].length); }
+  const suf = s.match(/\+(\d*)$/);
+  if (suf) { downDepth = suf[1] ? parseInt(suf[1]) : 99; s = s.slice(0, s.length - suf[0].length); }
+  const nodeId = s.trim();
+  if (!nodeId) return null;
+  return { nodeId, upDepth, downDepth };
+}
+
+function getSelectorGraph(sel: Selector) {
+  const inc = new Set<string>([sel.nodeId]);
+  let f = [sel.nodeId];
+  for (let d = 0; d < sel.upDepth && f.length; d++) {
+    const nx: string[] = []; EDGES_RAW.forEach(([s, t]) => { if (f.includes(t) && !inc.has(s)) { inc.add(s); nx.push(s); } }); f = nx;
+  }
+  f = [sel.nodeId];
+  for (let d = 0; d < sel.downDepth && f.length; d++) {
+    const nx: string[] = []; EDGES_RAW.forEach(([s, t]) => { if (f.includes(s) && !inc.has(t)) { inc.add(t); nx.push(t); } }); f = nx;
+  }
+  return { nodes: NODES.filter(n => inc.has(n.id)), edges: EDGES_RAW.filter(([s, t]) => inc.has(s) && inc.has(t)) };
+}
+
+function describeSel(sel: Selector): string {
+  const parts: string[] = [];
+  if (sel.upDepth   === 99) parts.push('all upstream');
+  else if (sel.upDepth > 0) parts.push(`${sel.upDepth} level${sel.upDepth > 1 ? 's' : ''} upstream`);
+  parts.push(sel.nodeId);
+  if (sel.downDepth === 99) parts.push('all downstream');
+  else if (sel.downDepth > 0) parts.push(`${sel.downDepth} level${sel.downDepth > 1 ? 's' : ''} downstream`);
+  return parts.join(' → ');
 }
 
 // ── Full-screen lineage modal ──────────────────────────────────────────────────
 
-function LineageModal({ selectedId, onClose, onNavigate }: {
-  selectedId: string; onClose: () => void; onNavigate: (id: string) => void;
+function LineageModal({ initialId, onClose, onNavigate }: {
+  initialId: string; onClose: () => void; onNavigate: (id: string) => void;
 }) {
   const { T, theme } = useTheme();
-  const [depth, setDepth] = useState(2);
-  const { nodes: mn, edges: me } = getFocusedGraph(selectedId, depth);
-  const { nodes: fn, edges: fe } = buildFlow(mn, me, selectedId, theme);
+  const [query, setQuery]     = useState(initialId);
+  const [applied, setApplied] = useState<Selector>({ nodeId: initialId, upDepth: 1, downDepth: 1 });
+  const [suggestions, setSuggestions] = useState<string[]>([]);
+  const [focusSug, setFocusSug] = useState(-1);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  const { nodes: mn, edges: me } = getSelectorGraph(applied);
+  const { nodes: fn, edges: fe } = buildFlow(mn, me, applied.nodeId, theme);
   const [nodes, setNodes, onNC] = useNodesState<Node>(fn);
   const [edges, setEdges, onEC] = useEdgesState<Edge>(fe);
-  const node = NODE_MAP.get(selectedId);
 
   useEffect(() => {
-    const { nodes: mn2, edges: me2 } = getFocusedGraph(selectedId, depth);
-    const { nodes: fn2, edges: fe2 } = buildFlow(mn2, me2, selectedId, theme);
+    const { nodes: mn2, edges: me2 } = getSelectorGraph(applied);
+    const { nodes: fn2, edges: fe2 } = buildFlow(mn2, me2, applied.nodeId, theme);
     setNodes(fn2); setEdges(fe2);
-  }, [selectedId, depth, theme]);
+  }, [applied, theme]);
+
+  // Autocomplete: extract the model-name part of the query
+  function updateSuggestions(raw: string) {
+    setQuery(raw);
+    const m = raw.trim().replace(/^\+\d*/, '').replace(/\+\d*$/, '').trim();
+    if (!m || m.length < 2) { setSuggestions([]); return; }
+    setSuggestions(NODES.filter(n => n.name.includes(m) && n.name !== m).map(n => n.name).slice(0, 6));
+    setFocusSug(-1);
+  }
+
+  function applySuggestion(name: string) {
+    const prefix = query.trim().match(/^\+\d*/)?.[0] ?? '';
+    const suffix = query.trim().match(/\+\d*$/)?.[0] ?? '';
+    const newQ = prefix + name + suffix;
+    setQuery(newQ); setSuggestions([]); applyQuery(newQ);
+  }
+
+  function applyQuery(raw = query) {
+    const sel = parseSelector(raw);
+    if (!sel) return;
+    const found = NODES.find(n => n.name === sel.nodeId || n.id === sel.nodeId);
+    if (!found) return;
+    setApplied({ ...sel, nodeId: found.id });
+    setSuggestions([]);
+  }
+
+  function onKeyDown(e: React.KeyboardEvent) {
+    if (suggestions.length > 0) {
+      if (e.key === 'ArrowDown') { e.preventDefault(); setFocusSug(p => Math.min(p + 1, suggestions.length - 1)); return; }
+      if (e.key === 'ArrowUp')   { e.preventDefault(); setFocusSug(p => Math.max(p - 1, -1)); return; }
+      if (e.key === 'Enter' && focusSug >= 0) { applySuggestion(suggestions[focusSug]); return; }
+      if (e.key === 'Escape') { setSuggestions([]); return; }
+    }
+    if (e.key === 'Enter') applyQuery();
+  }
+
+  const selNode = NODE_MAP.get(applied.nodeId);
+  const parsed  = parseSelector(query);
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center" style={{ background: 'rgba(0,0,0,0.65)' }}>
-      <div className="w-[90vw] h-[85vh] rounded-2xl flex flex-col overflow-hidden shadow-2xl border" style={{ background: T.panel, borderColor: T.border }}>
+      <div className="w-[92vw] h-[88vh] rounded-2xl flex flex-col overflow-hidden shadow-2xl border" style={{ background: T.panel, borderColor: T.border }}>
+
+        {/* ── Header ── */}
         <div className="flex items-center justify-between px-5 py-3 border-b flex-shrink-0" style={{ borderColor: T.border, background: T.secondary }}>
           <div className="flex items-center gap-3">
-            <span className="text-sm font-semibold" style={{ color: T.text }}>Lineage — {selectedId}</span>
-            {node && <span className="text-xs px-2 py-0.5 rounded" style={{ background: LAYER_BG[theme][node.layer], color: LAYER_BORDER[node.layer], border: `1px solid ${LAYER_BORDER[node.layer]}` }}>{LAYER_LABEL[node.layer]}</span>}
+            <span className="text-sm font-semibold" style={{ color: T.text }}>Lineage Explorer</span>
+            {selNode && <span className="text-xs px-2 py-0.5 rounded" style={{ background: LAYER_BG[theme][selNode.layer], color: LAYER_BORDER[selNode.layer], border: `1px solid ${LAYER_BORDER[selNode.layer]}` }}>{LAYER_LABEL[selNode.layer]}</span>}
             <span className="text-xs" style={{ color: T.faint }}>{nodes.length} nodes · {edges.length} edges</span>
           </div>
-          <div className="flex items-center gap-2">
-            <span className="text-xs mr-1" style={{ color: T.muted }}>Depth</span>
-            {[1,2,3].map(d => (
-              <button key={d} onClick={() => setDepth(d)}
-                className="w-6 h-6 rounded text-xs font-medium transition-colors"
-                style={{ background: depth === d ? '#6366f1' : T.secondary, color: depth === d ? '#fff' : T.muted, border: `1px solid ${T.border}` }}>
-                {d}
-              </button>
+          <div className="flex items-center gap-3">
+            {LAYERS.map(l => (
+              <span key={l} className="hidden md:flex items-center gap-1.5 text-xs" style={{ color: T.muted }}>
+                <span className="w-2 h-2 rounded-sm" style={{ background: LAYER_BORDER[l] }} />{LAYER_LABEL[l]}
+              </span>
             ))}
             <button onClick={onClose} className="ml-2 hover:opacity-70 transition-opacity" style={{ color: T.muted }}>
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -450,21 +487,92 @@ function LineageModal({ selectedId, onClose, onNavigate }: {
             </button>
           </div>
         </div>
-        <div className="flex items-center gap-4 px-5 py-1.5 border-b flex-shrink-0" style={{ borderColor: T.border }}>
-          {LAYERS.map(l => (
-            <span key={l} className="flex items-center gap-1.5 text-xs" style={{ color: T.muted }}>
-              <span className="w-2 h-2 rounded-sm" style={{ background: LAYER_BORDER[l] }} />{LAYER_LABEL[l]}
-            </span>
-          ))}
-          <span className="ml-auto text-xs" style={{ color: T.faint }}>Click any node to navigate to its docs</span>
-        </div>
-        <div className="flex-1" style={{ background: T.rfBg }}>
+
+        {/* ── Canvas ── */}
+        <div className="flex-1 relative" style={{ background: T.rfBg }}>
           <ReactFlow nodes={nodes} edges={edges} onNodesChange={onNC} onEdgesChange={onEC}
             onNodeClick={(_, n) => { onNavigate(n.id); onClose(); }}
             fitView fitViewOptions={{ padding: 0.15 }} proOptions={{ hideAttribution: true }}>
             <Background variant={BackgroundVariant.Dots} color={T.rfDot} gap={20} />
             <Controls />
           </ReactFlow>
+        </div>
+
+        {/* ── Selector bar (bottom, like dbt) ── */}
+        <div className="border-t px-4 py-3 flex-shrink-0 relative" style={{ borderColor: T.border, background: T.secondary }}>
+
+          {/* Autocomplete dropdown */}
+          {suggestions.length > 0 && (
+            <div className="absolute bottom-full left-4 right-4 mb-1 rounded-lg shadow-2xl overflow-hidden border z-10"
+              style={{ background: T.panel, borderColor: T.border }}>
+              {suggestions.map((s, i) => {
+                const n = NODE_MAP.get(s);
+                return (
+                  <button key={s} onClick={() => applySuggestion(s)}
+                    className="w-full flex items-center gap-2 px-3 py-2 text-left text-xs transition-colors"
+                    style={{ background: i === focusSug ? T.hover : 'transparent', color: T.text }}
+                    onMouseEnter={e => (e.currentTarget.style.background = T.hover)}
+                    onMouseLeave={e => (e.currentTarget.style.background = i === focusSug ? T.hover : 'transparent')}>
+                    {n && <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: LAYER_BORDER[n.layer] }} />}
+                    <span className="font-mono">{s}</span>
+                    {n && <span className="ml-auto text-xs" style={{ color: T.faint }}>{LAYER_LABEL[n.layer]}</span>}
+                  </button>
+                );
+              })}
+            </div>
+          )}
+
+          <div className="flex items-center gap-3">
+            {/* Input */}
+            <div className="flex-1 relative">
+              <input
+                ref={inputRef}
+                type="text"
+                value={query}
+                onChange={e => updateSuggestions(e.target.value)}
+                onKeyDown={onKeyDown}
+                placeholder="+2core_orders+1   (+ = all · +N = N levels · prefix = upstream · suffix = downstream)"
+                className={`w-full rounded-lg px-3 py-2 text-xs font-mono border focus:outline-none focus:ring-1 focus:ring-indigo-500 ${T.inputCls}`}
+              />
+            </div>
+            <button onClick={() => applyQuery()}
+              className="px-4 py-2 rounded-lg text-xs font-semibold text-white transition-colors hover:opacity-90"
+              style={{ background: '#4f46e5' }}>
+              Show
+            </button>
+
+            {/* Current interpretation */}
+            <div className="hidden md:flex items-center gap-2 min-w-[220px]">
+              {parsed && NODE_MAP.has(parsed.nodeId) ? (
+                <span className="text-xs font-mono px-2 py-1 rounded" style={{ background: T.panel, color: T.muted, border: `1px solid ${T.border}` }}>
+                  {describeSel(parsed)}
+                </span>
+              ) : (
+                <span className="text-xs" style={{ color: T.faint }}>
+                  Syntax: <span className="font-mono">+N</span>model<span className="font-mono">+N</span>
+                </span>
+              )}
+            </div>
+          </div>
+
+          {/* Quick examples */}
+          <div className="flex items-center gap-2 mt-2 flex-wrap">
+            <span className="text-xs" style={{ color: T.faint }}>Examples:</span>
+            {[
+              [initialId,           `${initialId} only`],
+              [`${initialId}+`,     'all downstream'],
+              [`+${initialId}`,     'all upstream'],
+              [`+${initialId}+`,    'full lineage'],
+              [`+2${initialId}+1`,  '2 up · 1 down'],
+            ].map(([q, label]) => (
+              <button key={q} onClick={() => { setQuery(q); applyQuery(q); }}
+                className="text-xs font-mono px-2 py-0.5 rounded transition-colors hover:opacity-80"
+                style={{ background: T.panel, color: '#818cf8', border: `1px solid ${T.border}` }}>
+                {q}
+                <span className="ml-1 font-sans" style={{ color: T.faint }}>({label})</span>
+              </button>
+            ))}
+          </div>
         </div>
       </div>
     </div>
@@ -481,7 +589,6 @@ function ModelDocs({ id, onNavigate, onFocusAI }: {
   const { T, theme } = useTheme();
   const [tab, setTab] = useState<DocTab>('description');
   const [lineageOpen, setLineageOpen] = useState(false);
-  const [lineageExpanded, setLineageExpanded] = useState(false);
 
   const node = NODE_MAP.get(id);
   const meta = getMeta(id);
@@ -621,44 +728,38 @@ function ModelDocs({ id, onNavigate, onFocusAI }: {
         )}
       </div>
 
-      {/* ── Floating Action Buttons (bottom-right) ── */}
-      <div className="absolute bottom-5 right-5 flex flex-col items-end gap-3 z-10">
-
-        {/* Lineage popup */}
-        {lineageOpen && (
-          <LineagePopup
-            selectedId={id}
-            onExpand={() => { setLineageOpen(false); setLineageExpanded(true); }}
-            onNavigate={onNavigate}
-            onClose={() => setLineageOpen(false)}
-          />
-        )}
-
-        {/* Round FAB row */}
-        <div className="flex gap-3">
-          {/* AI FAB */}
-          <button onClick={onFocusAI} title="Ask AI about this model"
+      {/* ── FABs: vertical strip on right edge, vertically centred ── */}
+      <div className="absolute right-5 top-1/2 -translate-y-1/2 flex flex-col gap-3 z-10">
+        {/* AI FAB */}
+        <div className="relative group">
+          <button onClick={onFocusAI} title="Ask AI"
             className="w-11 h-11 rounded-full shadow-lg flex items-center justify-center transition-transform hover:scale-105 active:scale-95 border"
             style={{ background: '#4f46e5', borderColor: '#6366f1', color: '#fff' }}>
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
             </svg>
           </button>
-          {/* Lineage FAB */}
-          <button onClick={() => setLineageOpen(v => !v)} title="View lineage"
+          <span className="absolute right-14 top-1/2 -translate-y-1/2 text-xs px-2 py-1 rounded whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity"
+            style={{ background: T.secondary, color: T.text, border: `1px solid ${T.border}` }}>Ask AI</span>
+        </div>
+        {/* Lineage FAB */}
+        <div className="relative group">
+          <button onClick={() => setLineageOpen(true)} title="View Lineage"
             className="w-11 h-11 rounded-full shadow-lg flex items-center justify-center transition-transform hover:scale-105 active:scale-95 border"
-            style={{ background: lineageOpen ? LAYER_BORDER[node.layer] : T.secondary, borderColor: LAYER_BORDER[node.layer], color: lineageOpen ? '#fff' : LAYER_BORDER[node.layer] }}>
+            style={{ background: LAYER_BORDER[node.layer], borderColor: LAYER_BORDER[node.layer], color: '#fff' }}>
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <circle cx="5" cy="12" r="2"/><circle cx="19" cy="5" r="2"/><circle cx="19" cy="19" r="2"/>
               <line x1="7" y1="12" x2="17" y2="6"/><line x1="7" y1="12" x2="17" y2="18"/>
             </svg>
           </button>
+          <span className="absolute right-14 top-1/2 -translate-y-1/2 text-xs px-2 py-1 rounded whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity"
+            style={{ background: T.secondary, color: T.text, border: `1px solid ${T.border}` }}>View Lineage</span>
         </div>
       </div>
 
-      {/* Full-screen modal */}
-      {lineageExpanded && (
-        <LineageModal selectedId={id} onClose={() => setLineageExpanded(false)} onNavigate={id2 => { onNavigate(id2); setLineageExpanded(false); }} />
+      {/* Full lineage modal */}
+      {lineageOpen && (
+        <LineageModal initialId={id} onClose={() => setLineageOpen(false)} onNavigate={id2 => { onNavigate(id2); setLineageOpen(false); }} />
       )}
     </div>
   );
