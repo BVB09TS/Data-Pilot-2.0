@@ -38,7 +38,7 @@ router.get(
       if (err || !user) return res.redirect(`${FRONTEND_URL}/login?error=oauth`);
       const u = user as { id: string };
       issueSessionCookie(res, u.id);
-      res.redirect(`${FRONTEND_URL}/dashboard`);
+      res.redirect(`${FRONTEND_URL}/`);
     })(req, res, next);
   }
 );
@@ -54,7 +54,7 @@ router.get(
       if (err || !user) return res.redirect(`${FRONTEND_URL}/login?error=oauth`);
       const u = user as { id: string };
       issueSessionCookie(res, u.id);
-      res.redirect(`${FRONTEND_URL}/dashboard`);
+      res.redirect(`${FRONTEND_URL}/`);
     })(req, res, next);
   }
 );
