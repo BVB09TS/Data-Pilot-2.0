@@ -6,11 +6,11 @@ export const api = axios.create({
   headers: { 'Content-Type': 'application/json' },
 });
 
-// Redirect to login on 401
+// Redirect to login on 401 — but never when already on the login page
 api.interceptors.response.use(
   r => r,
   err => {
-    if (err.response?.status === 401) {
+    if (err.response?.status === 401 && !window.location.pathname.startsWith('/login')) {
       window.location.href = '/login';
     }
     return Promise.reject(err);
