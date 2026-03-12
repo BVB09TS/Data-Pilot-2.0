@@ -1,23 +1,47 @@
-import { useState, useCallback, useEffect, useRef } from 'react';
+import { useState, useCallback, useEffect, useRef, createContext, useContext } from 'react';
 import {
-  ReactFlow,
-  Background,
-  Controls,
-  useNodesState,
-  useEdgesState,
-  type Node,
-  type Edge,
-  MarkerType,
-  BackgroundVariant,
+  ReactFlow, Background, Controls,
+  useNodesState, useEdgesState,
+  type Node, type Edge,
+  MarkerType, BackgroundVariant,
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import dagre from 'dagre';
+
+// ── Theme ──────────────────────────────────────────────────────────────────────
+
+type Theme = 'dark' | 'light';
+
+interface TV {
+  bg: string; panel: string; secondary: string; hover: string;
+  border: string; text: string; muted: string; faint: string;
+  inputCls: string; rfBg: string; rfDot: string; scrollbar: string;
+}
+
+const THEME: Record<Theme, TV> = {
+  dark: {
+    bg: '#030712', panel: '#111827', secondary: '#1f2937', hover: '#1f2937',
+    border: '#1f2937', text: '#f9fafb', muted: '#9ca3af', faint: '#4b5563',
+    inputCls: 'bg-gray-800 border-gray-700 text-gray-200 placeholder-gray-600 focus:border-gray-500',
+    rfBg: '#030712', rfDot: '#1e293b', scrollbar: 'scrollbar-dark',
+  },
+  light: {
+    bg: '#ffffff', panel: '#f9fafb', secondary: '#f3f4f6', hover: '#f3f4f6',
+    border: '#e5e7eb', text: '#111827', muted: '#6b7280', faint: '#9ca3af',
+    inputCls: 'bg-white border-gray-300 text-gray-800 placeholder-gray-400 focus:border-blue-400',
+    rfBg: '#f8fafc', rfDot: '#cbd5e1', scrollbar: 'scrollbar-light',
+  },
+};
+
+const ThemeCtx = createContext<{ theme: Theme; T: TV; isDark: boolean }>({
+  theme: 'dark', T: THEME.dark, isDark: true,
+});
+const useTheme = () => useContext(ThemeCtx);
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
 type Layer = 'raw' | 'source' | 'core' | 'analytics';
 type TestBadge = 'P' | 'F' | 'N' | 'U';
-
 interface ModelNode  { id: string; name: string; layer: Layer; }
 interface ColumnDef  { name: string; type: string; tests: TestBadge[]; description?: string; }
 interface ModelMeta  { description: string; columns: ColumnDef[]; sql: string; }
@@ -176,82 +200,94 @@ const EDGES_RAW: [string, string][] = [
   ['core_orders','analytics_channel_roi'],['core_web_engagement','analytics_channel_roi'],
 ];
 
-// ── Model metadata (descriptions, columns, SQL) ───────────────────────────────
+// ── Layer colours (both themes) ────────────────────────────────────────────────
+
+const LAYER_BORDER: Record<Layer, string> = { raw: '#3b82f6', source: '#22c55e', core: '#818cf8', analytics: '#f59e0b' };
+const LAYER_BG: Record<Theme, Record<Layer, string>> = {
+  dark:  { raw: '#1e3a5f', source: '#14532d', core: '#312e81', analytics: '#78350f' },
+  light: { raw: '#dbeafe', source: '#dcfce7', core: '#ede9fe', analytics: '#fef3c7' },
+};
+const LAYER_TEXT: Record<Theme, Record<Layer, string>> = {
+  dark:  { raw: '#e2e8f0', source: '#e2e8f0', core: '#e2e8f0', analytics: '#e2e8f0' },
+  light: { raw: '#1e3a8a', source: '#14532d', core: '#3730a3', analytics: '#78350f' },
+};
+const LAYER_LABEL: Record<Layer, string> = { raw: 'Raw', source: 'Source', core: 'Core', analytics: 'Analytics' };
+const LAYERS: Layer[] = ['raw', 'source', 'core', 'analytics'];
+
+const BADGE_CLS: Record<TestBadge, string> = {
+  P: 'bg-blue-100 text-blue-700 border border-blue-300 dark:bg-blue-900 dark:text-blue-300 dark:border-blue-700',
+  F: 'bg-purple-100 text-purple-700 border border-purple-300 dark:bg-purple-900 dark:text-purple-300 dark:border-purple-700',
+  N: 'bg-green-100 text-green-700 border border-green-300 dark:bg-green-900 dark:text-green-300 dark:border-green-700',
+  U: 'bg-yellow-100 text-yellow-700 border border-yellow-300 dark:bg-yellow-900 dark:text-yellow-300 dark:border-yellow-700',
+};
+const BADGE_TITLE: Record<TestBadge, string> = { P: 'Primary Key', F: 'Foreign Key', N: 'Not Null', U: 'Unique' };
+
+// ── Model metadata ─────────────────────────────────────────────────────────────
+
+const NODE_MAP = new Map(NODES.map(n => [n.id, n]));
 
 const META: Record<string, ModelMeta> = {
   core_orders: {
     description: 'Unified orders fact table combining Shopify order data with Stripe payment records. Each row represents one order with resolved payment status, item count, and revenue attribution.',
     columns: [
-      { name: 'order_id',        type: 'varchar',   tests: ['P', 'N'],     description: 'Unique Shopify order ID' },
-      { name: 'customer_id',     type: 'varchar',   tests: ['F', 'N'],     description: 'Foreign key to core_customers' },
-      { name: 'order_date',      type: 'date',      tests: ['N'],          description: 'Date the order was placed' },
-      { name: 'total_amount',    type: 'numeric',   tests: ['N'],          description: 'Gross order value in USD' },
-      { name: 'payment_status',  type: 'varchar',   tests: [],             description: 'paid | pending | refunded' },
-      { name: 'item_count',      type: 'integer',   tests: ['N'],          description: 'Number of line items' },
-      { name: 'stripe_charge_id',type: 'varchar',   tests: ['U'],          description: 'Matching Stripe charge' },
+      { name: 'order_id',         type: 'varchar',   tests: ['P','N'],     description: 'Unique Shopify order ID' },
+      { name: 'customer_id',      type: 'varchar',   tests: ['F','N'],     description: 'Foreign key to core_customers' },
+      { name: 'order_date',       type: 'date',      tests: ['N'],         description: 'Date the order was placed' },
+      { name: 'total_amount',     type: 'numeric',   tests: ['N'],         description: 'Gross order value in USD' },
+      { name: 'payment_status',   type: 'varchar',   tests: [],            description: 'paid | pending | refunded' },
+      { name: 'item_count',       type: 'integer',   tests: ['N'],         description: 'Number of line items' },
+      { name: 'stripe_charge_id', type: 'varchar',   tests: ['U'],         description: 'Matching Stripe charge' },
     ],
-    sql: `with orders as (\n  select * from {{ ref('src_shopify_orders') }}\n),\npayments as (\n  select * from {{ ref('src_stripe_payments') }}\n),\nline_items as (\n  select order_id, count(*) as item_count\n  from {{ ref('src_shopify_order_items') }}\n  group by 1\n)\nselect\n  o.order_id,\n  o.customer_id,\n  o.created_at::date          as order_date,\n  o.total_price               as total_amount,\n  coalesce(p.status, 'pending') as payment_status,\n  coalesce(li.item_count, 0)  as item_count,\n  p.charge_id                 as stripe_charge_id\nfrom orders o\nleft join payments p on o.order_id = p.order_id\nleft join line_items li on o.order_id = li.order_id`,
+    sql: `with orders as (\n  select * from {{ ref('src_shopify_orders') }}\n),\npayments as (\n  select * from {{ ref('src_stripe_payments') }}\n),\nline_items as (\n  select order_id, count(*) as item_count\n  from {{ ref('src_shopify_order_items') }}\n  group by 1\n)\nselect\n  o.order_id,\n  o.customer_id,\n  o.created_at::date            as order_date,\n  o.total_price                 as total_amount,\n  coalesce(p.status,'pending')  as payment_status,\n  coalesce(li.item_count, 0)    as item_count,\n  p.charge_id                   as stripe_charge_id\nfrom orders o\nleft join payments  p  on o.order_id = p.order_id\nleft join line_items li on o.order_id = li.order_id`,
   },
   core_customers: {
-    description: 'Customer dimension table combining Shopify customer profiles with Stripe subscription status and order history. Used as the primary customer entity across all analytics models.',
+    description: 'Customer dimension table combining Shopify profiles with Stripe subscription status and order history. Primary customer entity across all analytics models.',
     columns: [
-      { name: 'customer_id',       type: 'varchar', tests: ['P', 'N', 'U'], description: 'Unique customer identifier' },
-      { name: 'email',             type: 'varchar', tests: ['N', 'U'],       description: 'Customer email address' },
-      { name: 'first_name',        type: 'varchar', tests: [],               description: 'First name' },
-      { name: 'last_name',         type: 'varchar', tests: [],               description: 'Last name' },
-      { name: 'created_at',        type: 'timestamp',tests: ['N'],           description: 'Account creation timestamp' },
-      { name: 'total_orders',      type: 'integer', tests: ['N'],            description: 'Lifetime order count' },
-      { name: 'lifetime_value',    type: 'numeric', tests: [],               description: 'Total revenue attributed' },
-      { name: 'is_subscriber',     type: 'boolean', tests: ['N'],            description: 'Has active Stripe subscription' },
+      { name: 'customer_id',    type: 'varchar',   tests: ['P','N','U'], description: 'Unique customer identifier' },
+      { name: 'email',          type: 'varchar',   tests: ['N','U'],     description: 'Customer email address' },
+      { name: 'first_name',     type: 'varchar',   tests: [],            description: 'First name' },
+      { name: 'last_name',      type: 'varchar',   tests: [],            description: 'Last name' },
+      { name: 'created_at',     type: 'timestamp', tests: ['N'],         description: 'Account creation timestamp' },
+      { name: 'total_orders',   type: 'integer',   tests: ['N'],         description: 'Lifetime order count' },
+      { name: 'lifetime_value', type: 'numeric',   tests: [],            description: 'Total revenue attributed' },
+      { name: 'is_subscriber',  type: 'boolean',   tests: ['N'],         description: 'Has active Stripe subscription' },
     ],
-    sql: `with customers as (\n  select * from {{ ref('src_shopify_customers') }}\n),\norder_stats as (\n  select\n    customer_id,\n    count(*)       as total_orders,\n    sum(total_amount) as lifetime_value\n  from {{ ref('core_orders') }}\n  group by 1\n),\nsubs as (\n  select distinct customer_id, true as is_subscriber\n  from {{ ref('src_stripe_subscriptions') }}\n  where status = 'active'\n)\nselect\n  c.customer_id,\n  c.email,\n  c.first_name,\n  c.last_name,\n  c.created_at,\n  coalesce(os.total_orders, 0)    as total_orders,\n  coalesce(os.lifetime_value, 0)  as lifetime_value,\n  coalesce(s.is_subscriber, false) as is_subscriber\nfrom customers c\nleft join order_stats os using (customer_id)\nleft join subs s using (customer_id)`,
+    sql: `with customers as (\n  select * from {{ ref('src_shopify_customers') }}\n),\norder_stats as (\n  select customer_id,\n    count(*)          as total_orders,\n    sum(total_amount) as lifetime_value\n  from {{ ref('core_orders') }}\n  group by 1\n),\nsubs as (\n  select distinct customer_id, true as is_subscriber\n  from {{ ref('src_stripe_subscriptions') }}\n  where status = 'active'\n)\nselect\n  c.customer_id, c.email, c.first_name, c.last_name, c.created_at,\n  coalesce(os.total_orders,0)    as total_orders,\n  coalesce(os.lifetime_value,0)  as lifetime_value,\n  coalesce(s.is_subscriber,false) as is_subscriber\nfrom customers c\nleft join order_stats os using (customer_id)\nleft join subs s        using (customer_id)`,
   },
   core_revenue_daily: {
-    description: 'Daily revenue aggregation from core_orders. Provides date-grain revenue metrics used by downstream analytics and finance reporting.',
+    description: 'Daily revenue aggregation from core_orders. Provides date-grain metrics used by downstream analytics and finance reporting.',
     columns: [
-      { name: 'date_day',      type: 'date',    tests: ['P', 'N', 'U'], description: 'Calendar date' },
-      { name: 'order_count',   type: 'integer', tests: ['N'],            description: 'Number of paid orders' },
-      { name: 'gross_revenue', type: 'numeric', tests: ['N'],            description: 'Sum of total_amount' },
-      { name: 'net_revenue',   type: 'numeric', tests: ['N'],            description: 'Gross minus refunds' },
-      { name: 'avg_order_value',type:'numeric', tests: [],               description: 'gross_revenue / order_count' },
+      { name: 'date_day',       type: 'date',    tests: ['P','N','U'], description: 'Calendar date' },
+      { name: 'order_count',    type: 'integer', tests: ['N'],         description: 'Number of paid orders' },
+      { name: 'gross_revenue',  type: 'numeric', tests: ['N'],         description: 'Sum of total_amount' },
+      { name: 'net_revenue',    type: 'numeric', tests: ['N'],         description: 'Gross minus refunds' },
+      { name: 'avg_order_value',type: 'numeric', tests: [],            description: 'gross_revenue / order_count' },
     ],
-    sql: `select\n  order_date                       as date_day,\n  count(*)                         as order_count,\n  sum(total_amount)                as gross_revenue,\n  sum(total_amount)\n    - coalesce(sum(refund_amount),0) as net_revenue,\n  avg(total_amount)                as avg_order_value\nfrom {{ ref('core_orders') }}\nwhere payment_status = 'paid'\ngroup by 1`,
-  },
-  analytics_revenue_v1: {
-    description: 'Daily revenue report (v1) — legacy format used by finance dashboards. Sourced from core_revenue_daily with additional rolling window calculations.',
-    columns: [
-      { name: 'date_day',        type: 'date',    tests: ['P', 'N'], description: 'Report date' },
-      { name: 'gross_revenue',   type: 'numeric', tests: ['N'],      description: 'Daily gross revenue' },
-      { name: 'net_revenue',     type: 'numeric', tests: ['N'],      description: 'Daily net revenue' },
-      { name: 'revenue_7d',      type: 'numeric', tests: [],         description: '7-day rolling sum' },
-      { name: 'revenue_30d',     type: 'numeric', tests: [],         description: '30-day rolling sum' },
-    ],
-    sql: `select\n  date_day,\n  gross_revenue,\n  net_revenue,\n  sum(gross_revenue) over (\n    order by date_day\n    rows between 6 preceding and current row\n  ) as revenue_7d,\n  sum(gross_revenue) over (\n    order by date_day\n    rows between 29 preceding and current row\n  ) as revenue_30d\nfrom {{ ref('core_revenue_daily') }}\norder by date_day`,
-  },
-  raw_salesforce_accounts: {
-    description: 'Raw Salesforce Account records loaded via Fivetran. Contains all CRM account data including B2B company profiles, ARR estimates, and sales owner assignments.',
-    columns: [
-      { name: 'id',              type: 'varchar',   tests: ['P', 'N', 'U'], description: 'Salesforce Account ID (18-char)' },
-      { name: 'name',            type: 'varchar',   tests: ['N'],            description: 'Account / company name' },
-      { name: 'industry',        type: 'varchar',   tests: [],               description: 'Industry vertical' },
-      { name: 'annual_revenue',  type: 'numeric',   tests: [],               description: 'Self-reported ARR' },
-      { name: 'owner_id',        type: 'varchar',   tests: ['F'],            description: 'Salesforce User ID of AE' },
-      { name: '_fivetran_synced',type: 'timestamp', tests: ['N'],            description: 'Last Fivetran sync time' },
-    ],
-    sql: `-- Raw table loaded by Fivetran connector\n-- Do not transform here — use src_salesforce_accounts\nselect * from salesforce.account`,
+    sql: `select\n  order_date                        as date_day,\n  count(*)                          as order_count,\n  sum(total_amount)                 as gross_revenue,\n  sum(total_amount)\n    - coalesce(sum(refund_amount),0)  as net_revenue,\n  avg(total_amount)                 as avg_order_value\nfrom {{ ref('core_orders') }}\nwhere payment_status = 'paid'\ngroup by 1`,
   },
   analytics_b2b_pipeline: {
-    description: 'B2B sales pipeline analytics combining CRM accounts with open opportunities. Provides deal stage distribution, weighted pipeline value, and win-rate metrics for sales leadership.',
+    description: 'B2B sales pipeline combining CRM accounts with open opportunities. Provides deal stage distribution, weighted pipeline value, and win-rate metrics for sales leadership.',
     columns: [
-      { name: 'account_id',       type: 'varchar', tests: ['P', 'N'],  description: 'Salesforce account ID' },
-      { name: 'account_name',     type: 'varchar', tests: ['N'],       description: 'Company name' },
-      { name: 'open_opps',        type: 'integer', tests: ['N'],       description: 'Count of open opportunities' },
-      { name: 'pipeline_value',   type: 'numeric', tests: [],          description: 'Sum of opportunity amounts' },
-      { name: 'weighted_pipeline',type: 'numeric', tests: [],          description: 'Amount × close probability' },
-      { name: 'stage',            type: 'varchar', tests: [],          description: 'Dominant opportunity stage' },
-      { name: 'days_in_pipeline', type: 'integer', tests: [],          description: 'Days since first open opp' },
+      { name: 'account_id',        type: 'varchar', tests: ['P','N'], description: 'Salesforce account ID' },
+      { name: 'account_name',      type: 'varchar', tests: ['N'],     description: 'Company name' },
+      { name: 'open_opps',         type: 'integer', tests: ['N'],     description: 'Count of open opportunities' },
+      { name: 'pipeline_value',    type: 'numeric', tests: [],        description: 'Sum of opportunity amounts' },
+      { name: 'weighted_pipeline', type: 'numeric', tests: [],        description: 'Amount × close probability' },
+      { name: 'stage',             type: 'varchar', tests: [],        description: 'Dominant opportunity stage' },
     ],
-    sql: `with accounts as (\n  select * from {{ ref('core_b2b_accounts') }}\n),\nopps as (\n  select\n    account_id,\n    count(*)                              as open_opps,\n    sum(amount)                           as pipeline_value,\n    sum(amount * close_probability / 100) as weighted_pipeline,\n    mode() within group (order by stage)  as stage,\n    datediff('day', min(created_date), current_date) as days_in_pipeline\n  from {{ ref('core_opportunities') }}\n  where is_closed = false\n  group by 1\n)\nselect a.*, o.*\nfrom accounts a\nleft join opps o using (account_id)`,
+    sql: `select\n  a.account_id, a.account_name,\n  count(o.opportunity_id)                       as open_opps,\n  sum(o.amount)                                 as pipeline_value,\n  sum(o.amount * o.close_probability / 100)     as weighted_pipeline,\n  mode() within group (order by o.stage)        as stage\nfrom {{ ref('core_b2b_accounts') }} a\nleft join {{ ref('core_opportunities') }} o\n  on a.account_id = o.account_id and not o.is_closed\ngroup by 1, 2`,
+  },
+  raw_salesforce_accounts: {
+    description: 'Raw Salesforce Account records loaded via Fivetran. Contains all CRM account data including B2B company profiles, ARR estimates, and owner assignments.',
+    columns: [
+      { name: 'id',               type: 'varchar',   tests: ['P','N','U'], description: 'Salesforce Account ID (18-char)' },
+      { name: 'name',             type: 'varchar',   tests: ['N'],         description: 'Account / company name' },
+      { name: 'industry',         type: 'varchar',   tests: [],            description: 'Industry vertical' },
+      { name: 'annual_revenue',   type: 'numeric',   tests: [],            description: 'Self-reported ARR' },
+      { name: 'owner_id',         type: 'varchar',   tests: ['F'],         description: 'Salesforce User ID of AE' },
+      { name: '_fivetran_synced', type: 'timestamp', tests: ['N'],         description: 'Last Fivetran sync time' },
+    ],
+    sql: `-- Raw table loaded by Fivetran connector\n-- Do not transform here — use src_salesforce_accounts\nselect * from salesforce.account`,
   },
 };
 
@@ -260,61 +296,31 @@ function getMeta(id: string): ModelMeta {
   const n = NODES.find(x => x.id === id);
   const layer = n?.layer ?? 'raw';
   const label = id.replace(/^(raw_|src_|core_|analytics_)/, '').replace(/_/g, ' ');
+  const upstream = EDGES_RAW.find(([, t]) => t === id)?.[0] ?? 'upstream_model';
   return {
-    description: `${layer.charAt(0).toUpperCase() + layer.slice(1)}-layer model: ${label}. Part of the ShopMesh dbt project.`,
+    description: `${LAYER_LABEL[layer as Layer]}-layer model for ${label}. Part of the ShopMesh dbt project.`,
     columns: [
-      { name: `${id.replace(/^(raw_|src_|core_|analytics_)/, '')}_id`, type: 'varchar', tests: ['P', 'N', 'U'], description: 'Primary key' },
+      { name: `${id.replace(/^(raw_|src_|core_|analytics_)/, '')}_id`, type: 'varchar',   tests: ['P','N','U'], description: 'Primary key' },
       { name: 'created_at', type: 'timestamp', tests: ['N'], description: 'Record creation timestamp' },
       { name: 'updated_at', type: 'timestamp', tests: [],    description: 'Last update timestamp' },
     ],
-    sql: layer === 'raw'
-      ? `select * from ${id.replace('raw_', '')}`
-      : `select *\nfrom {{ ref('${EDGES_RAW.find(([,t]) => t === id)?.[0] ?? 'upstream_model'}') }}`,
+    sql: layer === 'raw' ? `select * from ${id.replace('raw_', '')}` : `select *\nfrom {{ ref('${upstream}') }}`,
   };
 }
-
-// ── Lookups ────────────────────────────────────────────────────────────────────
-
-const NODE_MAP  = new Map(NODES.map(n => [n.id, n]));
-const LAYERS: Layer[] = ['raw', 'source', 'core', 'analytics'];
-
-const LAYER_COLOR: Record<Layer, string>  = { raw: '#1e3a5f', source: '#14532d', core: '#312e81', analytics: '#78350f' };
-const LAYER_BORDER: Record<Layer, string> = { raw: '#3b82f6', source: '#22c55e', core: '#818cf8', analytics: '#f59e0b' };
-const LAYER_LABEL: Record<Layer, string>  = { raw: 'Raw', source: 'Source', core: 'Core', analytics: 'Analytics' };
-
-const BADGE_STYLE: Record<TestBadge, string> = {
-  P: 'bg-blue-900 text-blue-300 border border-blue-700',
-  F: 'bg-purple-900 text-purple-300 border border-purple-700',
-  N: 'bg-green-900 text-green-300 border border-green-700',
-  U: 'bg-yellow-900 text-yellow-300 border border-yellow-700',
-};
-const BADGE_TITLE: Record<TestBadge, string> = { P: 'Primary Key', F: 'Foreign Key', N: 'Not Null', U: 'Unique' };
 
 // ── Graph helpers ──────────────────────────────────────────────────────────────
 
 function getFocusedGraph(id: string, depth: number) {
   const inc = new Set<string>([id]);
   let f = [id];
-  for (let d = 0; d < depth; d++) {
-    const nx: string[] = [];
-    EDGES_RAW.forEach(([s, t]) => { if (f.includes(t) && !inc.has(s)) { inc.add(s); nx.push(s); } });
-    f = nx;
-  }
+  for (let d = 0; d < depth; d++) { const nx: string[] = []; EDGES_RAW.forEach(([s, t]) => { if (f.includes(t) && !inc.has(s)) { inc.add(s); nx.push(s); } }); f = nx; }
   f = [id];
-  for (let d = 0; d < depth; d++) {
-    const nx: string[] = [];
-    EDGES_RAW.forEach(([s, t]) => { if (f.includes(s) && !inc.has(t)) { inc.add(t); nx.push(t); } });
-    f = nx;
-  }
-  return {
-    nodes: NODES.filter(n => inc.has(n.id)),
-    edges: EDGES_RAW.filter(([s, t]) => inc.has(s) && inc.has(t)),
-  };
+  for (let d = 0; d < depth; d++) { const nx: string[] = []; EDGES_RAW.forEach(([s, t]) => { if (f.includes(s) && !inc.has(t)) { inc.add(t); nx.push(t); } }); f = nx; }
+  return { nodes: NODES.filter(n => inc.has(n.id)), edges: EDGES_RAW.filter(([s, t]) => inc.has(s) && inc.has(t)) };
 }
 
 function getFullLineage(id: string) {
-  const anc: string[] = []; const desc: string[] = [];
-  const vis = new Set([id]);
+  const anc: string[] = [], desc: string[] = [], vis = new Set([id]);
   const up = (n: string) => EDGES_RAW.forEach(([s, t]) => { if (t === n && !vis.has(s)) { vis.add(s); anc.push(s); up(s); } });
   up(id); vis.clear(); vis.add(id);
   const dn = (n: string) => EDGES_RAW.forEach(([s, t]) => { if (s === n && !vis.has(t)) { vis.add(t); desc.push(t); dn(t); } });
@@ -322,151 +328,141 @@ function getFullLineage(id: string) {
   return { ancestors: anc, descendants: desc };
 }
 
-// ── Dagre + ReactFlow builders ─────────────────────────────────────────────────
+// ── Dagre + ReactFlow ─────────────────────────────────────────────────────────
 
-const NODE_W = 200; const NODE_H = 44;
+const NW = 195, NH = 44;
 
-function layoutNodes(rfNodes: Node[], rfEdges: Edge[]) {
-  const g = new dagre.graphlib.Graph();
-  g.setDefaultEdgeLabel(() => ({}));
-  g.setGraph({ rankdir: 'LR', nodesep: 40, ranksep: 110 });
-  rfNodes.forEach(n => g.setNode(n.id, { width: NODE_W, height: NODE_H }));
-  rfEdges.forEach(e => g.setEdge(e.source, e.target));
-  dagre.layout(g);
-  return rfNodes.map(n => { const p = g.node(n.id); return { ...n, position: { x: p.x - NODE_W / 2, y: p.y - NODE_H / 2 } }; });
-}
-
-function buildFlow(modelNodes: ModelNode[], edgePairs: [string, string][], selectedId: string) {
+function buildFlow(modelNodes: ModelNode[], edgePairs: [string, string][], selectedId: string, theme: Theme) {
   const rfNodes: Node[] = modelNodes.map(n => ({
     id: n.id, type: 'default', position: { x: 0, y: 0 },
     data: { label: n.name.replace(/^(raw_|src_|core_|analytics_)/, '') },
     style: {
-      background: n.id === selectedId ? LAYER_BORDER[n.layer] : LAYER_COLOR[n.layer],
-      color: '#f1f5f9',
+      background: n.id === selectedId ? LAYER_BORDER[n.layer] : LAYER_BG[theme][n.layer],
+      color: n.id === selectedId ? '#ffffff' : LAYER_TEXT[theme][n.layer],
       border: `2px solid ${LAYER_BORDER[n.layer]}`,
-      borderRadius: 7, fontSize: 11,
-      fontWeight: n.id === selectedId ? 700 : 400,
-      width: NODE_W, height: NODE_H,
-      display: 'flex', alignItems: 'center', justifyContent: 'center',
-      padding: '0 8px', cursor: 'pointer',
-      boxShadow: n.id === selectedId ? `0 0 14px ${LAYER_BORDER[n.layer]}55` : '0 1px 4px rgba(0,0,0,0.5)',
+      borderRadius: 8, fontSize: 11, fontWeight: n.id === selectedId ? 700 : 400,
+      width: NW, height: NH, display: 'flex', alignItems: 'center',
+      justifyContent: 'center', padding: '0 8px', cursor: 'pointer',
+      boxShadow: n.id === selectedId ? `0 0 16px ${LAYER_BORDER[n.layer]}66` : '0 1px 6px rgba(0,0,0,0.15)',
     },
   }));
   const rfEdges: Edge[] = edgePairs.map(([s, t], i) => ({
     id: `e${i}`, source: s, target: t,
-    style: { stroke: '#475569', strokeWidth: 1.5 },
-    markerEnd: { type: MarkerType.ArrowClosed, color: '#64748b', width: 11, height: 11 },
+    style: { stroke: theme === 'dark' ? '#475569' : '#94a3b8', strokeWidth: 1.5 },
+    markerEnd: { type: MarkerType.ArrowClosed, color: theme === 'dark' ? '#64748b' : '#94a3b8', width: 11, height: 11 },
   }));
-  return { nodes: layoutNodes(rfNodes, rfEdges), edges: rfEdges };
+  const g = new dagre.graphlib.Graph();
+  g.setDefaultEdgeLabel(() => ({}));
+  g.setGraph({ rankdir: 'LR', nodesep: 40, ranksep: 110 });
+  rfNodes.forEach(n => g.setNode(n.id, { width: NW, height: NH }));
+  rfEdges.forEach(e => g.setEdge(e.source, e.target));
+  dagre.layout(g);
+  return {
+    nodes: rfNodes.map(n => { const p = g.node(n.id); return { ...n, position: { x: p.x - NW / 2, y: p.y - NH / 2 } }; }),
+    edges: rfEdges,
+  };
 }
 
-// ── Mini Lineage graph (floating panel in docs) ────────────────────────────────
+// ── Lineage popup (triggered by FAB) ─────────────────────────────────────────
 
-function MiniLineage({ selectedId, onExpand, onNodeClick }: {
-  selectedId: string;
-  onExpand: () => void;
-  onNodeClick: (id: string) => void;
+function LineagePopup({ selectedId, onExpand, onNavigate, onClose }: {
+  selectedId: string; onExpand: () => void;
+  onNavigate: (id: string) => void; onClose: () => void;
 }) {
+  const { T, theme } = useTheme();
   const { nodes: mn, edges: me } = getFocusedGraph(selectedId, 1);
-  const { nodes: fn, edges: fe } = buildFlow(mn, me, selectedId);
+  const { nodes: fn, edges: fe } = buildFlow(mn, me, selectedId, theme);
   const [nodes, , onNC] = useNodesState<Node>(fn);
   const [edges, , onEC] = useEdgesState<Edge>(fe);
 
-  useEffect(() => {
-    const { nodes: mn2, edges: me2 } = getFocusedGraph(selectedId, 1);
-    const { nodes: fn2, edges: fe2 } = buildFlow(mn2, me2, selectedId);
-    onNC(fn2.map(n => ({ type: 'reset', item: n })));
-    onEC(fe2.map(e => ({ type: 'reset', item: e })));
-  }, [selectedId]);
-
   return (
-    <div className="absolute bottom-4 right-4 w-72 h-52 bg-gray-900 border border-gray-700 rounded-lg shadow-2xl overflow-hidden z-10">
-      <div className="flex items-center justify-between px-3 py-2 border-b border-gray-700 bg-gray-800">
-        <span className="text-xs font-semibold text-gray-300">Lineage Graph</span>
-        <button onClick={onExpand} className="text-gray-400 hover:text-white transition-colors" title="Expand">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/>
-          </svg>
-        </button>
+    <div
+      className="absolute bottom-20 right-4 w-80 h-60 rounded-2xl shadow-2xl overflow-hidden z-20 border"
+      style={{ background: T.panel, borderColor: T.border }}
+    >
+      <div className="flex items-center justify-between px-3 py-2 border-b" style={{ borderColor: T.border, background: T.secondary }}>
+        <span className="text-xs font-semibold" style={{ color: T.text }}>Lineage Graph</span>
+        <div className="flex gap-2">
+          <button onClick={onExpand} title="Expand" style={{ color: T.muted }} className="hover:opacity-80 transition-opacity">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/>
+            </svg>
+          </button>
+          <button onClick={onClose} style={{ color: T.muted }} className="hover:opacity-80 transition-opacity">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+          </button>
+        </div>
       </div>
-      <ReactFlow
-        nodes={nodes} edges={edges}
-        onNodesChange={onNC} onEdgesChange={onEC}
-        onNodeClick={(_, n) => onNodeClick(n.id)}
-        fitView fitViewOptions={{ padding: 0.25 }}
-        proOptions={{ hideAttribution: true }}
-        nodesDraggable={false} zoomOnScroll={false} panOnDrag={false}
-      >
-        <Background variant={BackgroundVariant.Dots} color="#1e293b" gap={16} />
+      <ReactFlow nodes={nodes} edges={edges} onNodesChange={onNC} onEdgesChange={onEC}
+        onNodeClick={(_, n) => { onNavigate(n.id); onClose(); }}
+        fitView fitViewOptions={{ padding: 0.2 }}
+        proOptions={{ hideAttribution: true }} nodesDraggable={false} zoomOnScroll={false} panOnDrag={false}
+        style={{ background: T.rfBg }}>
+        <Background variant={BackgroundVariant.Dots} color={T.rfDot} gap={16} />
       </ReactFlow>
     </div>
   );
 }
 
-// ── Full Lineage modal ─────────────────────────────────────────────────────────
+// ── Full-screen lineage modal ──────────────────────────────────────────────────
 
-function LineageModal({ selectedId, onClose, onNodeClick }: {
-  selectedId: string;
-  onClose: () => void;
-  onNodeClick: (id: string) => void;
+function LineageModal({ selectedId, onClose, onNavigate }: {
+  selectedId: string; onClose: () => void; onNavigate: (id: string) => void;
 }) {
+  const { T, theme } = useTheme();
   const [depth, setDepth] = useState(2);
   const { nodes: mn, edges: me } = getFocusedGraph(selectedId, depth);
-  const { nodes: fn, edges: fe } = buildFlow(mn, me, selectedId);
+  const { nodes: fn, edges: fe } = buildFlow(mn, me, selectedId, theme);
   const [nodes, setNodes, onNC] = useNodesState<Node>(fn);
   const [edges, setEdges, onEC] = useEdgesState<Edge>(fe);
   const node = NODE_MAP.get(selectedId);
 
   useEffect(() => {
     const { nodes: mn2, edges: me2 } = getFocusedGraph(selectedId, depth);
-    const { nodes: fn2, edges: fe2 } = buildFlow(mn2, me2, selectedId);
+    const { nodes: fn2, edges: fe2 } = buildFlow(mn2, me2, selectedId, theme);
     setNodes(fn2); setEdges(fe2);
-  }, [selectedId, depth]);
+  }, [selectedId, depth, theme]);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70">
-      <div className="w-[90vw] h-[85vh] bg-gray-900 border border-gray-700 rounded-xl flex flex-col overflow-hidden shadow-2xl">
-        {/* Header */}
-        <div className="flex items-center justify-between px-5 py-3 border-b border-gray-700 bg-gray-800 flex-shrink-0">
+    <div className="fixed inset-0 z-50 flex items-center justify-center" style={{ background: 'rgba(0,0,0,0.65)' }}>
+      <div className="w-[90vw] h-[85vh] rounded-2xl flex flex-col overflow-hidden shadow-2xl border" style={{ background: T.panel, borderColor: T.border }}>
+        <div className="flex items-center justify-between px-5 py-3 border-b flex-shrink-0" style={{ borderColor: T.border, background: T.secondary }}>
           <div className="flex items-center gap-3">
-            <span className="text-sm font-semibold text-white">Lineage — {selectedId}</span>
-            {node && (
-              <span className="text-xs px-2 py-0.5 rounded" style={{ background: LAYER_COLOR[node.layer], color: LAYER_BORDER[node.layer], border: `1px solid ${LAYER_BORDER[node.layer]}` }}>
-                {LAYER_LABEL[node.layer]}
-              </span>
-            )}
-            <span className="text-xs text-gray-500">{nodes.length} nodes · {edges.length} edges</span>
+            <span className="text-sm font-semibold" style={{ color: T.text }}>Lineage — {selectedId}</span>
+            {node && <span className="text-xs px-2 py-0.5 rounded" style={{ background: LAYER_BG[theme][node.layer], color: LAYER_BORDER[node.layer], border: `1px solid ${LAYER_BORDER[node.layer]}` }}>{LAYER_LABEL[node.layer]}</span>}
+            <span className="text-xs" style={{ color: T.faint }}>{nodes.length} nodes · {edges.length} edges</span>
           </div>
-          <div className="flex items-center gap-3">
-            <span className="text-xs text-gray-500">Depth</span>
-            {[1, 2, 3].map(d => (
+          <div className="flex items-center gap-2">
+            <span className="text-xs mr-1" style={{ color: T.muted }}>Depth</span>
+            {[1,2,3].map(d => (
               <button key={d} onClick={() => setDepth(d)}
-                className={`w-6 h-6 rounded text-xs font-medium transition-colors ${depth === d ? 'bg-indigo-600 text-white' : 'bg-gray-700 text-gray-400 hover:bg-gray-600'}`}>
+                className="w-6 h-6 rounded text-xs font-medium transition-colors"
+                style={{ background: depth === d ? '#6366f1' : T.secondary, color: depth === d ? '#fff' : T.muted, border: `1px solid ${T.border}` }}>
                 {d}
               </button>
             ))}
-            <button onClick={onClose} className="ml-2 text-gray-400 hover:text-white transition-colors">
+            <button onClick={onClose} className="ml-2 hover:opacity-70 transition-opacity" style={{ color: T.muted }}>
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
               </svg>
             </button>
           </div>
         </div>
-        {/* Layer legend */}
-        <div className="flex items-center gap-4 px-5 py-1.5 border-b border-gray-800 bg-gray-900 flex-shrink-0">
+        <div className="flex items-center gap-4 px-5 py-1.5 border-b flex-shrink-0" style={{ borderColor: T.border }}>
           {LAYERS.map(l => (
-            <span key={l} className="flex items-center gap-1.5 text-xs text-gray-500">
+            <span key={l} className="flex items-center gap-1.5 text-xs" style={{ color: T.muted }}>
               <span className="w-2 h-2 rounded-sm" style={{ background: LAYER_BORDER[l] }} />{LAYER_LABEL[l]}
             </span>
           ))}
-          <span className="ml-auto text-xs text-gray-600">Click any node to navigate to its documentation</span>
+          <span className="ml-auto text-xs" style={{ color: T.faint }}>Click any node to navigate to its docs</span>
         </div>
-        {/* Canvas */}
-        <div className="flex-1 bg-gray-950">
+        <div className="flex-1" style={{ background: T.rfBg }}>
           <ReactFlow nodes={nodes} edges={edges} onNodesChange={onNC} onEdgesChange={onEC}
-            onNodeClick={(_, n) => { onNodeClick(n.id); onClose(); }}
+            onNodeClick={(_, n) => { onNavigate(n.id); onClose(); }}
             fitView fitViewOptions={{ padding: 0.15 }} proOptions={{ hideAttribution: true }}>
-            <Background variant={BackgroundVariant.Dots} color="#1e293b" gap={20} />
+            <Background variant={BackgroundVariant.Dots} color={T.rfDot} gap={20} />
             <Controls />
           </ReactFlow>
         </div>
@@ -475,83 +471,95 @@ function LineageModal({ selectedId, onClose, onNodeClick }: {
   );
 }
 
-// ── Model Documentation panel ──────────────────────────────────────────────────
+// ── Model Documentation ────────────────────────────────────────────────────────
 
 type DocTab = 'description' | 'columns' | 'sql';
 
-function ModelDocs({ id, onNavigate }: { id: string; onNavigate: (id: string) => void }) {
+function ModelDocs({ id, onNavigate, onFocusAI }: {
+  id: string; onNavigate: (id: string) => void; onFocusAI: () => void;
+}) {
+  const { T, theme } = useTheme();
   const [tab, setTab] = useState<DocTab>('description');
+  const [lineageOpen, setLineageOpen] = useState(false);
   const [lineageExpanded, setLineageExpanded] = useState(false);
+
   const node = NODE_MAP.get(id);
   const meta = getMeta(id);
-  const directParents  = EDGES_RAW.filter(([, t]) => t === id).map(([s]) => s);
-  const directChildren = EDGES_RAW.filter(([s]) => s === id).map(([, t]) => t);
+  const parents  = EDGES_RAW.filter(([, t]) => t === id).map(([s]) => s);
+  const children = EDGES_RAW.filter(([s]) => s === id).map(([, t]) => t);
+  const { ancestors, descendants } = getFullLineage(id);
 
   if (!node) return null;
 
   return (
-    <div className="flex-1 flex flex-col overflow-hidden relative">
-      {/* Model header */}
-      <div className="px-8 pt-6 pb-4 border-b border-gray-800 flex-shrink-0">
+    <div className="flex-1 flex flex-col overflow-hidden relative" style={{ background: T.bg }}>
+      {/* Header */}
+      <div className="px-8 pt-6 pb-0 border-b flex-shrink-0" style={{ borderColor: T.border }}>
         <div className="flex items-start gap-3">
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
-              <h1 className="text-xl font-bold text-white font-mono">{node.name}</h1>
+              <h1 className="text-xl font-bold font-mono" style={{ color: T.text }}>{node.name}</h1>
               <span className="text-xs px-2 py-0.5 rounded font-medium"
-                style={{ background: LAYER_COLOR[node.layer], color: LAYER_BORDER[node.layer], border: `1px solid ${LAYER_BORDER[node.layer]}` }}>
+                style={{ background: LAYER_BG[theme][node.layer], color: LAYER_BORDER[node.layer], border: `1px solid ${LAYER_BORDER[node.layer]}` }}>
                 {LAYER_LABEL[node.layer]}
               </span>
-              <span className="text-xs text-gray-600">table</span>
+              <span className="text-xs" style={{ color: T.faint }}>table</span>
             </div>
-            {/* Upstream / downstream quick ref */}
-            <div className="flex items-center gap-4 mt-2 text-xs text-gray-500">
-              {directParents.length > 0 && (
-                <span>↑ {directParents.length} upstream: {directParents.slice(0, 2).map(p => (
-                  <button key={p} onClick={() => onNavigate(p)}
-                    className="text-indigo-400 hover:text-indigo-300 ml-1 font-mono">{p}</button>
-                ))}{directParents.length > 2 && ` +${directParents.length - 2} more`}</span>
+            <div className="flex items-center gap-4 mt-1.5 text-xs flex-wrap" style={{ color: T.muted }}>
+              {parents.length > 0 && (
+                <span>↑ {parents.length} upstream: {parents.slice(0,2).map(p => (
+                  <button key={p} onClick={() => onNavigate(p)} className="hover:underline ml-1 font-mono" style={{ color: '#818cf8' }}>{p}</button>
+                ))}{parents.length > 2 && ` +${parents.length-2} more`}</span>
               )}
-              {directChildren.length > 0 && (
-                <span>↓ {directChildren.length} downstream: {directChildren.slice(0, 2).map(c => (
-                  <button key={c} onClick={() => onNavigate(c)}
-                    className="text-indigo-400 hover:text-indigo-300 ml-1 font-mono">{c}</button>
-                ))}{directChildren.length > 2 && ` +${directChildren.length - 2} more`}</span>
+              {children.length > 0 && (
+                <span>↓ {children.length} downstream: {children.slice(0,2).map(c => (
+                  <button key={c} onClick={() => onNavigate(c)} className="hover:underline ml-1 font-mono" style={{ color: '#818cf8' }}>{c}</button>
+                ))}{children.length > 2 && ` +${children.length-2} more`}</span>
               )}
-              {directParents.length === 0 && <span className="text-green-600">● root model</span>}
-              {directChildren.length === 0 && <span className="text-orange-600">● leaf model</span>}
+              {parents.length === 0  && <span style={{ color: '#22c55e' }}>● root model</span>}
+              {children.length === 0 && <span style={{ color: '#f59e0b' }}>● leaf model</span>}
             </div>
           </div>
         </div>
-
         {/* Tabs */}
-        <div className="flex gap-1 mt-4">
-          {(['description', 'columns', 'sql'] as DocTab[]).map(t => (
+        <div className="flex gap-0 mt-4">
+          {(['description','columns','sql'] as DocTab[]).map(t => (
             <button key={t} onClick={() => setTab(t)}
-              className={`px-4 py-1.5 text-sm font-medium rounded-t transition-colors capitalize ${
-                tab === t ? 'text-indigo-400 border-b-2 border-indigo-400' : 'text-gray-500 hover:text-gray-300'
-              }`}>
+              className="px-4 py-2 text-sm font-medium capitalize transition-colors border-b-2"
+              style={{
+                color: tab === t ? '#818cf8' : T.muted,
+                borderColor: tab === t ? '#818cf8' : 'transparent',
+              }}>
               {t}
             </button>
           ))}
         </div>
       </div>
 
-      {/* Tab content */}
+      {/* Tab body */}
       <div className="flex-1 overflow-y-auto px-8 py-6">
+
         {tab === 'description' && (
-          <div className="max-w-2xl space-y-4">
+          <div className="max-w-2xl space-y-5">
             <div>
-              <h3 className="text-sm font-semibold text-gray-300 mb-2">Description</h3>
-              <p className="text-sm text-gray-400 leading-relaxed">{meta.description}</p>
+              <h3 className="text-sm font-semibold mb-2" style={{ color: T.text }}>Description</h3>
+              <p className="text-sm leading-relaxed" style={{ color: T.muted }}>{meta.description}</p>
             </div>
             <div>
-              <h3 className="text-sm font-semibold text-gray-300 mb-2">Details</h3>
-              <table className="text-xs text-gray-400 w-full">
+              <h3 className="text-sm font-semibold mb-2" style={{ color: T.text }}>Details</h3>
+              <table className="text-xs w-full">
                 <tbody>
-                  <tr className="border-b border-gray-800"><td className="py-2 pr-8 text-gray-600 w-32">Layer</td><td className="py-2">{LAYER_LABEL[node.layer]}</td></tr>
-                  <tr className="border-b border-gray-800"><td className="py-2 pr-8 text-gray-600">Columns</td><td className="py-2">{meta.columns.length}</td></tr>
-                  <tr className="border-b border-gray-800"><td className="py-2 pr-8 text-gray-600">Upstream</td><td className="py-2">{directParents.length} direct · {getFullLineage(id).ancestors.length} total</td></tr>
-                  <tr><td className="py-2 pr-8 text-gray-600">Downstream</td><td className="py-2">{directChildren.length} direct · {getFullLineage(id).descendants.length} total</td></tr>
+                  {[
+                    ['Layer',      LAYER_LABEL[node.layer]],
+                    ['Columns',    String(meta.columns.length)],
+                    ['Upstream',   `${parents.length} direct · ${ancestors.length} total`],
+                    ['Downstream', `${children.length} direct · ${descendants.length} total`],
+                  ].map(([k, v]) => (
+                    <tr key={k} className="border-b" style={{ borderColor: T.border }}>
+                      <td className="py-2 pr-8 w-28" style={{ color: T.faint }}>{k}</td>
+                      <td className="py-2" style={{ color: T.text }}>{v}</td>
+                    </tr>
+                  ))}
                 </tbody>
               </table>
             </div>
@@ -562,39 +570,33 @@ function ModelDocs({ id, onNavigate }: { id: string; onNavigate: (id: string) =>
           <div className="max-w-3xl">
             <table className="w-full text-xs">
               <thead>
-                <tr className="border-b border-gray-800 text-gray-500 text-left">
-                  <th className="pb-2 pr-4 font-medium uppercase tracking-wide w-16">Tests</th>
-                  <th className="pb-2 pr-8 font-medium uppercase tracking-wide">Column</th>
-                  <th className="pb-2 pr-8 font-medium uppercase tracking-wide w-32">Type</th>
-                  <th className="pb-2 font-medium uppercase tracking-wide">Description</th>
+                <tr className="border-b text-left" style={{ borderColor: T.border }}>
+                  {['Tests','Column','Type','Description'].map(h => (
+                    <th key={h} className="pb-2 pr-6 font-medium uppercase tracking-wide" style={{ color: T.faint }}>{h}</th>
+                  ))}
                 </tr>
               </thead>
               <tbody>
                 {meta.columns.map(col => (
-                  <tr key={col.name} className="border-b border-gray-800/50 hover:bg-gray-800/30 transition-colors">
+                  <tr key={col.name} className="border-b transition-colors" style={{ borderColor: T.border }}>
                     <td className="py-2.5 pr-4">
                       <div className="flex gap-1">
                         {col.tests.map(t => (
-                          <span key={t} title={BADGE_TITLE[t]}
-                            className={`px-1 py-0.5 rounded text-[10px] font-bold leading-none ${BADGE_STYLE[t]}`}>
-                            {t}
-                          </span>
+                          <span key={t} title={BADGE_TITLE[t]} className={`px-1 py-0.5 rounded text-[10px] font-bold leading-none ${BADGE_CLS[t]}`}>{t}</span>
                         ))}
                       </div>
                     </td>
-                    <td className="py-2.5 pr-8">
-                      <span className="font-mono text-gray-200">{col.name}</span>
-                    </td>
-                    <td className="py-2.5 pr-8 text-gray-500 font-mono">{col.type}</td>
-                    <td className="py-2.5 text-gray-500">{col.description ?? '—'}</td>
+                    <td className="py-2.5 pr-6 font-mono" style={{ color: T.text }}>{col.name}</td>
+                    <td className="py-2.5 pr-6 font-mono" style={{ color: T.faint }}>{col.type}</td>
+                    <td className="py-2.5" style={{ color: T.muted }}>{col.description ?? '—'}</td>
                   </tr>
                 ))}
               </tbody>
             </table>
-            <div className="flex gap-4 mt-4 text-xs text-gray-600">
+            <div className="flex gap-4 mt-4">
               {(['P','F','N','U'] as TestBadge[]).map(t => (
-                <span key={t} className="flex items-center gap-1">
-                  <span className={`px-1 py-0.5 rounded text-[10px] font-bold ${BADGE_STYLE[t]}`}>{t}</span>
+                <span key={t} className="flex items-center gap-1 text-xs" style={{ color: T.faint }}>
+                  <span className={`px-1 py-0.5 rounded text-[10px] font-bold ${BADGE_CLS[t]}`}>{t}</span>
                   {BADGE_TITLE[t]}
                 </span>
               ))}
@@ -604,16 +606,14 @@ function ModelDocs({ id, onNavigate }: { id: string; onNavigate: (id: string) =>
 
         {tab === 'sql' && (
           <div className="max-w-3xl">
-            <div className="bg-gray-800 border border-gray-700 rounded-lg overflow-hidden">
-              <div className="flex items-center justify-between px-4 py-2 border-b border-gray-700 bg-gray-800">
-                <span className="text-xs text-gray-500 font-mono">{node.name}.sql</span>
-                <button
-                  onClick={() => navigator.clipboard?.writeText(meta.sql)}
-                  className="text-xs text-gray-600 hover:text-gray-400 transition-colors">
-                  Copy
-                </button>
+            <div className="rounded-xl overflow-hidden border" style={{ borderColor: T.border }}>
+              <div className="flex items-center justify-between px-4 py-2 border-b" style={{ borderColor: T.border, background: T.secondary }}>
+                <span className="text-xs font-mono" style={{ color: T.muted }}>{node.name}.sql</span>
+                <button onClick={() => navigator.clipboard?.writeText(meta.sql)}
+                  className="text-xs transition-opacity hover:opacity-70" style={{ color: T.muted }}>Copy</button>
               </div>
-              <pre className="p-4 text-xs text-green-300 font-mono leading-relaxed overflow-x-auto whitespace-pre">
+              <pre className="p-4 text-xs font-mono leading-relaxed overflow-x-auto whitespace-pre"
+                style={{ background: T.panel, color: theme === 'dark' ? '#86efac' : '#166534' }}>
                 {meta.sql}
               </pre>
             </div>
@@ -621,20 +621,44 @@ function ModelDocs({ id, onNavigate }: { id: string; onNavigate: (id: string) =>
         )}
       </div>
 
-      {/* Floating mini lineage */}
-      <MiniLineage
-        selectedId={id}
-        onExpand={() => setLineageExpanded(true)}
-        onNodeClick={onNavigate}
-      />
+      {/* ── Floating Action Buttons (bottom-right) ── */}
+      <div className="absolute bottom-5 right-5 flex flex-col items-end gap-3 z-10">
 
-      {/* Full-screen lineage modal */}
+        {/* Lineage popup */}
+        {lineageOpen && (
+          <LineagePopup
+            selectedId={id}
+            onExpand={() => { setLineageOpen(false); setLineageExpanded(true); }}
+            onNavigate={onNavigate}
+            onClose={() => setLineageOpen(false)}
+          />
+        )}
+
+        {/* Round FAB row */}
+        <div className="flex gap-3">
+          {/* AI FAB */}
+          <button onClick={onFocusAI} title="Ask AI about this model"
+            className="w-11 h-11 rounded-full shadow-lg flex items-center justify-center transition-transform hover:scale-105 active:scale-95 border"
+            style={{ background: '#4f46e5', borderColor: '#6366f1', color: '#fff' }}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+            </svg>
+          </button>
+          {/* Lineage FAB */}
+          <button onClick={() => setLineageOpen(v => !v)} title="View lineage"
+            className="w-11 h-11 rounded-full shadow-lg flex items-center justify-center transition-transform hover:scale-105 active:scale-95 border"
+            style={{ background: lineageOpen ? LAYER_BORDER[node.layer] : T.secondary, borderColor: LAYER_BORDER[node.layer], color: lineageOpen ? '#fff' : LAYER_BORDER[node.layer] }}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <circle cx="5" cy="12" r="2"/><circle cx="19" cy="5" r="2"/><circle cx="19" cy="19" r="2"/>
+              <line x1="7" y1="12" x2="17" y2="6"/><line x1="7" y1="12" x2="17" y2="18"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      {/* Full-screen modal */}
       {lineageExpanded && (
-        <LineageModal
-          selectedId={id}
-          onClose={() => setLineageExpanded(false)}
-          onNodeClick={id2 => { onNavigate(id2); setLineageExpanded(false); }}
-        />
+        <LineageModal selectedId={id} onClose={() => setLineageExpanded(false)} onNavigate={id2 => { onNavigate(id2); setLineageExpanded(false); }} />
       )}
     </div>
   );
@@ -642,18 +666,19 @@ function ModelDocs({ id, onNavigate }: { id: string; onNavigate: (id: string) =>
 
 // ── Model Tree ─────────────────────────────────────────────────────────────────
 
-function ModelTree({ selected, onSelect }: { selected: string | null; onSelect: (id: string) => void }) {
-  const [search, setSearch] = useState('');
+function ModelTree({ selected, onSelect, width }: { selected: string | null; onSelect: (id: string) => void; width: number }) {
+  const { T } = useTheme();
+  const [search, setSearch]   = useState('');
   const [collapsed, setCollapsed] = useState<Set<Layer>>(new Set());
   const toggle = (l: Layer) => setCollapsed(p => { const s = new Set(p); s.has(l) ? s.delete(l) : s.add(l); return s; });
   const filtered = NODES.filter(n => n.name.toLowerCase().includes(search.toLowerCase()));
 
   return (
-    <div className="flex flex-col h-full bg-gray-900 border-r border-gray-800 w-60 flex-shrink-0">
-      <div className="px-3 py-3 border-b border-gray-800">
-        <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">Models</p>
+    <div className="flex flex-col h-full border-r flex-shrink-0" style={{ width, background: T.panel, borderColor: T.border }}>
+      <div className="px-3 py-3 border-b flex-shrink-0" style={{ borderColor: T.border }}>
+        <p className="text-xs font-semibold uppercase tracking-wide mb-2" style={{ color: T.faint }}>Models</p>
         <input type="text" placeholder="Search…" value={search} onChange={e => setSearch(e.target.value)}
-          className="w-full bg-gray-800 border border-gray-700 rounded px-2 py-1.5 text-xs text-gray-200 placeholder-gray-600 focus:outline-none focus:border-gray-500" />
+          className={`w-full rounded px-2 py-1.5 text-xs border focus:outline-none ${T.inputCls}`} />
       </div>
       <div className="flex-1 overflow-y-auto py-1">
         {LAYERS.map(layer => {
@@ -663,18 +688,24 @@ function ModelTree({ selected, onSelect }: { selected: string | null; onSelect: 
           return (
             <div key={layer}>
               <button onClick={() => toggle(layer)}
-                className="w-full flex items-center gap-2 px-3 py-1.5 hover:bg-gray-800 text-left">
-                <span className="text-gray-600 text-xs w-2">{isCol ? '▶' : '▼'}</span>
+                className="w-full flex items-center gap-2 px-3 py-1.5 text-left transition-colors"
+                style={{ color: T.muted }}
+                onMouseEnter={e => (e.currentTarget.style.background = T.hover)}
+                onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}>
+                <span className="text-xs w-2" style={{ color: T.faint }}>{isCol ? '▶' : '▼'}</span>
                 <span className="w-2 h-2 rounded-sm flex-shrink-0" style={{ background: LAYER_BORDER[layer] }} />
-                <span className="text-xs font-semibold text-gray-300">{LAYER_LABEL[layer]}</span>
-                <span className="ml-auto text-xs text-gray-600">{models.length}</span>
+                <span className="text-xs font-semibold" style={{ color: T.text }}>{LAYER_LABEL[layer]}</span>
+                <span className="ml-auto text-xs" style={{ color: T.faint }}>{models.length}</span>
               </button>
               {!isCol && models.map(n => (
                 <button key={n.id} onClick={() => onSelect(n.id)}
-                  className={`w-full flex items-center gap-2 px-4 py-1 text-left hover:bg-gray-800 transition-colors ${selected === n.id ? 'bg-gray-800' : ''}`}>
+                  className="w-full flex items-center gap-2 px-4 py-1 text-left transition-colors"
+                  style={{ background: selected === n.id ? T.hover : 'transparent' }}
+                  onMouseEnter={e => { if (selected !== n.id) e.currentTarget.style.background = T.hover; }}
+                  onMouseLeave={e => { if (selected !== n.id) e.currentTarget.style.background = 'transparent'; }}>
                   <span className="w-1.5 h-1.5 rounded-full flex-shrink-0"
-                    style={{ background: selected === n.id ? LAYER_BORDER[layer] : '#374151', border: `1px solid ${LAYER_BORDER[layer]}` }} />
-                  <span className={`text-xs truncate ${selected === n.id ? 'text-white font-medium' : 'text-gray-400'}`}>
+                    style={{ background: selected === n.id ? LAYER_BORDER[layer] : T.faint, border: `1px solid ${LAYER_BORDER[layer]}` }} />
+                  <span className="text-xs truncate" style={{ color: selected === n.id ? T.text : T.muted, fontWeight: selected === n.id ? 600 : 400 }}>
                     {n.name.replace(/^(raw_|src_|core_|analytics_)/, '')}
                   </span>
                 </button>
@@ -683,8 +714,8 @@ function ModelTree({ selected, onSelect }: { selected: string | null; onSelect: 
           );
         })}
       </div>
-      <div className="px-3 py-2 border-t border-gray-800">
-        <p className="text-xs text-gray-600">{NODES.length} models</p>
+      <div className="px-3 py-2 border-t" style={{ borderColor: T.border }}>
+        <p className="text-xs" style={{ color: T.faint }}>{NODES.length} models</p>
       </div>
     </div>
   );
@@ -693,28 +724,30 @@ function ModelTree({ selected, onSelect }: { selected: string | null; onSelect: 
 // ── AI Chat ────────────────────────────────────────────────────────────────────
 
 function buildContext(id: string) {
-  const n = NODE_MAP.get(id);
-  if (!n) return '';
+  const n = NODE_MAP.get(id); if (!n) return '';
   const { ancestors, descendants } = getFullLineage(id);
-  const parents  = EDGES_RAW.filter(([, t]) => t === id).map(([s]) => s);
-  const children = EDGES_RAW.filter(([s]) => s === id).map(([, t]) => t);
+  const parents  = EDGES_RAW.filter(([,t]) => t === id).map(([s]) => s);
+  const children = EDGES_RAW.filter(([s]) => s === id).map(([,t]) => t);
   return [
     `**Model: \`${id}\`** (${LAYER_LABEL[n.layer]} layer)`,
     '',
-    parents.length ? `**Direct upstream (${parents.length}):** ${parents.join(', ')}` : '**Upstream:** none — root model',
+    parents.length  ? `**Direct upstream (${parents.length}):** ${parents.join(', ')}`   : '**Upstream:** none — root model',
     children.length ? `**Direct downstream (${children.length}):** ${children.join(', ')}` : '**Downstream:** none — leaf model',
     '',
-    `**Full ancestry:** ${ancestors.length ? ancestors.join(', ') : 'none'}`,
-    `**Full impact:** ${descendants.length ? descendants.join(', ') : 'none'}`,
+    `**Full ancestry (${ancestors.length}):** ${ancestors.length ? ancestors.join(', ') : 'none'}`,
+    `**Full impact (${descendants.length}):** ${descendants.length ? descendants.join(', ') : 'none'}`,
     '',
     'How can I help you with this model?',
   ].join('\n');
 }
 
-function AiChat({ selectedModelId }: { selectedModelId: string | null }) {
+function AiChat({ selectedModelId, open, onToggle }: {
+  selectedModelId: string | null; open: boolean; onToggle: () => void;
+}) {
+  const { T } = useTheme();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
-  const [input, setInput] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [input, setInput]       = useState('');
+  const [loading, setLoading]   = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -726,17 +759,12 @@ function AiChat({ selectedModelId }: { selectedModelId: string | null }) {
 
   async function send() {
     if (!input.trim() || loading) return;
-    const userMsg: ChatMessage = { role: 'user', content: input.trim(), ts: Date.now() };
-    setMessages(p => [...p, userMsg]);
-    setInput('');
-    setLoading(true);
+    const msg: ChatMessage = { role: 'user', content: input.trim(), ts: Date.now() };
+    setMessages(p => [...p, msg]); setInput(''); setLoading(true);
     try {
       const res = await fetch('/api/ai/chat', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          model_context: selectedModelId ? buildContext(selectedModelId) : null,
-          messages: [...messages, userMsg].map(m => ({ role: m.role, content: m.content })),
-        }),
+        body: JSON.stringify({ model_context: selectedModelId ? buildContext(selectedModelId) : null, messages: [...messages, msg].map(m => ({ role: m.role, content: m.content })) }),
       });
       if (!res.ok) throw new Error();
       const data = await res.json();
@@ -747,43 +775,69 @@ function AiChat({ selectedModelId }: { selectedModelId: string | null }) {
   }
 
   return (
-    <div className="flex flex-col w-72 flex-shrink-0 border-l border-gray-800 bg-gray-900">
-      <div className="px-4 py-3 border-b border-gray-800 flex items-center gap-2">
-        <div className="w-2 h-2 rounded-full bg-indigo-400" />
-        <p className="text-xs font-semibold text-gray-300">AI Assistant</p>
-        {selectedModelId && (
-          <span className="ml-auto text-xs bg-gray-800 text-gray-400 px-2 py-0.5 rounded truncate max-w-[130px]">{selectedModelId}</span>
-        )}
-      </div>
-      <div className="flex-1 overflow-y-auto px-3 py-3 space-y-3">
-        {!selectedModelId && (
-          <div className="flex flex-col items-center justify-center h-full text-center px-4">
-            <div className="text-2xl mb-3 opacity-30">⬅</div>
-            <p className="text-xs text-gray-600">Select a model from the tree to load its context into the AI conversation.</p>
-          </div>
-        )}
-        {messages.map((m, i) => (
-          <div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-            <div className={`max-w-[92%] rounded-lg px-3 py-2 text-xs leading-relaxed whitespace-pre-wrap ${m.role === 'user' ? 'bg-indigo-700 text-white' : 'bg-gray-800 text-gray-300'}`}>
-              {m.content}
-            </div>
-          </div>
-        ))}
-        {loading && <div className="flex justify-start"><div className="bg-gray-800 rounded-lg px-3 py-2 text-xs text-gray-500 animate-pulse">Thinking…</div></div>}
-        <div ref={bottomRef} />
-      </div>
-      <div className="px-3 py-3 border-t border-gray-800">
-        <div className="flex gap-2">
-          <input type="text" value={input} onChange={e => setInput(e.target.value)} onKeyDown={e => e.key === 'Enter' && send()}
-            placeholder={selectedModelId ? `Ask about ${selectedModelId}…` : 'Select a model first…'}
-            disabled={!selectedModelId || loading}
-            className="flex-1 bg-gray-800 border border-gray-700 rounded px-2 py-1.5 text-xs text-gray-200 placeholder-gray-600 focus:outline-none focus:border-indigo-500 disabled:opacity-40" />
-          <button onClick={send} disabled={!selectedModelId || !input.trim() || loading}
-            className="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-40 text-white text-xs rounded transition-colors">
-            Send
+    <div className="flex flex-col flex-shrink-0 border-l transition-all duration-200 overflow-hidden"
+      style={{ width: open ? 288 : 44, borderColor: T.border, background: T.panel }}>
+
+      {/* Collapsed strip */}
+      {!open && (
+        <button onClick={onToggle} className="flex flex-col items-center justify-center h-full gap-3 w-full hover:opacity-80 transition-opacity"
+          style={{ color: T.muted }}>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+          </svg>
+          <span className="text-xs font-semibold" style={{ writingMode: 'vertical-rl', transform: 'rotate(180deg)' }}>AI</span>
+        </button>
+      )}
+
+      {/* Expanded panel */}
+      {open && (<>
+        <div className="px-4 py-3 border-b flex items-center gap-2 flex-shrink-0" style={{ borderColor: T.border }}>
+          <div className="w-2 h-2 rounded-full bg-indigo-400" />
+          <p className="text-xs font-semibold flex-1" style={{ color: T.text }}>AI Assistant</p>
+          {selectedModelId && (
+            <span className="text-xs px-2 py-0.5 rounded truncate max-w-[110px]" style={{ background: T.secondary, color: T.muted }}>{selectedModelId}</span>
+          )}
+          {/* Minimize button */}
+          <button onClick={onToggle} className="ml-1 hover:opacity-70 transition-opacity" style={{ color: T.faint }} title="Minimize">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <polyline points="9 18 15 12 9 6"/>
+            </svg>
           </button>
         </div>
-      </div>
+
+        <div className="flex-1 overflow-y-auto px-3 py-3 space-y-3">
+          {!selectedModelId && messages.length === 0 && (
+            <div className="flex flex-col items-center justify-center h-full text-center px-4">
+              <div className="text-2xl mb-3 opacity-20">⬅</div>
+              <p className="text-xs" style={{ color: T.faint }}>Select a model to load its context into the conversation.</p>
+            </div>
+          )}
+          {messages.map((m, i) => (
+            <div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+              <div className="max-w-[92%] rounded-lg px-3 py-2 text-xs leading-relaxed whitespace-pre-wrap"
+                style={{ background: m.role === 'user' ? '#4f46e5' : T.secondary, color: m.role === 'user' ? '#fff' : T.text }}>
+                {m.content}
+              </div>
+            </div>
+          ))}
+          {loading && <div className="flex justify-start"><div className="rounded-lg px-3 py-2 text-xs animate-pulse" style={{ background: T.secondary, color: T.faint }}>Thinking…</div></div>}
+          <div ref={bottomRef} />
+        </div>
+
+        <div className="px-3 py-3 border-t flex-shrink-0" style={{ borderColor: T.border }}>
+          <div className="flex gap-2">
+            <input type="text" value={input} onChange={e => setInput(e.target.value)} onKeyDown={e => e.key === 'Enter' && send()}
+              placeholder={selectedModelId ? `Ask about ${selectedModelId}…` : 'Select a model first…'}
+              disabled={!selectedModelId || loading}
+              className={`flex-1 rounded px-2 py-1.5 text-xs border focus:outline-none disabled:opacity-40 ${T.inputCls}`} />
+            <button onClick={send} disabled={!selectedModelId || !input.trim() || loading}
+              className="px-3 py-1.5 rounded text-xs text-white transition-colors disabled:opacity-40"
+              style={{ background: '#4f46e5' }}>
+              Send
+            </button>
+          </div>
+        </div>
+      </>)}
     </div>
   );
 }
@@ -791,29 +845,72 @@ function AiChat({ selectedModelId }: { selectedModelId: string | null }) {
 // ── Main ───────────────────────────────────────────────────────────────────────
 
 export default function Lineage() {
-  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [theme, setTheme]       = useState<Theme>('dark');
+  const [selectedId, setSelected] = useState<string | null>(null);
+  const [aiOpen, setAiOpen]     = useState(true);
+  const [treeWidth, setTreeWidth] = useState(240);
+  const dragging = useRef(false);
+  const dragStart = useRef({ x: 0, w: 0 });
 
-  const handleSelect = useCallback((id: string) => setSelectedId(id), []);
+  const T = THEME[theme];
+
+  // Drag-resize the tree panel
+  useEffect(() => {
+    const onMove = (e: MouseEvent) => {
+      if (!dragging.current) return;
+      const delta = e.clientX - dragStart.current.x;
+      setTreeWidth(Math.max(160, Math.min(380, dragStart.current.w + delta)));
+    };
+    const onUp = () => { dragging.current = false; document.body.style.cursor = ''; };
+    document.addEventListener('mousemove', onMove);
+    document.addEventListener('mouseup', onUp);
+    return () => { document.removeEventListener('mousemove', onMove); document.removeEventListener('mouseup', onUp); };
+  }, []);
+
+  const handleSelect = useCallback((id: string) => setSelected(id), []);
+
+  const focusAI = useCallback(() => { setAiOpen(true); }, []);
 
   return (
-    <div className="flex h-full overflow-hidden">
-      <ModelTree selected={selectedId} onSelect={handleSelect} />
+    <ThemeCtx.Provider value={{ theme, T, isDark: theme === 'dark' }}>
+      <div className="flex h-full overflow-hidden relative" style={{ background: T.bg }}>
 
-      <div className="flex-1 flex overflow-hidden">
-        {selectedId ? (
-          <ModelDocs id={selectedId} onNavigate={handleSelect} />
-        ) : (
-          <div className="flex-1 flex flex-col items-center justify-center text-center px-8 bg-gray-950">
-            <div className="text-5xl mb-5 opacity-10">⬡</div>
-            <p className="text-gray-600 text-sm font-medium mb-2">No model selected</p>
-            <p className="text-gray-700 text-xs max-w-xs">
-              Pick a model from the tree on the left to view its documentation, columns, SQL, and lineage.
-            </p>
-          </div>
-        )}
+        {/* ── Theme toggle (top-right of the whole page) ── */}
+        <div className="absolute top-3 right-3 z-30" style={{ right: aiOpen ? 300 : 56 }}>
+          <button onClick={() => setTheme(t => t === 'dark' ? 'light' : 'dark')}
+            className="w-8 h-8 rounded-full flex items-center justify-center border transition-all hover:opacity-80 shadow"
+            style={{ background: T.secondary, borderColor: T.border, color: T.muted }}
+            title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}>
+            {theme === 'dark' ? '☀' : '🌙'}
+          </button>
+        </div>
+
+        {/* ── Left: Model tree ── */}
+        <ModelTree selected={selectedId} onSelect={handleSelect} width={treeWidth} />
+
+        {/* ── Drag handle ── */}
+        <div
+          className="w-1 flex-shrink-0 cursor-col-resize transition-colors hover:bg-indigo-500/40 active:bg-indigo-500/60"
+          style={{ background: T.border }}
+          onMouseDown={e => { dragging.current = true; dragStart.current = { x: e.clientX, w: treeWidth }; document.body.style.cursor = 'col-resize'; }}
+        />
+
+        {/* ── Center: Docs or empty state ── */}
+        <div className="flex-1 overflow-hidden">
+          {selectedId ? (
+            <ModelDocs id={selectedId} onNavigate={handleSelect} onFocusAI={focusAI} />
+          ) : (
+            <div className="flex flex-col items-center justify-center h-full text-center px-8" style={{ background: T.bg }}>
+              <div className="text-5xl mb-5 opacity-10">⬡</div>
+              <p className="text-sm font-medium mb-2" style={{ color: T.faint }}>No model selected</p>
+              <p className="text-xs max-w-xs" style={{ color: T.faint }}>Pick a model from the tree to view its documentation, columns, SQL, and lineage.</p>
+            </div>
+          )}
+        </div>
+
+        {/* ── Right: AI Chat (collapsible) ── */}
+        <AiChat selectedModelId={selectedId} open={aiOpen} onToggle={() => setAiOpen(v => !v)} />
       </div>
-
-      <AiChat selectedModelId={selectedId} />
-    </div>
+    </ThemeCtx.Provider>
   );
 }
