@@ -8,6 +8,9 @@ import { buildGitHubStrategy } from './auth/github.strategy.js';
 import { buildGoogleStrategy } from './auth/google.strategy.js';
 import authRouter from './auth/routes.js';
 import connectionsRouter from './routes/connections.js';
+import nodesRouter from './routes/nodes.js';
+import edgesRouter from './routes/edges.js';
+import lineageRouter from './routes/lineage.js';
 
 const app = express();
 const PORT = process.env.PORT ?? 3000;
@@ -41,6 +44,9 @@ app.get('/api/health', (_req, res) => {
 
 app.use('/auth', authRouter);
 app.use('/api/workspaces/:workspaceId/connections', connectionsRouter);
+app.use('/api/workspaces/:workspaceId/nodes', nodesRouter);
+app.use('/api/workspaces/:workspaceId/edges', edgesRouter);
+app.use('/api/workspaces/:workspaceId/lineage', lineageRouter);
 
 // ── Start ─────────────────────────────────────────────────────────────────────
 
