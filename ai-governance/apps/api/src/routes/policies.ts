@@ -174,24 +174,26 @@ router.post('/:id/evaluate', async (req: Request, res: Response): Promise<void> 
     return;
   }
 
-  const { node_id, run_id, metadata = {} } = req.body as {
+  const { node_id, run_id, metadata = {}, subject: inlineSubject } = req.body as {
     node_id?: string;
     run_id?: string;
     metadata?: Record<string, unknown>;
+    subject?: EvaluationSubject;
   };
 
-  const subject: EvaluationSubject = { metadata };
+  // Inline subject takes precedence for ad-hoc / curl testing
+  const subject: EvaluationSubject = inlineSubject ?? { metadata };
 
-  // Load node if provided
-  if (node_id) {
+  // Load node from DB if node_id provided (and no inline subject)
+  if (node_id && !inlineSubject) {
     const nr = await pool.query(`SELECT * FROM nodes WHERE id = $1 AND workspace_id = $2`, [node_id, workspaceId]);
     if (nr.rows.length > 0) subject.node = nr.rows[0];
     const connCount = await pool.query(`SELECT COUNT(*) FROM connections WHERE workspace_id = $1`, [workspaceId]);
     subject.connectionCount = parseInt(connCount.rows[0].count, 10);
   }
 
-  // Load run if provided
-  if (run_id) {
+  // Load run from DB if run_id provided (and no inline subject)
+  if (run_id && !inlineSubject) {
     const rr = await pool.query(`SELECT * FROM runs WHERE id = $1 AND workspace_id = $2`, [run_id, workspaceId]);
     if (rr.rows.length > 0) subject.run = rr.rows[0];
     const runCount = await pool.query(`SELECT COUNT(*) FROM runs WHERE workspace_id = $1`, [workspaceId]);
