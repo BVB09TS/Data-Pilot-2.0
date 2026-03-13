@@ -30,6 +30,7 @@ import Lineage     from './pages/Lineage';
 import Runs        from './pages/Runs';
 import Policies    from './pages/Policies';
 import AuditLog    from './pages/AuditLog';
+import PRReviews   from './pages/PRReviews';
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
@@ -61,6 +62,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
             <Route path="/runs"        element={<Runs />} />
             <Route path="/policies"    element={<Policies />} />
             <Route path="/audit"       element={<AuditLog />} />
+            <Route path="/pr-reviews"  element={<PRReviews />} />
           </Route>
 
           {/* ── Fallback ── */}
