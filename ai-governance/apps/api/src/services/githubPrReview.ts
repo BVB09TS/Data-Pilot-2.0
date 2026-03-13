@@ -14,7 +14,7 @@
 
 import { Octokit } from '@octokit/rest';
 import { pool } from '../db/pool.js';
-import { decrypt, encrypt } from '../utils/crypto.js';
+import { decrypt } from '../utils/crypto.js';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
