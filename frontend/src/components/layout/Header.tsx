@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useTheme } from '../../contexts/ThemeContext'
+import { useAuth } from '../../contexts/AuthContext'
 import type { Tab } from '../../types'
 
 const TABS: { id: Tab; label: string }[] = [
@@ -20,8 +22,16 @@ interface HeaderProps {
 
 export function Header({ activeTab, onTabChange, onMenuToggle }: HeaderProps) {
   const { theme, toggleTheme } = useTheme()
+  const { user, logout } = useAuth()
+  const navigate = useNavigate()
   const [searchFocused, setSearchFocused] = useState(false)
+  const [avatarMenuOpen, setAvatarMenuOpen] = useState(false)
   const searchRef = useRef<HTMLInputElement>(null)
+
+  function handleLogout() {
+    logout()
+    navigate('/login')
+  }
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
@@ -143,6 +153,46 @@ export function Header({ activeTab, onTabChange, onMenuToggle }: HeaderProps) {
           <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
           <span className="text-xs font-medium text-green-700 dark:text-green-400">Live</span>
         </div>
+
+        {/* User avatar + dropdown */}
+        {user && (
+          <div className="relative">
+            <button
+              onClick={() => setAvatarMenuOpen(o => !o)}
+              className="flex items-center gap-2 p-1 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+            >
+              <div className="w-7 h-7 rounded-full bg-gradient-to-br from-blue-500 to-violet-600 flex items-center justify-center text-white text-xs font-bold shrink-0">
+                {user.name.charAt(0).toUpperCase()}
+              </div>
+              <span className="text-xs text-slate-600 dark:text-slate-400 font-medium hidden sm:block max-w-24 truncate">
+                {user.name}
+              </span>
+            </button>
+
+            {avatarMenuOpen && (
+              <>
+                {/* Backdrop */}
+                <div className="fixed inset-0 z-40" onClick={() => setAvatarMenuOpen(false)} />
+                {/* Menu */}
+                <div className="absolute right-0 top-10 z-50 w-52 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl shadow-xl overflow-hidden">
+                  <div className="px-4 py-3 border-b border-slate-100 dark:border-slate-800">
+                    <p className="text-sm font-medium text-slate-900 dark:text-slate-100 truncate">{user.name}</p>
+                    <p className="text-xs text-slate-500 truncate">{user.email}</p>
+                  </div>
+                  <button
+                    onClick={handleLogout}
+                    className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors"
+                  >
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h6a2 2 0 012 2v1" />
+                    </svg>
+                    Sign out
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+        )}
       </div>
     </header>
   )
