@@ -59,6 +59,27 @@ router.get(
   }
 );
 
+// ── GitLab ────────────────────────────────────────────────────────────────────
+
+router.get('/gitlab', (req: Request, res: Response, next: NextFunction) => {
+  if (!process.env.GITLAB_CLIENT_ID) {
+    return res.redirect(`${FRONTEND_URL}/login?error=provider_disabled`);
+  }
+  passport.authenticate('gitlab', { scope: ['read_user'] })(req, res, next);
+});
+
+router.get(
+  '/gitlab/callback',
+  (req: Request, res: Response, next: NextFunction) => {
+    passport.authenticate('gitlab', { session: false }, (err: Error | null, user: Express.User | false) => {
+      if (err || !user) return res.redirect(`${FRONTEND_URL}/login?error=oauth`);
+      const u = user as { id: string };
+      issueSessionCookie(res, u.id);
+      res.redirect(`${FRONTEND_URL}/dashboard`);
+    })(req, res, next);
+  }
+);
+
 // ── Dev login (only in development — creates a seed user + workspace) ─────────
 
 router.post('/dev-login', async (req: Request, res: Response): Promise<void> => {

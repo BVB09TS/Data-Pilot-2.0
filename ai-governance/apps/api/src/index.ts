@@ -6,6 +6,7 @@ import 'dotenv/config';
 
 import { buildGitHubStrategy } from './auth/github.strategy.js';
 import { buildGoogleStrategy } from './auth/google.strategy.js';
+import { buildGitLabStrategy } from './auth/gitlab.strategy.js';
 import authRouter from './auth/routes.js';
 import connectionsRouter from './routes/connections.js';
 import nodesRouter from './routes/nodes.js';
@@ -38,6 +39,11 @@ if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
   passport.use('google', buildGoogleStrategy());
 } else {
   console.warn('⚠️  GOOGLE_CLIENT_ID / GOOGLE_CLIENT_SECRET not set — Google OAuth disabled');
+}
+if (process.env.GITLAB_CLIENT_ID && process.env.GITLAB_CLIENT_SECRET) {
+  passport.use('gitlab', buildGitLabStrategy());
+} else {
+  console.warn('⚠️  GITLAB_CLIENT_ID / GITLAB_CLIENT_SECRET not set — GitLab OAuth disabled');
 }
 app.use(passport.initialize());
 

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { api } from '../lib/api';
 import { useTheme } from '../contexts/ThemeContext';
 
@@ -70,12 +70,19 @@ function ThemeToggle() {
 }
 
 /* ── Main component ───────────────────────────────────────────────────────── */
+const ERROR_MESSAGES: Record<string, string> = {
+  oauth: 'Authentication failed. Please try again.',
+  provider_disabled: 'This login provider is not configured. Try GitHub or Google.',
+};
+
 export default function Login() {
   const [mode, setMode] = useState<'signin' | 'signup'>('signin');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
   const [loading, setLoading] = useState(false);
+  const [searchParams] = useSearchParams();
+  const oauthError = searchParams.get('error') ? (ERROR_MESSAGES[searchParams.get('error')!] ?? 'An error occurred.') : null;
 
   async function devLogin() {
     setLoading(true);
@@ -175,6 +182,13 @@ export default function Login() {
                 {mode === 'signin' ? 'Sign up free' : 'Sign in'}
               </button>
             </p>
+
+            {/* OAuth error banner */}
+            {oauthError && (
+              <div className="mb-5 px-4 py-3 rounded-xl bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 text-sm">
+                {oauthError}
+              </div>
+            )}
 
             {/* SSO buttons */}
             <div className="space-y-3 mb-6">
