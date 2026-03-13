@@ -25,16 +25,30 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     api.get('/auth/me')
-      .then(r => setState({
-        user: r.data.user,
-        workspaceId: r.data.workspaces?.[0]?.workspace_id ?? null,
-        loading: false,
-      }))
-      .catch(() => setState({ user: null, workspaceId: null, loading: false }));
+      .then(r => {
+        localStorage.removeItem('datapilot_dev_user');
+        setState({
+          user: r.data.user,
+          workspaceId: r.data.workspaces?.[0]?.workspace_id ?? null,
+          loading: false,
+        });
+      })
+      .catch(() => {
+        const stored = localStorage.getItem('datapilot_dev_user');
+        if (stored) {
+          try {
+            const devUser = JSON.parse(stored) as User;
+            setState({ user: devUser, workspaceId: 'dev', loading: false });
+            return;
+          } catch { /* ignore */ }
+        }
+        setState({ user: null, workspaceId: null, loading: false });
+      });
   }, []);
 
   async function logout() {
     await api.post('/auth/logout').catch(() => {});
+    localStorage.removeItem('datapilot_dev_user');
     setState({ user: null, workspaceId: null, loading: false });
     window.location.href = '/login';
   }

@@ -9,6 +9,12 @@ export default function Login() {
   async function devLogin() {
     setLoading(true);
     await api.post('/auth/dev-login').catch(() => {});
+    localStorage.setItem('datapilot_dev_user', JSON.stringify({
+      id: 'dev',
+      name: 'Dev User',
+      email: 'dev@localhost',
+      avatar_url: null,
+    }));
     window.location.href = '/dashboard';
   }
 
