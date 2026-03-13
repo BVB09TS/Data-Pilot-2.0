@@ -10,5 +10,5 @@ CREATE TABLE IF NOT EXISTS audit_events (
   created_at TIMESTAMPTZ DEFAULT now()
 );
 
-CREATE INDEX audit_events_workspace_idx ON audit_events(workspace_id, created_at DESC);
-CREATE INDEX audit_events_resource_idx  ON audit_events(resource_type, resource_id);
+CREATE INDEX IF NOT EXISTS audit_events_workspace_idx ON audit_events(workspace_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS audit_events_resource_idx  ON audit_events(resource_type, resource_id);
