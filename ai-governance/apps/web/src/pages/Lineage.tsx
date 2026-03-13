@@ -310,14 +310,7 @@ function getMeta(id: string): ModelMeta {
 
 // ── Graph helpers ──────────────────────────────────────────────────────────────
 
-function getFocusedGraph(id: string, depth: number) {
-  const inc = new Set<string>([id]);
-  let f = [id];
-  for (let d = 0; d < depth; d++) { const nx: string[] = []; EDGES_RAW.forEach(([s, t]) => { if (f.includes(t) && !inc.has(s)) { inc.add(s); nx.push(s); } }); f = nx; }
-  f = [id];
-  for (let d = 0; d < depth; d++) { const nx: string[] = []; EDGES_RAW.forEach(([s, t]) => { if (f.includes(s) && !inc.has(t)) { inc.add(t); nx.push(t); } }); f = nx; }
-  return { nodes: NODES.filter(n => inc.has(n.id)), edges: EDGES_RAW.filter(([s, t]) => inc.has(s) && inc.has(t)) };
-}
+
 
 function getFullLineage(id: string) {
   const anc: string[] = [], desc: string[] = [], vis = new Set([id]);

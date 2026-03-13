@@ -9,7 +9,7 @@ export default function Login() {
   async function devLogin() {
     setLoading(true);
     await api.post('/auth/dev-login').catch(() => {});
-    window.location.href = '/';
+    window.location.href = '/dashboard';
   }
 
   return (
