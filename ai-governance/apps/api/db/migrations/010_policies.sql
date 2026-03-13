@@ -1,4 +1,4 @@
-CREATE TABLE policies (
+CREATE TABLE IF NOT EXISTS policies (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   workspace_id UUID REFERENCES workspaces(id) ON DELETE CASCADE,
   name TEXT NOT NULL,
@@ -10,7 +10,7 @@ CREATE TABLE policies (
   updated_at TIMESTAMPTZ DEFAULT now()
 );
 
-CREATE TABLE policy_evaluations (
+CREATE TABLE IF NOT EXISTS policy_evaluations (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   workspace_id UUID REFERENCES workspaces(id) ON DELETE CASCADE,
   policy_id UUID REFERENCES policies(id) ON DELETE CASCADE,
