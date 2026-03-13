@@ -25,6 +25,7 @@ import Login from './pages/Login';
 import Dashboard   from './pages/Dashboard';
 import Connections from './pages/Connections';
 import Nodes       from './pages/Nodes';
+import Edges       from './pages/Edges';
 import Lineage     from './pages/Lineage';
 import Runs        from './pages/Runs';
 import Policies    from './pages/Policies';
@@ -55,6 +56,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
             <Route path="/dashboard"  element={<Dashboard />} />
             <Route path="/connections" element={<Connections />} />
             <Route path="/nodes"       element={<Nodes />} />
+            <Route path="/edges"       element={<Edges />} />
             <Route path="/lineage"     element={<Lineage />} />
             <Route path="/runs"        element={<Runs />} />
             <Route path="/policies"    element={<Policies />} />
