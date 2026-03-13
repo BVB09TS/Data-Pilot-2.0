@@ -1,7 +1,10 @@
 import { Router, Request, Response, NextFunction, IRouter } from 'express';
 import passport from 'passport';
 import jwt from 'jsonwebtoken';
+import bcrypt from 'bcrypt';
 import { pool } from '../db/pool.js';
+
+const BCRYPT_ROUNDS = 12;
 
 const router: IRouter = Router();
 
@@ -79,6 +82,79 @@ router.get(
     })(req, res, next);
   }
 );
+
+// ── Local email/password register ─────────────────────────────────────────────
+
+router.post('/register', async (req: Request, res: Response): Promise<void> => {
+  const { email, password, name } = req.body as { email?: string; password?: string; name?: string };
+
+  if (!email || !password) {
+    res.status(400).json({ error: 'email and password are required' });
+    return;
+  }
+  if (password.length < 8) {
+    res.status(400).json({ error: 'password must be at least 8 characters' });
+    return;
+  }
+
+  const existing = await pool.query(`SELECT id FROM users WHERE email = $1`, [email]);
+  if (existing.rows.length > 0) {
+    res.status(409).json({ error: 'An account with this email already exists' });
+    return;
+  }
+
+  const passwordHash = await bcrypt.hash(password, BCRYPT_ROUNDS);
+  const result = await pool.query<{ id: string }>(
+    `INSERT INTO users (email, name, provider, provider_id, password_hash)
+     VALUES ($1, $2, 'local', $1, $3)
+     RETURNING id`,
+    [email, name ?? null, passwordHash]
+  );
+
+  const userId = result.rows[0].id;
+  const slug = `ws-${userId.slice(0, 8)}`;
+  const ws = await pool.query<{ id: string }>(
+    `INSERT INTO workspaces (name, slug, owner_id) VALUES ($1, $2, $3) RETURNING id`,
+    [`${(name ?? email).split('@')[0]}'s Workspace`, slug, userId]
+  );
+  await pool.query(
+    `INSERT INTO workspace_members (workspace_id, user_id, role) VALUES ($1, $2, 'owner')`,
+    [ws.rows[0].id, userId]
+  );
+
+  issueSessionCookie(res, userId);
+  res.status(201).json({ ok: true });
+});
+
+// ── Local email/password login ─────────────────────────────────────────────────
+
+router.post('/login', async (req: Request, res: Response): Promise<void> => {
+  const { email, password } = req.body as { email?: string; password?: string };
+
+  if (!email || !password) {
+    res.status(400).json({ error: 'email and password are required' });
+    return;
+  }
+
+  const result = await pool.query<{ id: string; password_hash: string | null }>(
+    `SELECT id, password_hash FROM users WHERE email = $1 AND provider = 'local'`,
+    [email]
+  );
+
+  if (result.rows.length === 0 || !result.rows[0].password_hash) {
+    res.status(401).json({ error: 'Invalid email or password' });
+    return;
+  }
+
+  const valid = await bcrypt.compare(password, result.rows[0].password_hash);
+  if (!valid) {
+    res.status(401).json({ error: 'Invalid email or password' });
+    return;
+  }
+
+  issueSessionCookie(res, result.rows[0].id);
+  res.json({ ok: true });
+});
 
 // ── Dev login (only in development — creates a seed user + workspace) ─────────
 

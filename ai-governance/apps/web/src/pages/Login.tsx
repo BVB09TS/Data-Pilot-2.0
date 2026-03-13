@@ -81,6 +81,7 @@ export default function Login() {
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
   const [loading, setLoading] = useState(false);
+  const [formError, setFormError] = useState<string | null>(null);
   const [searchParams] = useSearchParams();
   const oauthError = searchParams.get('error') ? (ERROR_MESSAGES[searchParams.get('error')!] ?? 'An error occurred.') : null;
 
@@ -96,10 +97,21 @@ export default function Login() {
     window.location.href = '/dashboard';
   }
 
-  function handleEmailSubmit(e: React.FormEvent) {
+  async function handleEmailSubmit(e: React.FormEvent) {
     e.preventDefault();
-    // Email/password auth not yet wired to backend — placeholder
-    window.location.href = '/dashboard';
+    setFormError(null);
+    setLoading(true);
+    try {
+      const endpoint = mode === 'signup' ? '/auth/register' : '/auth/login';
+      const body = mode === 'signup' ? { email, password, name } : { email, password };
+      await api.post(endpoint, body);
+      window.location.href = '/dashboard';
+    } catch (err: unknown) {
+      const msg = (err as { response?: { data?: { error?: string } } })?.response?.data?.error;
+      setFormError(msg ?? 'Something went wrong. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -261,11 +273,16 @@ export default function Login() {
                 />
               </div>
 
+              {formError && (
+                <p className="text-red-600 dark:text-red-400 text-sm">{formError}</p>
+              )}
+
               <button
                 type="submit"
-                className="w-full bg-indigo-600 hover:bg-indigo-500 text-white py-3 rounded-xl font-semibold text-sm transition-colors shadow-lg shadow-indigo-500/20"
+                disabled={loading}
+                className="w-full bg-indigo-600 hover:bg-indigo-500 disabled:opacity-60 text-white py-3 rounded-xl font-semibold text-sm transition-colors shadow-lg shadow-indigo-500/20"
               >
-                {mode === 'signin' ? 'Sign in' : 'Create account'}
+                {loading ? 'Please wait…' : mode === 'signin' ? 'Sign in' : 'Create account'}
               </button>
             </form>
 
