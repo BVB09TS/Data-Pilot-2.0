@@ -13,6 +13,8 @@
     "seed-dev": "node --import tsx/esm scripts/seed-dev.ts"
   },
   "dependencies": {
+    "@octokit/rest": "^22.0.1",
+    "@octokit/webhooks": "^14.2.0",
     "@types/shared": "workspace:*",
     "bcrypt": "^6.0.0",
     "cookie-parser": "^1.4.7",

@@ -16,6 +16,7 @@ import environmentsRouter from './routes/environments.js';
 import runsRouter from './routes/runs.js';
 import policiesRouter from './routes/policies.js';
 import auditLogRouter from './routes/auditLog.js';
+import { webhookRouter, githubRouter } from './routes/github.js';
 import { auditMiddleware } from './middleware/auditMiddleware.js';
 
 const app = express();
@@ -56,6 +57,9 @@ app.get('/api/health', (_req, res) => {
 app.use('/auth', authRouter);
 app.use('/api/auth', authRouter);
 
+// GitHub webhook (public — no auth middleware, verified by HMAC)
+app.use('/api', webhookRouter);
+
 app.use('/api/workspaces/:workspaceId/connections',  auditMiddleware('connections'),  connectionsRouter);
 app.use('/api/workspaces/:workspaceId/nodes',        auditMiddleware('nodes'),        nodesRouter);
 app.use('/api/workspaces/:workspaceId/edges',        auditMiddleware('edges'),        edgesRouter);
@@ -64,6 +68,7 @@ app.use('/api/workspaces/:workspaceId/environments', auditMiddleware('environmen
 app.use('/api/workspaces/:workspaceId/runs',         auditMiddleware('runs'),         runsRouter);
 app.use('/api/workspaces/:workspaceId/policies',     auditMiddleware('policies'),     policiesRouter);
 app.use('/api/workspaces/:workspaceId/audit',        auditLogRouter);
+app.use('/api/workspaces/:workspaceId/github',       githubRouter);
 
 // ── Start ─────────────────────────────────────────────────────────────────────
 
