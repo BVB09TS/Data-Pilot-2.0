@@ -6,11 +6,17 @@ export const api = axios.create({
   headers: { 'Content-Type': 'application/json' },
 });
 
-// Redirect to login on 401 — but never when already on the login page
+// Redirect to login on 401 — but never when already on the login page,
+// and never for /auth/me (AuthContext handles that and falls back to localStorage)
 api.interceptors.response.use(
   r => r,
   err => {
-    if (err.response?.status === 401 && !window.location.pathname.startsWith('/login')) {
+    const url: string = err.config?.url ?? '';
+    if (
+      err.response?.status === 401 &&
+      !window.location.pathname.startsWith('/login') &&
+      !url.includes('/auth/me')
+    ) {
       window.location.href = '/login';
     }
     return Promise.reject(err);
