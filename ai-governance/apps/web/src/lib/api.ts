@@ -84,3 +84,14 @@ export const policiesApi = {
 export const auditApi = {
   list: (wid: string, params?: Record<string, unknown>) => api.get(`/workspaces/${wid}/audit`, { params }),
 };
+
+export const datapilotApi = {
+  triggerAudit: (wid: string, body: { project_path: string; environment_id?: string; query_history?: Record<string, number> }) =>
+    api.post(`/workspaces/${wid}/datapilot/audit`, body),
+  listFindings: (wid: string, params?: { run_id?: string; type?: string; severity?: string; limit?: number; offset?: number }) =>
+    api.get(`/workspaces/${wid}/datapilot/findings`, { params }),
+  getFinding: (wid: string, findingId: string) =>
+    api.get(`/workspaces/${wid}/datapilot/findings/${findingId}`),
+  getQuota: (wid: string) =>
+    api.get(`/workspaces/${wid}/datapilot/quota`),
+};

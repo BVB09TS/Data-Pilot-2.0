@@ -100,3 +100,59 @@ export interface ApiResponse<T> {
   error?: string;
   code?: string;
 }
+
+// ── DataPilot ─────────────────────────────────────────────────────────────────
+
+export type FindingType =
+  | 'dead_model'
+  | 'orphan'
+  | 'broken_ref'
+  | 'duplicate_metric'
+  | 'grain_join'
+  | 'logic_drift'
+  | 'missing_tests'
+  | 'deprecated_source';
+
+export type FindingSeverity = 'critical' | 'high' | 'medium' | 'low';
+
+export interface Finding {
+  id: string;
+  workspaceId: string;
+  runId: string;
+  nodeId?: string;
+  modelName?: string;
+  type: FindingType;
+  severity: FindingSeverity;
+  title: string;
+  description: string;
+  recommendation?: string;
+  llmReasoning?: string;
+  costUsd: number;
+  metadata: Record<string, unknown>;
+  createdAt: Date;
+}
+
+export interface AuditTriggerRequest {
+  project_path: string;
+  environment_id?: string;
+  query_history?: Record<string, number>;
+}
+
+export interface AuditTriggerResponse {
+  run_id: string;
+  status: 'pending';
+  message: string;
+}
+
+export interface FindingsListResponse {
+  findings: Finding[];
+  total: number;
+  limit: number;
+  offset: number;
+}
+
+export interface LLMQuotaStatus {
+  used_usd: number;
+  limit_usd: number;
+  window_reset_at: string;
+}

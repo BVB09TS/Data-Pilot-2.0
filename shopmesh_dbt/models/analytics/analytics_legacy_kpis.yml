@@ -1,9 +1,0 @@
-version: 2
-models:
-  - name: analytics_legacy_kpis
-    description: "DEAD MODEL: Original board KPI report. Replaced by analytics_executive_kpis Jan 2024. Last queried 2023-12-15. Still costing $15/month."
-    config:
-      tags: ["analytics"]
-    columns:
-      - name: revenue_date
-        description: "DEAD — use analytics_executive_kpis"
