@@ -9,7 +9,7 @@ services:
     environment:
       DATABASE_URL: postgresql://postgres:postgres@postgres:5432/ai_governance
       PORT: 3000
-      NODE_ENV: production
+      NODE_ENV: development
       SERVER_SECRET: ${SERVER_SECRET}
       SESSION_SECRET: ${SESSION_SECRET}
       FRONTEND_URL: ${FRONTEND_URL:-http://localhost:5173}
