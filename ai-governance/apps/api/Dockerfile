@@ -17,6 +17,8 @@ COPY apps/api ./apps/api
 
 ENV NODE_ENV=production
 
+WORKDIR /app/apps/api
+
 EXPOSE 3000
 
-CMD ["node", "--import", "tsx/esm", "apps/api/src/index.ts"]
+CMD ["node", "--import", "tsx/esm", "src/index.ts"]
