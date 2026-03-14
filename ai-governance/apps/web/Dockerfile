@@ -2,19 +2,21 @@
 # ── Build stage ───────────────────────────────────────────────────────────────
 FROM node:20-alpine AS builder
 
+RUN npm install -g pnpm
+
 WORKDIR /app
 
-COPY package.json package-lock.json* ./
+COPY package.json pnpm-workspace.yaml pnpm-lock.yaml* ./
 COPY packages/types/package.json ./packages/types/
 COPY apps/web/package.json ./apps/web/
 
-RUN npm install --legacy-peer-deps
+RUN pnpm install --frozen-lockfile 2>/dev/null || pnpm install
 
 COPY packages/types ./packages/types
 COPY apps/web ./apps/web
 
-RUN cd packages/types && npx tsc 2>/dev/null || true
-RUN cd apps/web && npx vite build
+RUN pnpm --filter @types/shared run build 2>/dev/null || true
+RUN pnpm --filter @app/web run build
 
 # ── Runtime stage (nginx) ─────────────────────────────────────────────────────
 FROM nginx:alpine AS runtime
