@@ -6,7 +6,7 @@ RUN npm install -g pnpm
 
 WORKDIR /app
 
-COPY package.json pnpm-workspace.yaml pnpm-lock.yaml* ./
+COPY package.json pnpm-workspace.yaml pnpm-lock.yaml* tsconfig.json ./
 COPY packages/types/package.json ./packages/types/
 COPY apps/web/package.json ./apps/web/
 
