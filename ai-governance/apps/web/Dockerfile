@@ -23,7 +23,7 @@ FROM nginx:alpine AS runtime
 
 COPY --from=builder /app/apps/web/dist /usr/share/nginx/html
 
-RUN printf 'server {\n  listen 80;\n  root /usr/share/nginx/html;\n  index index.html;\n  location / {\n    try_files $uri $uri/ /index.html;\n  }\n}\n' \
+RUN printf 'server {\n  listen 80;\n  root /usr/share/nginx/html;\n  index index.html;\n  location /api/ {\n    proxy_pass http://api:3000/api/;\n    proxy_http_version 1.1;\n    proxy_set_header Host $host;\n    proxy_set_header X-Real-IP $remote_addr;\n    proxy_set_header Cookie $http_cookie;\n  }\n  location /auth/ {\n    proxy_pass http://api:3000/auth/;\n    proxy_http_version 1.1;\n    proxy_set_header Host $host;\n    proxy_set_header X-Real-IP $remote_addr;\n    proxy_set_header Cookie $http_cookie;\n  }\n  location / {\n    try_files $uri $uri/ /index.html;\n  }\n}\n' \
     > /etc/nginx/conf.d/default.conf
 
 EXPOSE 80
