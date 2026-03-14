@@ -16,7 +16,7 @@ COPY packages/types ./packages/types
 COPY apps/web ./apps/web
 
 # Skip tsc type-check, just run vite build (vite handles transpilation itself)
-RUN cd apps/web && node ../../node_modules/.bin/vite build
+RUN pnpm --filter @app/web exec vite build
 
 # ── Runtime stage (nginx) ─────────────────────────────────────────────────────
 FROM nginx:alpine AS runtime
