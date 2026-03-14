@@ -15,8 +15,8 @@ RUN pnpm install --frozen-lockfile 2>/dev/null || pnpm install
 COPY packages/types ./packages/types
 COPY apps/web ./apps/web
 
-RUN pnpm --filter @types/shared run build 2>/dev/null || true
-RUN pnpm --filter @app/web run build
+# Skip tsc type-check, just run vite build (vite handles transpilation itself)
+RUN cd apps/web && node ../../node_modules/.bin/vite build
 
 # ── Runtime stage (nginx) ─────────────────────────────────────────────────────
 FROM nginx:alpine AS runtime

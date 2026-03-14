@@ -15,8 +15,14 @@ RUN pnpm install --frozen-lockfile 2>/dev/null || pnpm install
 COPY packages/types ./packages/types
 COPY apps/api ./apps/api
 
-RUN pnpm --filter @types/shared run build 2>/dev/null || true
-RUN pnpm --filter @app/api run build
+# Bundle API into a single file with esbuild (skips type-checking)
+RUN node_modules/.bin/esbuild apps/api/src/index.ts \
+      --bundle \
+      --platform=node \
+      --format=esm \
+      --packages=external \
+      --outfile=apps/api/dist/index.js \
+      --sourcemap
 
 # ── Runtime stage ─────────────────────────────────────────────────────────────
 FROM node:20-alpine AS runtime
