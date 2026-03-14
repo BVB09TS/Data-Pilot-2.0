@@ -1,146 +1,179 @@
-# DATAPILOT 2.0 — Production Readiness Task List
+# DataPilot 2.0 — Master Task List
 
-**Senior Engineering Audit — March 14, 2026**
+**Updated: 2026-03-14**
 
 > **Effort:** S = hours | M = 1–2 days | L = 3–5 days | XL = 1–2 weeks
 >
 > **Priority:** CRITICAL = ship blocker | HIGH = before beta | MEDIUM = before GA | LOW = nice-to-have
 >
-> **Total tasks: 55** — Critical: 10 | High: 21 | Medium: 17 | Low: 7
+> **Status:** ✅ Done | 🔄 In Progress | ⏳ Pending
 
 ---
 
-## 1. SECURITY — Fix Before Any Deployment
+## SESSION LOG — What Was Built (2026-03-14)
 
-These are exploitable vulnerabilities. Nothing else matters until these are closed.
+> Full TypeScript migration of the DataPilot engine into the `ai-governance` monorepo.
 
-| # | Task | Priority | Effort | Status | Notes |
-|---|------|----------|--------|--------|-------|
-| S-1 | Add authentication to `/api/settings` POST endpoint | **CRITICAL** | M | ⏳ | Currently allows unauthenticated write to `.env` file — anyone can overwrite API keys remotely |
-| S-2 | Replace CORS wildcard (`*`) with explicit origins | **CRITICAL** | S | ⏳ | `WebConfig.cors_origins` and `create_api_app` both default to `*` — any website can call your API |
-| S-3 | Fail-closed on default `secret_key` | **CRITICAL** | S | ⏳ | Flask secret_key is `'change-me-in-production'` — refuse to start if unchanged |
-| S-4 | Make keyvault refuse XOR fallback in production | **CRITICAL** | S | ⏳ | XOR "encryption" is trivially reversible — require `cryptography` package or fail to start |
-| S-5 | Add rate limiting to all public API endpoints | **HIGH** | M | ⏳ | No rate limiting on `/api/chat`, `/api/settings`, `/api/v1/*` — wide open to abuse |
-| S-6 | Add CSRF protection to state-changing endpoints | **HIGH** | M | ⏳ | POST endpoints accept requests without CSRF tokens |
-| S-7 | Input validation and sanitization on all API inputs | **HIGH** | M | ⏳ | `request.get_json(silent=True)` used everywhere — no schema validation on payloads |
-| S-8 | Remove `/api/settings/test-key` from production builds | **MEDIUM** | S | ⏳ | Endpoint lets anyone test arbitrary API keys against Groq/Anthropic/OpenAI |
-| S-9 | Audit all file path operations for path traversal | **HIGH** | M | ⏳ | `_safe_resolve` exists in `api/routes.py` but `web/app.py` reads arbitrary paths |
-| S-10 | Add security headers (CSP, X-Frame-Options, HSTS) | **MEDIUM** | S | ⏳ | No security headers on any response |
+| What | Files |
+|------|-------|
+| Deleted all Python code (datapilot/, frontend/, agent/, tests/, scripts/, shopmesh_dbt/) | 339 files removed |
+| DB migration: `findings` table | `db/migrations/013_findings.sql` |
+| dbt manifest.json parser | `src/datapilot/parser.ts` |
+| Multi-provider LLM gateway (Groq/OpenAI/Anthropic) + quota tracking | `src/datapilot/llmGateway.ts` |
+| 8 analysis agents (deadModels, orphans, brokenRefs, duplicateMetrics, grainJoins, logicDrift, missingTests, deprecatedSources) | `src/datapilot/agents/` |
+| Parallel audit pipeline orchestrator | `src/datapilot/runPipeline.ts` |
+| REST API: POST /audit, GET /findings, GET /quota | `src/routes/datapilot.ts` |
+| Findings page (trigger, filter, paginate, detail drawer) | `apps/web/src/pages/Findings.tsx` |
+| Dockerfiles for API (tsx runtime) + Web (nginx + proxy) | `apps/api/Dockerfile`, `apps/web/Dockerfile` |
+| Docker Compose with api, web, postgres, pgadmin, dbt_projects volume | `docker-compose.yml` |
+| .env.example with LLM keys + quota setting | `.env.example` |
+| Shared TypeScript types for findings | `packages/types/src/index.ts` |
 
 ---
 
-## 2. ARCHITECTURE — Cut the Fat, Focus the Product
-
-You're building three products in one repo. Ship one sharp tool, not a dull Swiss army knife.
+## 1. SECURITY
 
 | # | Task | Priority | Effort | Status | Notes |
 |---|------|----------|--------|--------|-------|
-| A-1 | Extract or delete `datapilot/gateway/` module | **HIGH** | L | ⏳ | Full multi-tenant LLM proxy — separate product with its own attack surface. 6 files, ~500 LOC unrelated to dbt |
-| A-2 | Delete all stub integration modules | **HIGH** | M | ⏳ | Airflow, Snowflake, Azure, AWS, GitLab, Kafka, PowerBI, K8s — none actually connect to anything |
-| A-3 | Remove legacy `agent/` directory | **MEDIUM** | S | ⏳ | Duplicate parser, graph, reporter — drift risk. DATAPILOT_CONTEXT.md still points to it |
-| A-4 | Clean up circular import: `graph.py` imports `github_actions.parser` | **MEDIUM** | S | ⏳ | Core module depending on integration module — invert the dependency |
-| A-5 | Wire `/api/v1/audit/trigger` to actually run audits | **HIGH** | L | ⏳ | Returns 202 Accepted but does nothing — lying to consumers |
-| A-6 | Delete `ai-governance/` sub-project or move to separate repo | **MEDIUM** | S | ⏳ | 487KB separate app in the same repo — confuses the codebase |
-| A-7 | Update DATAPILOT_CONTEXT.md and README to match reality | **MEDIUM** | M | ⏳ | Context doc references legacy paths, outdated commands, and features that don't exist |
-| A-8 | Trim `pyproject.toml` optional deps to things that work | **LOW** | S | ⏳ | Lists airflow, snowflake, kafka extras — none of which have working code |
+| S-1 | Auth on all state-changing API endpoints | **CRITICAL** | M | ✅ | `requireAuth` middleware on all datapilot + workspace routes |
+| S-2 | Replace CORS wildcard with explicit origins | **CRITICAL** | S | ✅ | `FRONTEND_URL` env var controls allowed origin |
+| S-3 | Fail-closed on default `secret_key` | **CRITICAL** | S | ✅ | `SERVER_SECRET` required — falls back to `dev-secret` only in dev |
+| S-4 | Remove XOR fallback keyvault in production | **CRITICAL** | S | ✅ | Python gateway deleted entirely |
+| S-5 | Rate limiting on public API endpoints | **HIGH** | M | ⏳ | No rate limiting yet |
+| S-6 | CSRF protection on state-changing endpoints | **HIGH** | M | ⏳ | |
+| S-7 | Input validation / schema validation on all API inputs | **HIGH** | M | ⏳ | |
+| S-8 | Remove dev-login endpoint from production builds | **MEDIUM** | S | ⏳ | Currently gated by `NODE_ENV !== production` |
+| S-9 | Audit file path operations for path traversal | **HIGH** | M | ⏳ | `project_path` in audit trigger not sanitized |
+| S-10 | Add security headers (CSP, X-Frame-Options, HSTS) | **MEDIUM** | S | ⏳ | |
+
+---
+
+## 2. ARCHITECTURE
+
+| # | Task | Priority | Effort | Status | Notes |
+|---|------|----------|--------|--------|-------|
+| A-1 | LLM gateway is now scoped to DataPilot only | **HIGH** | L | ✅ | `llmGateway.ts` — no separate proxy product |
+| A-2 | Delete all stub Python integration modules | **HIGH** | M | ✅ | Entire Python codebase deleted |
+| A-3 | Remove legacy `agent/` directory | **MEDIUM** | S | ✅ | Deleted |
+| A-4 | Circular import in graph.py | **MEDIUM** | S | ✅ | Python deleted — not applicable |
+| A-5 | Wire `/audit` to actually run audits | **HIGH** | L | ✅ | `POST /datapilot/audit` triggers real pipeline |
+| A-6 | `ai-governance/` is now the primary codebase | **MEDIUM** | S | ✅ | Python root deleted, monorepo is the product |
+| A-7 | Update docs to match reality | **MEDIUM** | M | ⏳ | README and CLAUDE.md still reference old Python structure |
+| A-8 | Trim dead config / extras | **LOW** | S | ✅ | pyproject.toml deleted |
 
 ---
 
 ## 3. CORE AGENT — Make It Work on Real Projects
 
-The agents are hardcoded to ShopMesh. They need to be generic to deliver real value.
-
 | # | Task | Priority | Effort | Status | Notes |
 |---|------|----------|--------|--------|-------|
-| C-1 | Remove hardcoded ShopMesh model names from `analyst.py` | **CRITICAL** | L | ⏳ | `analytics_churn_risk`, `src_orders_v2`, `src_shopify_orders` all hardcoded — won't work on any other project |
-| C-2 | Make `duplicate_metrics` detection generic | **HIGH** | L | ⏳ | Currently only scans for `total_revenue` — needs to find ANY metric defined multiple ways |
-| C-3 | Use sqlglot AST parsing instead of regex for SQL analysis | **HIGH** | XL | ⏳ | sqlglot is in requirements but unused — regex misses complex patterns, CTEs, subqueries |
-| C-4 | Make `grain_joins` detection work without 'daily'/'monthly' in name | **HIGH** | L | ⏳ | Currently pattern-matches ref names — real projects don't name models this way |
-| C-5 | Stop agents from rubber-stamping static analysis | **MEDIUM** | L | ⏳ | Agents ask LLM to "confirm" then backfill from static — LLM should discover, not confirm |
-| C-6 | Add confidence scores to all findings | **MEDIUM** | M | ⏳ | No confidence levels — user can't tell high-certainty from speculative findings |
-| C-7 | Handle malformed/incomplete dbt projects gracefully | **HIGH** | M | ⏳ | Parser crashes on missing files, bad YAML, non-standard layouts |
-| C-8 | Support `manifest.json` as input (not just raw SQL files) | **HIGH** | L | ⏳ | Real dbt projects use compiled manifest — far richer metadata than raw parsing |
-| C-9 | Add column-level lineage tracking | **MEDIUM** | XL | ⏳ | Needed for real grain-join detection and PII tracking — requires sqlglot AST walking |
-| C-10 | Test against at least 3 real open-source dbt projects | **CRITICAL** | L | ⏳ | Only tested against ShopMesh (the project DataPilot itself created) |
+| C-1 | Remove hardcoded model names from agents | **CRITICAL** | L | ✅ | TypeScript agents are fully generic — no ShopMesh names |
+| C-2 | Generic duplicate_metrics detection | **HIGH** | L | ✅ | Keyword-based scanning across all models |
+| C-3 | Use sqlglot / AST parsing instead of regex | **HIGH** | XL | ⏳ | Current agents use SQL string matching — add proper AST parsing |
+| C-4 | Grain join detection without name patterns | **HIGH** | L | ⏳ | Currently relies on `daily`/`monthly` in model name |
+| C-5 | LLM should discover, not confirm | **MEDIUM** | L | ⏳ | |
+| C-6 | Add confidence scores to findings | **MEDIUM** | M | ⏳ | |
+| C-7 | Handle malformed/incomplete dbt projects gracefully | **HIGH** | M | ⏳ | Parser may crash on missing files or bad YAML |
+| C-8 | Support `manifest.json` as primary input | **HIGH** | L | ✅ | `parser.ts` reads manifest.json natively |
+| C-9 | Column-level lineage tracking | **MEDIUM** | XL | ⏳ | Requires AST walking |
+| C-10 | Test against real open-source dbt projects | **CRITICAL** | L | ⏳ | Untested against real projects beyond ShopMesh |
 
 ---
 
-## 4. TESTING — The Most Critical Path Is Untested
-
-There are zero tests for the parser, graph builder, or end-to-end pipeline — the core value of the product.
+## 4. TESTING
 
 | # | Task | Priority | Effort | Status | Notes |
 |---|------|----------|--------|--------|-------|
-| T-1 | Write unit tests for `parse_project()` | **CRITICAL** | M | ⏳ | Zero coverage on the parser — the first step of the entire pipeline |
-| T-2 | Write unit tests for `build_graph()` and all `find_*` functions | **CRITICAL** | M | ⏳ | Graph building and static detection are completely untested |
-| T-3 | Write integration test: parse → graph → pipeline → report | **CRITICAL** | L | ⏳ | End-to-end pipeline test against ShopMesh — `tests/integration/` is empty |
-| T-4 | Add API endpoint tests (Flask test client) | **HIGH** | M | ⏳ | No tests for `/api/report`, `/api/findings`, `/api/chat`, `/api/settings` |
-| T-5 | Add negative tests: bad input, missing files, invalid YAML | **HIGH** | M | ⏳ | Parser and graph assume well-formed input — need failure mode tests |
-| T-6 | Set up CI pipeline (GitHub Actions) | **HIGH** | M | ⏳ | No CI at all — tests don't run automatically on push/PR |
-| T-7 | Add test coverage reporting and enforce minimum threshold | **MEDIUM** | S | ⏳ | pytest-cov is in dev deps but no coverage config or enforcement |
-| T-8 | Add frontend tests (at least smoke tests for key components) | **MEDIUM** | L | ⏳ | React frontend has zero tests |
-| T-9 | Test LLM agent responses with mock/fixture responses | **MEDIUM** | M | ⏳ | Agent tests should work without live LLM API keys |
+| T-1 | Unit tests for `parser.ts` | **CRITICAL** | M | ⏳ | |
+| T-2 | Unit tests for all 8 agents | **CRITICAL** | M | ⏳ | |
+| T-3 | Integration test: parse → pipeline → findings | **CRITICAL** | L | ⏳ | |
+| T-4 | API endpoint tests | **HIGH** | M | ⏳ | |
+| T-5 | Negative tests: bad input, missing files, invalid manifest | **HIGH** | M | ⏳ | |
+| T-6 | CI pipeline (GitHub Actions: lint + test + build) | **HIGH** | M | ⏳ | |
+| T-7 | Coverage reporting + minimum threshold | **MEDIUM** | S | ⏳ | |
+| T-8 | Frontend smoke tests | **MEDIUM** | L | ⏳ | |
+| T-9 | Agent tests with mock LLM responses | **MEDIUM** | M | ⏳ | |
 
 ---
 
-## 5. FRONTEND — Ship It or Cut It
-
-React frontend exists but has never been built or tested against the actual backend.
+## 5. FRONTEND
 
 | # | Task | Priority | Effort | Status | Notes |
 |---|------|----------|--------|--------|-------|
-| F-1 | Get frontend building (`npm run build` → `dist/`) | **CRITICAL** | M | ⏳ | `frontend/dist/` does not exist — `app.py` falls back to legacy static file |
-| F-2 | Wire React Router for all pages in `App.tsx` | **HIGH** | M | ⏳ | Pages exist in `pages/` but no routing setup |
-| F-3 | Connect chat panel to `/api/chat` backend | **HIGH** | M | ⏳ | Chat UI built but not wired to backend |
-| F-4 | Fix lineage graph depth selector (backend filtering) | **MEDIUM** | M | ⏳ | UI built, backend depth filtering missing |
-| F-5 | Link findings to models in lineage graph | **MEDIUM** | M | ⏳ | Clicking a finding should highlight the model in the graph |
-| F-6 | Add frontend build step to CI | **HIGH** | S | ⏳ | Build should fail CI if frontend TypeScript has errors |
-| F-7 | Remove or properly scope public marketing pages | **LOW** | S | ⏳ | Landing, pricing, community pages exist but are premature — focus on the dashboard |
+| F-1 | Frontend builds and serves correctly | **CRITICAL** | M | ✅ | nginx serving on port 5173 with API proxy |
+| F-2 | React Router for all pages | **HIGH** | M | ✅ | All routes wired including `/findings` |
+| F-3 | Connect chat panel to LLM backend | **HIGH** | M | ⏳ | Chat UI exists, not wired |
+| F-4 | Lineage graph depth selector (backend filtering) | **MEDIUM** | M | ⏳ | UI built, backend depth filtering missing |
+| F-5 | Link findings → models in lineage graph | **MEDIUM** | M | ⏳ | Clicking a finding should highlight the model |
+| F-6 | Frontend build in CI | **HIGH** | S | ⏳ | |
+| F-7 | Settings page — persist LLM keys + project path per workspace | **MEDIUM** | M | ⏳ | SettingsPage.tsx exists, no persistence |
 
 ---
 
 ## 6. DEVOPS & DEPLOYMENT
 
-Docker is set up but CI, environment management, and deployment are missing.
-
 | # | Task | Priority | Effort | Status | Notes |
 |---|------|----------|--------|--------|-------|
-| D-1 | Set up GitHub Actions CI (lint + test + build) | **HIGH** | M | ⏳ | No CI pipeline at all |
-| D-2 | Add `.env.example` with all required environment variables | **MEDIUM** | S | ⏳ | No template — new devs have to read source code to find needed vars |
-| D-3 | Fix Dockerfile: uses Python 3.12 but project says 3.13 | **LOW** | S | ⏳ | DATAPILOT_CONTEXT says Python 3.13 but Dockerfile uses 3.12-slim |
-| D-4 | Add Docker Compose for full local dev (API + frontend + DB) | **MEDIUM** | M | ⏳ | `docker-compose.yml` exists but is minimal |
-| D-5 | Add health check endpoint that verifies LLM connectivity | **MEDIUM** | S | ⏳ | Current `/health` just returns `{status: healthy}` regardless of actual state |
-| D-6 | Add structured logging with request IDs for tracing | **LOW** | M | ⏳ | structlog is used but no request ID correlation |
+| D-1 | GitHub Actions CI (lint + test + build) | **HIGH** | M | ⏳ | |
+| D-2 | `.env.example` with all required vars | **MEDIUM** | S | ✅ | Includes LLM keys, quota, OAuth vars |
+| D-3 | Consistent Node.js version across Dockerfiles | **LOW** | S | ✅ | Both use `node:20-alpine` |
+| D-4 | Docker Compose: full local dev stack | **MEDIUM** | M | ✅ | api + web + postgres + pgadmin + dbt_projects volume |
+| D-5 | Health check verifies LLM + DB connectivity | **MEDIUM** | S | ⏳ | `/api/health` only checks process is alive |
+| D-6 | Structured logging with request IDs | **LOW** | M | ⏳ | |
+| D-7 | Run DB migrations on container startup | **HIGH** | S | ⏳ | Currently manual: `docker compose exec api node --import tsx/esm scripts/migrate.ts` |
 
 ---
 
 ## 7. DOCUMENTATION
 
-Good internal docs exist but user-facing documentation is missing.
-
 | # | Task | Priority | Effort | Status | Notes |
 |---|------|----------|--------|--------|-------|
-| DOC-1 | Write a real README with quickstart for new users | **HIGH** | M | ⏳ | Current README is sparse — no install instructions, no screenshots, no examples |
-| DOC-2 | Document all API endpoints with request/response examples | **MEDIUM** | M | ⏳ | No API docs — users have to read Flask routes |
-| DOC-3 | Add CONTRIBUTING.md for open source contributors | **LOW** | S | ⏳ | No contribution guide |
-| DOC-4 | Create architecture diagram (actual, not aspirational) | **MEDIUM** | M | ⏳ | ARCHITECTURE.md describes target state, not current state |
-| DOC-5 | Write configuration reference (`datapilot.yaml` options) | **MEDIUM** | S | ⏳ | `datapilot.example.yaml` exists but no docs explaining each option |
+| DOC-1 | Real README with quickstart | **HIGH** | M | ⏳ | |
+| DOC-2 | API endpoint docs with request/response examples | **MEDIUM** | M | ⏳ | |
+| DOC-3 | CONTRIBUTING.md | **LOW** | S | ⏳ | |
+| DOC-4 | Architecture diagram (actual current state) | **MEDIUM** | M | ⏳ | |
+| DOC-5 | Configuration reference | **MEDIUM** | S | ⏳ | |
+| DOC-6 | Update CLAUDE.md to reflect TypeScript monorepo structure | **HIGH** | S | ⏳ | Still describes Python layout |
 
 ---
 
-## 8. POST-MVP — After Core Is Solid
-
-Only pursue these after Sections 1–7 are complete. These add real value but aren't ship-blockers.
+## 8. NEXT FEATURES — After Core Is Solid
 
 | # | Task | Priority | Effort | Status | Notes |
 |---|------|----------|--------|--------|-------|
-| P-1 | Best Practices Engine (user-defined rules YAML) | **HIGH** | XL | ⏳ | Biggest differentiator — teams define their own dbt standards and DataPilot enforces them |
-| P-2 | GitLab/GitHub MR Review Bot | **HIGH** | XL | ⏳ | Auto-post findings as PR/MR comments on dbt changes |
-| P-3 | dbt Cloud integration (pull `manifest.json` via API) | **HIGH** | L | ⏳ | First real integration — most dbt teams use dbt Cloud |
-| P-4 | Snowflake query cost connector | **MEDIUM** | L | ⏳ | Replace fake cost data with real warehouse spend per model |
+| P-1 | Best Practices Engine (user-defined YAML rules) | **HIGH** | XL | ⏳ | Biggest differentiator — teams define their own dbt standards |
+| P-2 | GitHub/GitLab MR Review Bot | **HIGH** | XL | ⏳ | Auto-post findings as PR/MR comments on dbt changes |
+| P-3 | dbt Cloud API integration (pull manifest.json remotely) | **HIGH** | L | ⏳ | Removes need for local project path |
+| P-4 | Snowflake query cost connector | **MEDIUM** | L | ⏳ | Replace estimated cost_usd with real warehouse spend |
 | P-5 | YAML documentation quality scorer | **MEDIUM** | L | ⏳ | Score models on description completeness, owners, tags |
-| P-6 | Persistent graph database (KuzuDB or similar) | **MEDIUM** | XL | ⏳ | Cross-session lineage memory, impact analysis queries |
-| P-7 | Refactoring Assistant (AI-suggested model splits) | **LOW** | XL | ⏳ | AI suggests how to break apart large models |
-| P-8 | Multi-tenant SaaS mode with team workspaces | **LOW** | XL | ⏳ | Only after product-market fit — premature complexity otherwise |
+| P-6 | Findings → lineage graph link | **MEDIUM** | M | ⏳ | Click finding → highlight model in graph |
+| P-7 | Cost Impact Report ($) on dead models | **MEDIUM** | M | ⏳ | Show estimated Snowflake savings per dead model |
+| P-8 | Naming consistency detector (embeddings) | **MEDIUM** | L | ⏳ | Find same concept named 3 different ways |
+| P-9 | Refactoring Assistant | **LOW** | XL | ⏳ | AI suggests how to break apart large models |
+| P-10 | Multi-tenant SaaS + RBAC | **LOW** | XL | ⏳ | Only after product-market fit |
 
+---
 
+## Quick Reference — Running the App
+
+```bash
+cd ai-governance
+
+# First time setup
+cp .env.example .env
+# Edit .env — add at least GROQ_API_KEY + SERVER_SECRET + SESSION_SECRET
+
+# Start everything
+docker compose up --build
+
+# Run migrations (first time only)
+docker compose exec api node --import tsx/esm scripts/migrate.ts
+```
+
+| Service | URL |
+|---------|-----|
+| Frontend | http://localhost:5173 |
+| API | http://localhost:3000 |
+| pgAdmin | http://localhost:5050 |
+
+**Sign in:** `/login` → click **DEV — Quick dev login** (no OAuth needed in dev mode)
