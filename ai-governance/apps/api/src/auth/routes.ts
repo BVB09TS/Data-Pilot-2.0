@@ -3,6 +3,7 @@ import passport from 'passport';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 import { pool } from '../db/pool.js';
+import { validate, required, isString, minLen, maxLen } from '../middleware/validate.js';
 
 const BCRYPT_ROUNDS = 12;
 
@@ -88,12 +89,12 @@ router.get(
 router.post('/register', async (req: Request, res: Response): Promise<void> => {
   const { email, password, name } = req.body as { email?: string; password?: string; name?: string };
 
-  if (!email || !password) {
-    res.status(400).json({ error: 'email and password are required' });
-    return;
-  }
-  if (password.length < 8) {
-    res.status(400).json({ error: 'password must be at least 8 characters' });
+  const errors = validate(req.body as Record<string, unknown>, {
+    email: [required, isString, maxLen(320)],
+    password: [required, isString, minLen(8), maxLen(128)],
+  });
+  if (errors.length) {
+    res.status(400).json({ errors });
     return;
   }
 
@@ -131,8 +132,12 @@ router.post('/register', async (req: Request, res: Response): Promise<void> => {
 router.post('/login', async (req: Request, res: Response): Promise<void> => {
   const { email, password } = req.body as { email?: string; password?: string };
 
-  if (!email || !password) {
-    res.status(400).json({ error: 'email and password are required' });
+  const errors = validate(req.body as Record<string, unknown>, {
+    email: [required, isString, maxLen(320)],
+    password: [required, isString, maxLen(128)],
+  });
+  if (errors.length) {
+    res.status(400).json({ errors });
     return;
   }
 
@@ -156,45 +161,39 @@ router.post('/login', async (req: Request, res: Response): Promise<void> => {
   res.json({ ok: true });
 });
 
-// ── Dev login (only in development — creates a seed user + workspace) ─────────
+// ── Dev login (development only — not registered in production) ───────────────
 
-router.post('/dev-login', async (req: Request, res: Response): Promise<void> => {
-  if (process.env.NODE_ENV === 'production') {
-    res.status(404).json({ error: 'Not found' });
-    return;
-  }
+if (process.env.NODE_ENV !== 'production') {
+  router.post('/dev-login', async (req: Request, res: Response): Promise<void> => {
+    const userResult = await pool.query<{ id: string }>(
+      `INSERT INTO users (email, name, provider, provider_id)
+       VALUES ('dev@localhost', 'Dev User', 'dev', 'dev')
+       ON CONFLICT (email) DO UPDATE SET name = EXCLUDED.name
+       RETURNING id`,
+      []
+    );
+    const userId = userResult.rows[0].id;
 
-  // Upsert a dev user (conflict on email — the only unique constraint on users)
-  const userResult = await pool.query<{ id: string }>(
-    `INSERT INTO users (email, name, provider, provider_id)
-     VALUES ('dev@localhost', 'Dev User', 'dev', 'dev')
-     ON CONFLICT (email) DO UPDATE SET name = EXCLUDED.name
-     RETURNING id`,
-    []
-  );
-  const userId = userResult.rows[0].id;
+    const wsResult = await pool.query<{ id: string }>(
+      `INSERT INTO workspaces (name, slug)
+       VALUES ('Dev Workspace', 'dev')
+       ON CONFLICT (slug) DO UPDATE SET name = EXCLUDED.name
+       RETURNING id`,
+      []
+    );
+    const workspaceId = wsResult.rows[0].id;
 
-  // Upsert a dev workspace
-  const wsResult = await pool.query<{ id: string }>(
-    `INSERT INTO workspaces (name, slug)
-     VALUES ('Dev Workspace', 'dev')
-     ON CONFLICT (slug) DO UPDATE SET name = EXCLUDED.name
-     RETURNING id`,
-    []
-  );
-  const workspaceId = wsResult.rows[0].id;
+    await pool.query(
+      `INSERT INTO workspace_members (workspace_id, user_id, role)
+       VALUES ($1, $2, 'owner')
+       ON CONFLICT (workspace_id, user_id) DO NOTHING`,
+      [workspaceId, userId]
+    );
 
-  // Ensure membership
-  await pool.query(
-    `INSERT INTO workspace_members (workspace_id, user_id, role)
-     VALUES ($1, $2, 'owner')
-     ON CONFLICT (workspace_id, user_id) DO NOTHING`,
-    [workspaceId, userId]
-  );
-
-  issueSessionCookie(res, userId);
-  res.json({ ok: true });
-});
+    issueSessionCookie(res, userId);
+    res.json({ ok: true });
+  });
+}
 
 // ── Logout ────────────────────────────────────────────────────────────────────
 

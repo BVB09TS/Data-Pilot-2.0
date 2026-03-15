@@ -91,6 +91,7 @@ ${chains.map(c => `- ${c.model} → ${c.deprecatedDep}`).join('\n')}`;
         metadata: { deprecatedDep: f.deprecated_dep },
         cost_usd: response.cost_usd / Math.max(parsed.findings.length, 1),
         llm_reasoning: response.text,
+        confidence: 0.9, // LLM confirmed a graph fact
       });
     }
   } catch {
@@ -104,6 +105,7 @@ ${chains.map(c => `- ${c.model} → ${c.deprecatedDep}`).join('\n')}`;
         modelName: c.model,
         metadata: { deprecatedDep: c.deprecatedDep, filePath: c.filePath },
         cost_usd: 0,
+        confidence: 1.0, // deterministic — deprecation tag/name is a fact
       });
     }
   }

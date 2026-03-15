@@ -12,6 +12,7 @@ import { pool } from '../db/pool.js';
 import { requireAuth } from '../middleware/requireAuth.js';
 import { runPipeline } from '../datapilot/runPipeline.js';
 import { getQuotaStatus } from '../datapilot/llmGateway.js';
+import { validate, required, isString, maxLen, isUUID, noPathTraversal, optional } from '../middleware/validate.js';
 
 const router = Router({ mergeParams: true });
 router.use(requireAuth);
@@ -39,8 +40,12 @@ router.post('/audit', async (req: Request, res: Response): Promise<void> => {
     query_history?: Record<string, number>;
   };
 
-  if (!project_path) {
-    res.status(400).json({ error: 'project_path is required' });
+  const errors = validate(req.body as Record<string, unknown>, {
+    project_path: [required, isString, maxLen(512), noPathTraversal],
+    environment_id: [optional, isUUID],
+  });
+  if (errors.length) {
+    res.status(400).json({ errors });
     return;
   }
 

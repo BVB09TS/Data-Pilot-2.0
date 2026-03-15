@@ -24,4 +24,10 @@ export interface AgentFinding {
   metadata: Record<string, unknown>;
   cost_usd: number;
   llm_reasoning?: string;
+  /**
+   * Confidence score (0.0 – 1.0).
+   * 1.0 = deterministic finding (graph-based, no LLM).
+   * <1.0 = LLM-assisted; reflects model's self-reported confidence.
+   */
+  confidence?: number;
 }

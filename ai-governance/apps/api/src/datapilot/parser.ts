@@ -103,14 +103,56 @@ export interface ParsedSource {
  * @param environmentId Optional environment to associate nodes with.
  * @returns Summary of what was parsed and stored.
  */
+/**
+ * Resolve and validate a project path against the allowed base directory.
+ * Throws if the resolved path escapes the allowed directory.
+ */
+export function resolveProjectPath(rawPath: string): string {
+  // Allowed base: DBT_PROJECTS_DIR env var, or /dbt_projects, or cwd in dev
+  const allowedBase = path.resolve(
+    process.env.DBT_PROJECTS_DIR ?? (process.env.NODE_ENV === 'production' ? '/dbt_projects' : process.cwd()),
+  );
+  const resolved = path.resolve(rawPath);
+  if (!resolved.startsWith(allowedBase + path.sep) && resolved !== allowedBase) {
+    throw new Error(
+      `Project path "${resolved}" is outside the allowed directory "${allowedBase}". ` +
+      `Set DBT_PROJECTS_DIR env var to allow a different base.`,
+    );
+  }
+  return resolved;
+}
+
 export async function parseDbtProject(
   projectPath: string,
   workspaceId: string,
   environmentId?: string,
 ): Promise<ParsedProject> {
-  const manifestPath = findManifest(projectPath);
-  const raw = await fs.readFile(manifestPath, 'utf-8');
-  const manifest: DbtManifest = JSON.parse(raw);
+  const safePath = resolveProjectPath(projectPath);
+  const manifestPath = await findManifest(safePath);
+
+  let raw: string;
+  try {
+    raw = await fs.readFile(manifestPath, 'utf-8');
+  } catch (err) {
+    throw new Error(`Failed to read manifest at "${manifestPath}": ${String(err)}`);
+  }
+
+  let manifest: DbtManifest;
+  try {
+    manifest = JSON.parse(raw) as DbtManifest;
+  } catch {
+    throw new Error(
+      `manifest.json at "${manifestPath}" is not valid JSON. ` +
+      `Re-run "dbt parse" to regenerate it.`,
+    );
+  }
+
+  if (!manifest?.metadata || !manifest?.nodes) {
+    throw new Error(
+      `manifest.json at "${manifestPath}" is missing required fields (metadata, nodes). ` +
+      `This may be an unsupported dbt version (requires dbt 1.5+ / schema v9+).`,
+    );
+  }
 
   const models = extractModels(manifest);
   const sources = extractSources(manifest);
@@ -121,7 +163,7 @@ export async function parseDbtProject(
 
   // Derive project name from the first model's fqn[0] or directory name
   const firstModel = Object.values(manifest.nodes).find(n => n.resource_type === 'model');
-  const projectName = firstModel?.fqn?.[0] ?? path.basename(projectPath);
+  const projectName = firstModel?.fqn?.[0] ?? path.basename(safePath);
 
   return {
     projectName,
@@ -136,22 +178,22 @@ export async function parseDbtProject(
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
-function findManifest(projectPath: string): string {
+async function findManifest(projectPath: string): Promise<string> {
   const candidates = [
     path.join(projectPath, 'target', 'manifest.json'),
     path.join(projectPath, 'manifest.json'),
   ];
   for (const p of candidates) {
     try {
-      // synchronous existence check is fine here — called once at startup
-      require('fs').accessSync(p);
+      await fs.access(p);
       return p;
     } catch {
-      // not found at this path
+      // not found at this path — try next
     }
   }
   throw new Error(
-    `manifest.json not found in ${projectPath}. Run "dbt parse" or "dbt run" first.`,
+    `manifest.json not found in "${projectPath}". ` +
+    `Run "dbt parse" or "dbt run" inside your dbt project first.`,
   );
 }
 

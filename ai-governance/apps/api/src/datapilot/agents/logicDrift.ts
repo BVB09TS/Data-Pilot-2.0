@@ -22,29 +22,38 @@ export async function analyzeLogicDrift(project: ParsedProject): Promise<AgentFi
   // Take only the first 8 candidates to keep prompt size manageable
   const sample = candidates.slice(0, 8);
 
-  const prompt = `Review these dbt models for logic drift — cases where a downstream model recomputes a column
-that was already defined in an upstream model, but with different logic.
+  const prompt = `You are a senior analytics engineer auditing a dbt project for logic drift.
+
+Logic drift = a downstream model recomputes a business concept (column/metric) differently from how
+an upstream model already defined it. This creates inconsistency and confusion.
+
+Examine these models. Find any CONCRETE cases where a column appears in both an upstream and downstream
+model but with different calculation logic. You must quote the differing SQL fragments.
 
 Return JSON:
 {
   "findings": [
     {
-      "model": "<downstream model>",
+      "model": "<downstream model name>",
       "column": "<column name>",
-      "title": "<short title>",
-      "description": "<description of the divergence>",
-      "recommendation": "<how to fix>",
-      "severity": "medium"
+      "upstream_model": "<upstream model where column was originally defined>",
+      "title": "<concise title, e.g. 'revenue redefined in analytics_orders'>",
+      "description": "<concrete diff: quote the upstream formula vs downstream formula>",
+      "recommendation": "<how to fix — e.g. ref upstream column directly>",
+      "severity": "medium",
+      "confidence": 0.0-1.0
     }
   ]
 }
-If no drift found, return { "findings": [] }.
+If no genuine drift found, return { "findings": [] }.
 
 Models:
 ${sample.map(m => `
 Model: ${m.name}
-Columns: ${m.columns.map(c => c.name).join(', ')}
-SQL (excerpt): ${m.sql.slice(0, 400)}
+Depends on: ${m.dependsOn.join(', ') || 'none'}
+Columns: ${m.columns.map(c => c.name).join(', ') || 'not documented'}
+SQL:
+${m.sql.slice(0, 500)}
 `).join('\n---\n')}`;
 
   try {
@@ -53,12 +62,25 @@ SQL (excerpt): ${m.sql.slice(0, 400)}
         { role: 'system', content: 'You are a senior analytics engineer. Always respond with valid JSON.' },
         { role: 'user', content: prompt },
       ],
-      { tier: 'premium', jsonMode: true, maxTokens: 2000 },
+      { tier: 'premium', jsonMode: true, maxTokens: 2500 },
     );
 
-    const parsed = parseJsonResponse<{ findings: Array<{ model: string; column: string; title: string; description: string; recommendation: string; severity: 'medium' }> }>(response.text);
+    const parsed = parseJsonResponse<{
+      findings: Array<{
+        model: string;
+        column: string;
+        upstream_model?: string;
+        title: string;
+        description: string;
+        recommendation: string;
+        severity: 'medium';
+        confidence: number;
+      }>;
+    }>(response.text);
 
     for (const f of parsed.findings) {
+      const confidence = typeof f.confidence === 'number' ? Math.min(1, Math.max(0, f.confidence)) : 0.75;
+      if (confidence < 0.4) continue;
       findings.push({
         type: 'logic_drift',
         severity: 'medium',
@@ -66,9 +88,10 @@ SQL (excerpt): ${m.sql.slice(0, 400)}
         description: f.description,
         recommendation: f.recommendation,
         modelName: f.model,
-        metadata: { column: f.column },
+        metadata: { column: f.column, upstream_model: f.upstream_model },
         cost_usd: response.cost_usd / Math.max(parsed.findings.length, 1),
         llm_reasoning: response.text,
+        confidence,
       });
     }
   } catch {

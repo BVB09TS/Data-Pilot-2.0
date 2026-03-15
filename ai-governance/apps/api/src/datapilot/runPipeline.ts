@@ -71,8 +71,8 @@ async function persistFindings(
       await client.query(
         `INSERT INTO findings
            (workspace_id, run_id, node_id, type, severity, title, description,
-            recommendation, llm_reasoning, cost_usd, metadata)
-         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)`,
+            recommendation, llm_reasoning, cost_usd, confidence, metadata)
+         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12)`,
         [
           workspaceId,
           runId,
@@ -84,6 +84,7 @@ async function persistFindings(
           f.recommendation ?? null,
           f.llm_reasoning ?? null,
           f.cost_usd,
+          f.confidence ?? 1.0,
           JSON.stringify(f.metadata),
         ],
       );
@@ -117,24 +118,31 @@ export async function runPipeline(opts: PipelineOptions): Promise<PipelineResult
     );
 
     // 2. Run all 8 agents in parallel
-    const agentResults = await Promise.allSettled([
-      analyzeDeadModels(project, opts.queryHistory),
-      analyzeOrphans(project),
-      analyzeBrokenRefs(project),
-      analyzeDuplicateMetrics(project),
-      analyzeGrainJoins(project),
-      analyzeLogicDrift(project),
-      analyzeMissingTests(project),
-      analyzeDeprecatedSources(project),
-    ]);
+    const agents: Array<[string, Promise<AgentFinding[]>]> = [
+      ['dead_models',        analyzeDeadModels(project, opts.queryHistory)],
+      ['orphans',            analyzeOrphans(project)],
+      ['broken_refs',        analyzeBrokenRefs(project)],
+      ['duplicate_metrics',  analyzeDuplicateMetrics(project)],
+      ['grain_joins',        analyzeGrainJoins(project)],
+      ['logic_drift',        analyzeLogicDrift(project)],
+      ['missing_tests',      analyzeMissingTests(project)],
+      ['deprecated_sources', analyzeDeprecatedSources(project)],
+    ];
+
+    const agentResults = await Promise.allSettled(agents.map(([, p]) => p));
 
     // Collect successful findings, log failures
     const allFindings: AgentFinding[] = [];
-    for (const result of agentResults) {
+    const agentErrors: string[] = [];
+    for (let i = 0; i < agentResults.length; i++) {
+      const result = agentResults[i];
+      const [name] = agents[i];
       if (result.status === 'fulfilled') {
         allFindings.push(...result.value);
       } else {
-        console.error('[DataPilot] Agent error:', result.reason);
+        const msg = result.reason instanceof Error ? result.reason.message : String(result.reason);
+        console.error(`[DataPilot] Agent "${name}" failed: ${msg}`);
+        agentErrors.push(`${name}: ${msg}`);
       }
     }
 
@@ -161,6 +169,7 @@ export async function runPipeline(opts: PipelineOptions): Promise<PipelineResult
       projectName: project.projectName,
       nodeCount: project.nodeCount,
       edgeCount: project.edgeCount,
+      ...(agentErrors.length ? { agentErrors } : {}),
     };
 
     await setRunStatus(opts.runId, 'success', summary);

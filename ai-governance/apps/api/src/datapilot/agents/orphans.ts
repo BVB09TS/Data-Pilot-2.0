@@ -69,6 +69,7 @@ ${orphans.map(m => `- ${m.name}: ${m.description || 'no description'}`).join('\n
         metadata: { filePath: orphans.find(m => m.name === f.model)?.filePath },
         cost_usd: response.cost_usd / parsed.findings.length,
         llm_reasoning: response.text,
+        confidence: 1.0, // deterministic — graph-based detection
       });
     }
   } catch {
@@ -82,6 +83,7 @@ ${orphans.map(m => `- ${m.name}: ${m.description || 'no description'}`).join('\n
         modelName: m.name,
         metadata: { filePath: m.filePath },
         cost_usd: 0,
+        confidence: 1.0, // deterministic
       });
     }
   }

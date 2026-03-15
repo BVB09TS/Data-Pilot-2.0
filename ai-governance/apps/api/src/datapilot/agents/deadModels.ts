@@ -75,6 +75,7 @@ ${candidates.map(m => `- ${m.name}: ${m.description || 'no description'} (file: 
         metadata: { filePath: model?.filePath, tags: model?.tags },
         cost_usd: response.cost_usd / parsed.findings.length,
         llm_reasoning: response.text,
+        confidence: 0.95, // LLM confirmed a graph-deterministic fact
       });
     }
   } catch {
@@ -89,6 +90,7 @@ ${candidates.map(m => `- ${m.name}: ${m.description || 'no description'} (file: 
         modelName: m.name,
         metadata: { filePath: m.filePath, tags: m.tags },
         cost_usd: 0,
+        confidence: 1.0, // purely graph-based
       });
     }
   }

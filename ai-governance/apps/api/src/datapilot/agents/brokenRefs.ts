@@ -71,6 +71,7 @@ ${brokenRefs.map(r => `- ${r.model} → ${r.missingDep} (file: ${r.filePath})`).
         metadata: { missingDep: f.missing },
         cost_usd: response.cost_usd / parsed.findings.length,
         llm_reasoning: response.text,
+        confidence: 1.0, // deterministic — missing ref is a fact
       });
     }
   } catch {
@@ -84,6 +85,7 @@ ${brokenRefs.map(r => `- ${r.model} → ${r.missingDep} (file: ${r.filePath})`).
         modelName: r.model,
         metadata: { missingDep: r.missingDep, filePath: r.filePath },
         cost_usd: 0,
+        confidence: 1.0, // deterministic
       });
     }
   }

@@ -74,6 +74,7 @@ ${missingCriticalTests.map(m => `- ${m.name}: critical columns = ${m.columns.fil
         metadata: {},
         cost_usd: response.cost_usd / Math.max(parsed.findings.length, 1),
         llm_reasoning: response.text,
+        confidence: 1.0, // deterministic — either tests exist or they don't
       });
     }
   } catch {
@@ -87,6 +88,7 @@ ${missingCriticalTests.map(m => `- ${m.name}: critical columns = ${m.columns.fil
         modelName: m.name,
         metadata: {},
         cost_usd: 0,
+        confidence: 1.0, // deterministic
       });
     }
   }

@@ -36,29 +36,34 @@ export async function analyzeDuplicateMetrics(project: ParsedProject): Promise<A
 
   if (groups.size === 0) return [];
 
-  const groupSummary = Array.from(groups.entries())
-    .map(([kw, models]) =>
-      `Keyword "${kw}":\n${models.map(m => `  - ${m.name}: ${m.sql.slice(0, 300).replace(/\n/g, ' ')}`).join('\n')}`,
-    )
-    .join('\n\n');
+  // Give LLM the full model data — let it discover patterns, not just confirm our keyword groups
+  const modelData = metricCandidates
+    .map(m => `Model: ${m.name}\nSQL:\n${m.sql.slice(0, 500)}`)
+    .join('\n\n---\n\n');
 
-  const prompt = `Review these dbt models that share metric keywords. Identify any that compute the same metric with different logic (potential duplicate metrics).
-Return JSON:
+  const prompt = `You are a senior analytics engineer auditing a dbt project for duplicate metric definitions.
+
+Examine these models and find any cases where the SAME business metric is computed with DIFFERENT logic across multiple models.
+Look for: different filters, different denominators, different date ranges, different join conditions.
+
+Return JSON — only include genuine duplicates (do NOT include models that simply reference the same upstream):
 {
   "findings": [
     {
       "models": ["<model1>", "<model2>"],
       "metric": "<metric name>",
-      "title": "<short title>",
-      "description": "<explanation of the divergence>",
-      "recommendation": "<how to consolidate>",
-      "severity": "high"
+      "title": "<concise title, e.g. 'Duplicate revenue definition'>",
+      "description": "<concrete explanation of HOW the logic differs>",
+      "recommendation": "<how to consolidate into a single source of truth>",
+      "severity": "high",
+      "confidence": 0.0-1.0
     }
   ]
 }
 If no genuine duplicates exist, return { "findings": [] }.
 
-${groupSummary}`;
+Models to analyze:
+${modelData}`;
 
   try {
     const response = await llmCall(
@@ -72,6 +77,8 @@ ${groupSummary}`;
     const parsed = parseJsonResponse<{ findings: Array<{ models: string[]; metric: string; title: string; description: string; recommendation: string; severity: 'high' }> }>(response.text);
 
     for (const f of parsed.findings) {
+      const confidence = typeof f.confidence === 'number' ? Math.min(1, Math.max(0, f.confidence)) : 0.8;
+      if (confidence < 0.4) continue; // skip very low confidence findings
       findings.push({
         type: 'duplicate_metric',
         severity: 'high',
@@ -82,6 +89,7 @@ ${groupSummary}`;
         metadata: { models: f.models, metric: f.metric },
         cost_usd: response.cost_usd / Math.max(parsed.findings.length, 1),
         llm_reasoning: response.text,
+        confidence,
       });
     }
   } catch {
