@@ -69,12 +69,22 @@ function safeParse(sql: string): any | null {
 
 // ── AST walkers ───────────────────────────────────────────────────────────────
 
+/** Extract a plain string from a column value (handles v5 PG object shape). */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function resolveColumnName(col: any): string {
+  if (typeof col === 'string') return col;
+  // PG dialect: { expr: { type: 'default', value: 'col_name' } }
+  if (col?.expr?.value) return String(col.expr.value);
+  if (col?.value)       return String(col.value);
+  return String(col ?? '');
+}
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function collectColumnRefs(node: any, refs: ColumnRef[] = []): ColumnRef[] {
   if (!node || typeof node !== 'object') return refs;
 
   if (node.type === 'column_ref') {
-    refs.push({ table: node.table ?? null, column: node.column });
+    refs.push({ table: node.table ?? null, column: resolveColumnName(node.column) });
     return refs;
   }
 
@@ -154,7 +164,12 @@ function getCteNames(ast: any): Set<string> {
   const names = new Set<string>();
   if (ast.with) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    for (const cte of ast.with as any[]) names.add((cte.name as string)?.toLowerCase());
+    for (const cte of ast.with as any[]) {
+      // PG dialect: cte.name is { type: 'default', value: 'base' } not a string
+      const raw = cte.name;
+      const name = typeof raw === 'string' ? raw : (raw?.value ?? raw?.name ?? '');
+      if (name) names.add(String(name).toLowerCase());
+    }
   }
   return names;
 }
@@ -169,8 +184,9 @@ export function analyzeSQL(sql: string): SqlAstSummary | null {
   const tableAliases = buildAliasMap(ast);
   const cteNames = getCteNames(ast);
 
-  // Group By
-  const hasGroupBy = Array.isArray(ast.groupby) && ast.groupby.length > 0;
+  // Group By — PG dialect: { columns: [...] }; older dialects: array
+  const gb = ast.groupby;
+  const hasGroupBy = Array.isArray(gb) ? gb.length > 0 : (gb?.columns?.length ?? 0) > 0;
 
   // Joins
   const joins: any[] = (ast.from ?? []).filter((f: any) => f?.join);
@@ -192,7 +208,8 @@ export function analyzeSQL(sql: string): SqlAstSummary | null {
         continue;
       }
       const expr = col?.expr;
-      const rawAlias = col?.as ?? expr?.column;
+      // col.as can be a string or object; expr.column may be a PG-dialect object
+      const rawAlias = col?.as ?? (expr?.type === 'column_ref' ? resolveColumnName(expr.column) : null);
       const alias = (typeof rawAlias === 'string' ? rawAlias : 'expr').toLowerCase();
       const exprType: string = isAggregateFunc(expr) ? 'aggr_func'
         : expr?.type === 'column_ref' ? 'column_ref'
