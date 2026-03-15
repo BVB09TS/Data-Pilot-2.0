@@ -94,6 +94,138 @@ Data-Pilot-2.0/
 
 ---
 
+## TypeScript Governance Platform (ai-governance/)
+
+`ai-governance/` is a **pnpm workspaces** monorepo that ships the production web
+dashboard and REST API for the DataPilot governance platform. It is separate from
+the Python CLI package above and has its own CI, tests, and Docker images.
+
+```
+ai-governance/
+├── package.json              # pnpm workspace root
+├── pnpm-workspace.yaml
+├── .github/workflows/ci.yml  # api-test → web-build → docker-build (main only)
+├── packages/
+│   └── shared/               # @types/shared — shared TypeScript types (TS only)
+└── apps/
+    ├── api/                   # @app/api — Express + PostgreSQL REST API
+    │   ├── src/
+    │   │   ├── index.ts       # App entry: migrations → Express start
+    │   │   ├── auth/          # GitHub/Google/GitLab OAuth + dev-login
+    │   │   ├── db/
+    │   │   │   ├── pool.ts    # pg Pool singleton
+    │   │   │   └── migrate.ts # Sequential SQL migration runner
+    │   │   ├── middleware/
+    │   │   │   ├── requireAuth.ts    # JWT cookie auth guard
+    │   │   │   ├── rateLimit.ts      # Sliding-window in-memory rate limiter
+    │   │   │   ├── csrf.ts           # Origin/Referer CSRF protection
+    │   │   │   ├── validate.ts       # Field validators (required/optional/isUUID/…)
+    │   │   │   ├── requestLogger.ts  # Structured JSON logging + request IDs
+    │   │   │   └── auditMiddleware.ts # Writes to audit_events table
+    │   │   ├── routes/
+    │   │   │   ├── connections.ts    # CRUD + ping
+    │   │   │   ├── nodes.ts          # CRUD
+    │   │   │   ├── edges.ts          # CRUD
+    │   │   │   ├── lineage.ts        # Graph + manifest + ancestor/descendant
+    │   │   │   ├── environments.ts   # CRUD
+    │   │   │   ├── runs.ts           # CRUD + status + logs
+    │   │   │   ├── policies.ts       # CRUD + evaluate + evaluations
+    │   │   │   ├── auditLog.ts       # Read-only audit event log
+    │   │   │   ├── github.ts         # Webhook + PR review routes
+    │   │   │   ├── datapilot.ts      # Audit trigger + findings + quota
+    │   │   │   ├── chat.ts           # LLM chat with findings context
+    │   │   │   └── settings.ts       # Workspace LLM keys + project path
+    │   │   └── datapilot/
+    │   │       ├── parser.ts         # dbt manifest + SQL parser; resolveProjectPath()
+    │   │       ├── runPipeline.ts    # Orchestrates all 8 agents in parallel
+    │   │       ├── llmGateway.ts     # Multi-provider LLM calls (Groq/OpenAI/Anthropic)
+    │   │       └── agents/
+    │   │           ├── types.ts          # AgentFinding (with confidence score)
+    │   │           ├── deadModels.ts     # 0-query models
+    │   │           ├── orphans.ts        # No-downstream models
+    │   │           ├── brokenRefs.ts     # ref() to non-existent models
+    │   │           ├── deprecatedSources.ts
+    │   │           ├── duplicateMetrics.ts  # LLM discovers from raw SQL
+    │   │           ├── grainJoins.ts        # SQL-based grain inference
+    │   │           ├── logicDrift.ts
+    │   │           └── missingTests.ts
+    │   ├── db/migrations/     # Sequential SQL files (001_users … 015_workspace_settings)
+    │   └── vitest.config.ts   # Coverage thresholds: 60% stmts/funcs/lines, 50% branches
+    └── web/                   # @app/web — React + Vite + Tailwind SPA
+        └── src/
+            ├── main.tsx       # React Router — all routes wired here
+            ├── components/
+            │   ├── Layout.tsx     # Sidebar nav + ChatPanel
+            │   └── ChatPanel.tsx  # Floating AI chat panel (indigo button, slide-up)
+            ├── contexts/
+            │   ├── AuthContext.tsx
+            │   └── ThemeContext.tsx
+            ├── lib/api.ts     # Typed axios helpers for every API namespace
+            └── pages/
+                ├── Dashboard.tsx
+                ├── Connections.tsx
+                ├── Nodes.tsx / Edges.tsx
+                ├── Lineage.tsx    # ReactFlow graph; reads ?focus= query param
+                ├── Runs.tsx
+                ├── Policies.tsx
+                ├── AuditLog.tsx
+                ├── PRReviews.tsx
+                ├── Findings.tsx   # Findings table; model links navigate to Lineage
+                └── Settings.tsx   # LLM API keys (masked) + default project path
+```
+
+### TypeScript monorepo — key conventions
+
+- **Runtime:** `tsx` (no compile step in dev), `tsc --noEmit` for type checking
+- **Package manager:** `pnpm` with workspaces; never use `npm` or `yarn` inside `ai-governance/`
+- **Tests:** `vitest` with `vi.mock()` for all external dependencies (DB, LLM, fs)
+- **Imports:** always use `.js` extension for relative imports (ESM requirement)
+- **Env vars:** loaded via `dotenv/config` in `src/index.ts`; never hard-code secrets
+- **Auth:** JWT in `HttpOnly` cookie; CSRF protection via Origin/Referer check
+- **Migrations:** add new SQL files to `apps/api/db/migrations/` named `NNN_description.sql`;
+  they run automatically on startup in lexicographic order
+- **Validation:** use `validate()` from `middleware/validate.ts`; mark optional fields with
+  the `optional` sentinel as the **first** validator in the array
+- **LLM calls:** go through `llmGateway.ts`; never call provider SDKs directly from routes
+- **Path safety:** all `project_path` inputs must pass through `resolveProjectPath()` in
+  `datapilot/parser.ts` before any filesystem access
+
+### TypeScript monorepo — development setup
+
+```bash
+cd ai-governance
+pnpm install
+pnpm --filter @types/shared build   # build shared types first
+
+# Run API in dev mode
+pnpm --filter @app/api dev          # tsx watch src/index.ts on :3000
+
+# Run web in dev mode
+pnpm --filter @app/web dev          # Vite on :5173
+
+# Run all tests
+pnpm --filter @app/api test
+
+# Type-check everything
+pnpm --filter @app/api typecheck
+pnpm --filter @app/web typecheck
+```
+
+Required environment variables for `apps/api/.env`:
+
+```
+DATABASE_URL=postgresql://user:pass@localhost:5432/datapilot
+JWT_SECRET=<random 64-char hex>
+GROQ_API_KEY=gsk_...
+OPENAI_API_KEY=sk-...        # optional
+ANTHROPIC_API_KEY=sk-ant-... # optional
+FRONTEND_URL=http://localhost:5173
+DBT_PROJECTS_DIR=/dbt_projects  # restricts audit project paths in production
+NODE_ENV=development
+```
+
+---
+
 ## Technology Stack
 
 | Layer | Technology |
