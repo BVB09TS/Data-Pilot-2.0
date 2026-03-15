@@ -41,6 +41,12 @@ const ThemeCtx = createContext<{ theme: Theme; T: TV; isDark: boolean }>({
 });
 const useTheme = () => useContext(ThemeCtx);
 
+// ── Graph context (API-backed, falls back to static NODES/EDGES_RAW) ───────────
+
+interface GraphCtxValue { nodes: ModelNode[]; edgePairs: [string, string][]; loading: boolean; }
+const GraphCtx = createContext<GraphCtxValue>({ nodes: [], edgePairs: [], loading: true });
+const useGraph = () => useContext(GraphCtx);
+
 // ── Types ──────────────────────────────────────────────────────────────────────
 
 type Layer = 'raw' | 'source' | 'core' | 'analytics';
@@ -227,7 +233,8 @@ const BADGE_TITLE: Record<TestBadge, string> = { P: 'Primary Key', F: 'Foreign K
 
 // ── Model metadata ─────────────────────────────────────────────────────────────
 
-const NODE_MAP = new Map(NODES.map(n => [n.id, n]));
+// Static NODE_MAP for META lookups (meta is demo-only anyway)
+const STATIC_NODE_MAP = new Map(NODES.map(n => [n.id, n]));
 
 const META: Record<string, ModelMeta> = {
   core_orders: {
@@ -294,14 +301,14 @@ const META: Record<string, ModelMeta> = {
   },
 };
 
-function getMeta(id: string): ModelMeta {
+function getMeta(id: string, nodes: ModelNode[], edgePairs: [string, string][]): ModelMeta {
   if (META[id]) return META[id];
-  const n = NODES.find(x => x.id === id);
+  const n = nodes.find(x => x.id === id) ?? STATIC_NODE_MAP.get(id);
   const layer = n?.layer ?? 'raw';
   const label = id.replace(/^(raw_|src_|core_|analytics_)/, '').replace(/_/g, ' ');
-  const upstream = EDGES_RAW.find(([, t]) => t === id)?.[0] ?? 'upstream_model';
+  const upstream = edgePairs.find(([, t]) => t === id)?.[0] ?? 'upstream_model';
   return {
-    description: `${LAYER_LABEL[layer as Layer]}-layer model for ${label}. Part of the ShopMesh dbt project.`,
+    description: `${LAYER_LABEL[layer as Layer]}-layer model for ${label}.`,
     columns: [
       { name: `${id.replace(/^(raw_|src_|core_|analytics_)/, '')}_id`, type: 'varchar',   tests: ['P','N','U'], description: 'Primary key' },
       { name: 'created_at', type: 'timestamp', tests: ['N'], description: 'Record creation timestamp' },
@@ -311,15 +318,25 @@ function getMeta(id: string): ModelMeta {
   };
 }
 
+// ── Layer inference from model name ────────────────────────────────────────────
+
+function inferLayer(name: string): Layer {
+  if (name.startsWith('raw_'))       return 'raw';
+  if (name.startsWith('src_'))       return 'source';
+  if (name.startsWith('core_'))      return 'core';
+  if (name.startsWith('analytics_')) return 'analytics';
+  return 'raw';
+}
+
 // ── Graph helpers ──────────────────────────────────────────────────────────────
 
 
 
-function getFullLineage(id: string) {
+function getFullLineage(id: string, edgePairs: [string, string][]) {
   const anc: string[] = [], desc: string[] = [], vis = new Set([id]);
-  const up = (n: string) => EDGES_RAW.forEach(([s, t]) => { if (t === n && !vis.has(s)) { vis.add(s); anc.push(s); up(s); } });
+  const up = (n: string) => edgePairs.forEach(([s, t]) => { if (t === n && !vis.has(s)) { vis.add(s); anc.push(s); up(s); } });
   up(id); vis.clear(); vis.add(id);
-  const dn = (n: string) => EDGES_RAW.forEach(([s, t]) => { if (s === n && !vis.has(t)) { vis.add(t); desc.push(t); dn(t); } });
+  const dn = (n: string) => edgePairs.forEach(([s, t]) => { if (s === n && !vis.has(t)) { vis.add(t); desc.push(t); dn(t); } });
   dn(id);
   return { ancestors: anc, descendants: desc };
 }
@@ -375,17 +392,17 @@ function parseSelector(raw: string): Selector | null {
   return { nodeId, upDepth, downDepth };
 }
 
-function getSelectorGraph(sel: Selector) {
+function getSelectorGraph(sel: Selector, nodes: ModelNode[], edgePairs: [string, string][]) {
   const inc = new Set<string>([sel.nodeId]);
   let f = [sel.nodeId];
   for (let d = 0; d < sel.upDepth && f.length; d++) {
-    const nx: string[] = []; EDGES_RAW.forEach(([s, t]) => { if (f.includes(t) && !inc.has(s)) { inc.add(s); nx.push(s); } }); f = nx;
+    const nx: string[] = []; edgePairs.forEach(([s, t]) => { if (f.includes(t) && !inc.has(s)) { inc.add(s); nx.push(s); } }); f = nx;
   }
   f = [sel.nodeId];
   for (let d = 0; d < sel.downDepth && f.length; d++) {
-    const nx: string[] = []; EDGES_RAW.forEach(([s, t]) => { if (f.includes(s) && !inc.has(t)) { inc.add(t); nx.push(t); } }); f = nx;
+    const nx: string[] = []; edgePairs.forEach(([s, t]) => { if (f.includes(s) && !inc.has(t)) { inc.add(t); nx.push(t); } }); f = nx;
   }
-  return { nodes: NODES.filter(n => inc.has(n.id)), edges: EDGES_RAW.filter(([s, t]) => inc.has(s) && inc.has(t)) };
+  return { nodes: nodes.filter(n => inc.has(n.id)), edges: edgePairs.filter(([s, t]) => inc.has(s) && inc.has(t)) };
 }
 
 function describeSel(sel: Selector): string {
@@ -404,29 +421,30 @@ function LineageModal({ initialId, onClose, onNavigate }: {
   initialId: string; onClose: () => void; onNavigate: (id: string) => void;
 }) {
   const { T, theme } = useTheme();
+  const { nodes: graphNodes, edgePairs } = useGraph();
   const [query, setQuery]     = useState(initialId);
   const [applied, setApplied] = useState<Selector>({ nodeId: initialId, upDepth: 1, downDepth: 1 });
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [focusSug, setFocusSug] = useState(-1);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const { nodes: mn, edges: me } = getSelectorGraph(applied);
+  const { nodes: mn, edges: me } = getSelectorGraph(applied, graphNodes, edgePairs);
   const { nodes: fn, edges: fe } = buildFlow(mn, me, applied.nodeId, theme);
   const [nodes, setNodes, onNC] = useNodesState<Node>(fn);
   const [edges, setEdges, onEC] = useEdgesState<Edge>(fe);
 
   useEffect(() => {
-    const { nodes: mn2, edges: me2 } = getSelectorGraph(applied);
+    const { nodes: mn2, edges: me2 } = getSelectorGraph(applied, graphNodes, edgePairs);
     const { nodes: fn2, edges: fe2 } = buildFlow(mn2, me2, applied.nodeId, theme);
     setNodes(fn2); setEdges(fe2);
-  }, [applied, theme]);
+  }, [applied, theme, graphNodes, edgePairs]);
 
   // Autocomplete: extract the model-name part of the query
   function updateSuggestions(raw: string) {
     setQuery(raw);
     const m = raw.trim().replace(/^\+\d*/, '').replace(/\+\d*$/, '').trim();
     if (!m || m.length < 2) { setSuggestions([]); return; }
-    setSuggestions(NODES.filter(n => n.name.includes(m) && n.name !== m).map(n => n.name).slice(0, 6));
+    setSuggestions(graphNodes.filter(n => n.name.includes(m) && n.name !== m).map(n => n.name).slice(0, 6));
     setFocusSug(-1);
   }
 
@@ -440,7 +458,7 @@ function LineageModal({ initialId, onClose, onNavigate }: {
   function applyQuery(raw = query) {
     const sel = parseSelector(raw);
     if (!sel) return;
-    const found = NODES.find(n => n.name === sel.nodeId || n.id === sel.nodeId);
+    const found = graphNodes.find(n => n.name === sel.nodeId || n.id === sel.nodeId);
     if (!found) return;
     setApplied({ ...sel, nodeId: found.id });
     setSuggestions([]);
@@ -456,7 +474,7 @@ function LineageModal({ initialId, onClose, onNavigate }: {
     if (e.key === 'Enter') applyQuery();
   }
 
-  const selNode = NODE_MAP.get(applied.nodeId);
+  const selNode = graphNodes.find(n => n.id === applied.nodeId);
   const parsed  = parseSelector(query);
 
   return (
@@ -502,7 +520,7 @@ function LineageModal({ initialId, onClose, onNavigate }: {
             <div className="absolute bottom-full left-4 right-4 mb-1 rounded-lg shadow-2xl overflow-hidden border z-10"
               style={{ background: T.panel, borderColor: T.border }}>
               {suggestions.map((s, i) => {
-                const n = NODE_MAP.get(s);
+                const n = graphNodes.find(x => x.name === s || x.id === s);
                 return (
                   <button key={s} onClick={() => applySuggestion(s)}
                     className="w-full flex items-center gap-2 px-3 py-2 text-left text-xs transition-colors"
@@ -539,7 +557,7 @@ function LineageModal({ initialId, onClose, onNavigate }: {
 
             {/* Current interpretation */}
             <div className="hidden md:flex items-center gap-2 min-w-[220px]">
-              {parsed && NODE_MAP.has(parsed.nodeId) ? (
+              {parsed && graphNodes.some(n => n.id === parsed.nodeId || n.name === parsed.nodeId) ? (
                 <span className="text-xs font-mono px-2 py-1 rounded" style={{ background: T.panel, color: T.muted, border: `1px solid ${T.border}` }}>
                   {describeSel(parsed)}
                 </span>
@@ -626,6 +644,7 @@ function ModelDocs({ id, onNavigate, onFocusAI }: {
 }) {
   const { T, theme } = useTheme();
   const { workspaceId } = useAuth();
+  const { nodes: graphNodes, edgePairs } = useGraph();
   const [tab, setTab] = useState<DocTab>('description');
   const [colLineage, setColLineage] = useState<ColLineageEntry[]>([]);
   const [lineageLoading, setLineageLoading] = useState(false);
@@ -640,11 +659,11 @@ function ModelDocs({ id, onNavigate, onFocusAI }: {
   }, [tab, id, workspaceId]);
   const [lineageOpen, setLineageOpen] = useState(false);
 
-  const node = NODE_MAP.get(id);
-  const meta = getMeta(id);
-  const parents  = EDGES_RAW.filter(([, t]) => t === id).map(([s]) => s);
-  const children = EDGES_RAW.filter(([s]) => s === id).map(([, t]) => t);
-  const { ancestors, descendants } = getFullLineage(id);
+  const node = graphNodes.find(n => n.id === id) ?? STATIC_NODE_MAP.get(id);
+  const meta = getMeta(id, graphNodes, edgePairs);
+  const parents  = edgePairs.filter(([, t]) => t === id).map(([s]) => s);
+  const children = edgePairs.filter(([s]) => s === id).map(([, t]) => t);
+  const { ancestors, descendants } = getFullLineage(id, edgePairs);
 
   if (!node) return null;
 
@@ -876,10 +895,11 @@ function ModelDocs({ id, onNavigate, onFocusAI }: {
 
 function ModelTree({ selected, onSelect, width }: { selected: string | null; onSelect: (id: string) => void; width: number }) {
   const { T } = useTheme();
+  const { nodes: graphNodes, loading: graphLoading } = useGraph();
   const [search, setSearch]   = useState('');
   const [collapsed, setCollapsed] = useState<Set<Layer>>(new Set());
   const toggle = (l: Layer) => setCollapsed(p => { const s = new Set(p); s.has(l) ? s.delete(l) : s.add(l); return s; });
-  const filtered = NODES.filter(n => n.name.toLowerCase().includes(search.toLowerCase()));
+  const filtered = graphNodes.filter(n => n.name.toLowerCase().includes(search.toLowerCase()));
 
   return (
     <div className="flex flex-col h-full border-r flex-shrink-0" style={{ width, background: T.panel, borderColor: T.border }}>
@@ -922,8 +942,11 @@ function ModelTree({ selected, onSelect, width }: { selected: string | null; onS
           );
         })}
       </div>
-      <div className="px-3 py-2 border-t" style={{ borderColor: T.border }}>
-        <p className="text-xs" style={{ color: T.faint }}>{NODES.length} models</p>
+      <div className="px-3 py-2 border-t flex items-center gap-2" style={{ borderColor: T.border }}>
+        {graphLoading
+          ? <div className="w-3 h-3 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin" />
+          : <p className="text-xs" style={{ color: T.faint }}>{graphNodes.length} models</p>
+        }
       </div>
     </div>
   );
@@ -931,11 +954,11 @@ function ModelTree({ selected, onSelect, width }: { selected: string | null; onS
 
 // ── AI Chat ────────────────────────────────────────────────────────────────────
 
-function buildContext(id: string) {
-  const n = NODE_MAP.get(id); if (!n) return '';
-  const { ancestors, descendants } = getFullLineage(id);
-  const parents  = EDGES_RAW.filter(([,t]) => t === id).map(([s]) => s);
-  const children = EDGES_RAW.filter(([s]) => s === id).map(([,t]) => t);
+function buildContext(id: string, graphNodes: ModelNode[], edgePairs: [string, string][]) {
+  const n = graphNodes.find(x => x.id === id) ?? STATIC_NODE_MAP.get(id); if (!n) return '';
+  const { ancestors, descendants } = getFullLineage(id, edgePairs);
+  const parents  = edgePairs.filter(([,t]) => t === id).map(([s]) => s);
+  const children = edgePairs.filter(([s]) => s === id).map(([,t]) => t);
   return [
     `**Model: \`${id}\`** (${LAYER_LABEL[n.layer]} layer)`,
     '',
@@ -953,6 +976,8 @@ function AiChat({ selectedModelId, open, onToggle }: {
   selectedModelId: string | null; open: boolean; onToggle: () => void;
 }) {
   const { T } = useTheme();
+  const { workspaceId } = useAuth();
+  const { nodes: graphNodes, edgePairs } = useGraph();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput]       = useState('');
   const [loading, setLoading]   = useState(false);
@@ -960,8 +985,8 @@ function AiChat({ selectedModelId, open, onToggle }: {
 
   useEffect(() => {
     if (!selectedModelId) return;
-    setMessages([{ role: 'assistant', content: buildContext(selectedModelId), ts: Date.now() }]);
-  }, [selectedModelId]);
+    setMessages([{ role: 'assistant', content: buildContext(selectedModelId, graphNodes, edgePairs), ts: Date.now() }]);
+  }, [selectedModelId, graphNodes, edgePairs]);
 
   useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [messages]);
 
@@ -1059,6 +1084,7 @@ function AiChat({ selectedModelId, open, onToggle }: {
 export default function Lineage() {
   const [searchParams] = useSearchParams();
   const focusParam = searchParams.get('focus');
+  const { workspaceId } = useAuth();
 
   const [theme, setTheme]       = useState<Theme>('dark');
   const [selectedId, setSelected] = useState<string | null>(focusParam ?? null);
@@ -1066,6 +1092,36 @@ export default function Lineage() {
   const [treeWidth, setTreeWidth] = useState(240);
   const dragging = useRef(false);
   const dragStart = useRef({ x: 0, w: 0 });
+
+  // ── API-backed graph state ────────────────────────────────────────────────
+  const [graphNodes, setGraphNodes] = useState<ModelNode[]>(NODES);
+  const [edgePairs, setEdgePairs]   = useState<[string, string][]>(EDGES_RAW);
+  const [graphLoading, setGraphLoading] = useState(false);
+
+  useEffect(() => {
+    if (!workspaceId) return;
+    setGraphLoading(true);
+    lineageApi.graph(workspaceId)
+      .then(r => {
+        const data = r.data?.data;
+        if (!data) return;
+        const apiNodes: ModelNode[] = (data.nodes ?? []).map((n: { id: string; name: string }) => ({
+          id: n.id,
+          name: n.name,
+          layer: inferLayer(n.name),
+        }));
+        const apiEdges: [string, string][] = (data.edges ?? []).map(
+          (e: { source_node_id: string; target_node_id: string }) => [e.source_node_id, e.target_node_id] as [string, string]
+        );
+        if (apiNodes.length > 0) {
+          setGraphNodes(apiNodes);
+          setEdgePairs(apiEdges);
+        }
+        // If API returns empty (no nodes yet), keep static ShopMesh demo data
+      })
+      .catch(() => { /* keep static fallback */ })
+      .finally(() => setGraphLoading(false));
+  }, [workspaceId]);
 
   const T = THEME[theme];
 
@@ -1093,6 +1149,7 @@ export default function Lineage() {
 
   return (
     <ThemeCtx.Provider value={{ theme, T, isDark: theme === 'dark' }}>
+    <GraphCtx.Provider value={{ nodes: graphNodes, edgePairs, loading: graphLoading }}>
       <div className="flex h-full overflow-hidden relative" style={{ background: T.bg }}>
 
         {/* ── Theme toggle (top-right of the whole page) ── */}
@@ -1131,6 +1188,7 @@ export default function Lineage() {
         {/* ── Right: AI Chat (collapsible) ── */}
         <AiChat selectedModelId={selectedId} open={aiOpen} onToggle={() => setAiOpen(v => !v)} />
       </div>
+    </GraphCtx.Provider>
     </ThemeCtx.Provider>
   );
 }
