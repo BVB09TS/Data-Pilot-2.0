@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import { connectionsApi, nodesApi, runsApi } from '../lib/api';
+import { connectionsApi, nodesApi, runsApi, datapilotApi } from '../lib/api';
 
 interface Stats {
   connections: number;
   nodes: number;
+  findings: number;
+  criticalFindings: number;
   recentRuns: { id: string; status: string; created_at: string; node_name?: string }[];
 }
 
@@ -18,7 +20,7 @@ const STATUS_COLOR: Record<string, string> = {
 
 export default function Dashboard() {
   const { workspaceId } = useAuth();
-  const [stats, setStats] = useState<Stats>({ connections: 0, nodes: 0, recentRuns: [] });
+  const [stats, setStats] = useState<Stats>({ connections: 0, nodes: 0, findings: 0, criticalFindings: 0, recentRuns: [] });
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -27,11 +29,15 @@ export default function Dashboard() {
       connectionsApi.list(workspaceId),
       nodesApi.list(workspaceId),
       runsApi.list(workspaceId, { limit: 5 }),
-    ]).then(([c, n, r]) => {
+      datapilotApi.listFindings(workspaceId, { limit: 1 }),
+      datapilotApi.listFindings(workspaceId, { limit: 1, severity: 'critical' }),
+    ]).then(([c, n, r, f, fc]) => {
       setStats({
-        connections: c.data.data.length,
-        nodes: n.data.data.length,
-        recentRuns: r.data.data,
+        connections: c.data.data?.length ?? 0,
+        nodes: n.data.data?.length ?? 0,
+        recentRuns: r.data.data ?? [],
+        findings: f.data.total ?? 0,
+        criticalFindings: fc.data.total ?? 0,
       });
     }).finally(() => setLoading(false));
   }, [workspaceId]);
@@ -46,11 +52,12 @@ export default function Dashboard() {
       </div>
 
       {/* Stat cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         {[
-          { label: 'Connections', value: stats.connections, color: 'text-indigo-400' },
-          { label: 'Nodes',       value: stats.nodes,       color: 'text-purple-400' },
-          { label: 'Recent Runs', value: stats.recentRuns.length, color: 'text-blue-400' },
+          { label: 'Connections',       value: stats.connections,    color: 'text-indigo-400' },
+          { label: 'Nodes',             value: stats.nodes,          color: 'text-purple-400' },
+          { label: 'Total Findings',    value: stats.findings,       color: 'text-blue-400' },
+          { label: 'Critical Findings', value: stats.criticalFindings, color: 'text-red-400' },
         ].map(s => (
           <div key={s.label} className="card">
             <p className="text-sm text-gray-400">{s.label}</p>

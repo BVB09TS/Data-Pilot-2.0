@@ -1,6 +1,6 @@
 import { useState, useCallback, useEffect, useRef, createContext, useContext } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { lineageApi } from '../lib/api';
+import { lineageApi, chatApi } from '../lib/api';
 import { useAuth } from '../contexts/AuthContext';
 import {
   ReactFlow, Background, Controls,
@@ -966,19 +966,23 @@ function AiChat({ selectedModelId, open, onToggle }: {
   useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [messages]);
 
   async function send() {
-    if (!input.trim() || loading) return;
+    if (!input.trim() || loading || !workspaceId) return;
     const msg: ChatMessage = { role: 'user', content: input.trim(), ts: Date.now() };
     setMessages(p => [...p, msg]); setInput(''); setLoading(true);
     try {
-      const res = await fetch('/api/ai/chat', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ model_context: selectedModelId ? buildContext(selectedModelId) : null, messages: [...messages, msg].map(m => ({ role: m.role, content: m.content })) }),
+      const history = messages.slice(-6).map(m => ({ role: m.role, content: m.content }));
+      const { data } = await chatApi.send(workspaceId, {
+        message: msg.content,
+        history,
+        context_model_name: selectedModelId ?? undefined,
       });
-      if (!res.ok) throw new Error();
-      const data = await res.json();
       setMessages(p => [...p, { role: 'assistant', content: data.reply, ts: Date.now() }]);
-    } catch {
-      setMessages(p => [...p, { role: 'assistant', content: '⚙️ AI provider not configured yet. Connect your AI in Settings to enable chat.', ts: Date.now() }]);
+    } catch (err: unknown) {
+      const raw = (err as { response?: { data?: { error?: string } } })?.response?.data?.error ?? '';
+      const reply = raw.toLowerCase().includes('no llm provider') || raw.toLowerCase().includes('not configured')
+        ? '⚙️ AI provider not configured yet. Connect your API key in Settings to enable chat.'
+        : raw || 'Failed to get a response.';
+      setMessages(p => [...p, { role: 'assistant', content: reply, ts: Date.now() }]);
     } finally { setLoading(false); }
   }
 
