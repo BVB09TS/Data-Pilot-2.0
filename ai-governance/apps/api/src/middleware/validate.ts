@@ -64,7 +64,11 @@ export function validate(
   const errors: string[] = [];
   for (const [field, validators] of Object.entries(schema)) {
     const value = body[field];
+    const isOptional = validators[0] === optional;
+    // If field is optional and not provided, skip all validators for this field
+    if (isOptional && (value === undefined || value === null || value === '')) continue;
     for (const validator of validators) {
+      if (validator === optional) continue; // skip the marker itself
       const error = validator(value, field);
       if (error) {
         errors.push(error);
