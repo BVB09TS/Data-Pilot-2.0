@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { datapilotApi } from '../lib/api';
 
@@ -40,6 +41,7 @@ const TYPES = Object.keys(TYPE_LABEL);
 
 export default function Findings() {
   const { workspaceId } = useAuth();
+  const navigate = useNavigate();
 
   const [findings, setFindings] = useState<Finding[]>([]);
   const [total, setTotal] = useState(0);
@@ -188,7 +190,17 @@ export default function Findings() {
                 </td>
                 <td className="px-4 py-3 text-gray-300">{TYPE_LABEL[f.type] ?? f.type}</td>
                 <td className="px-4 py-3 text-white font-medium max-w-xs truncate">{f.title}</td>
-                <td className="px-4 py-3 text-gray-400">{f.model_name ?? '—'}</td>
+                <td className="px-4 py-3">
+                  {f.model_name ? (
+                    <button
+                      onClick={e => { e.stopPropagation(); navigate(`/lineage?focus=${encodeURIComponent(f.model_name!)}`); }}
+                      className="font-mono text-indigo-400 hover:text-indigo-300 hover:underline transition-colors"
+                      title="View in lineage graph"
+                    >
+                      {f.model_name}
+                    </button>
+                  ) : <span className="text-gray-500">—</span>}
+                </td>
                 <td className="px-4 py-3 text-gray-500 whitespace-nowrap">
                   {new Date(f.created_at).toLocaleDateString()}
                 </td>
@@ -238,7 +250,18 @@ export default function Findings() {
 
             <div className="space-y-1 text-sm">
               <p className="text-gray-400">Type: <span className="text-white">{TYPE_LABEL[selected.type] ?? selected.type}</span></p>
-              {selected.model_name && <p className="text-gray-400">Model: <span className="text-white font-mono">{selected.model_name}</span></p>}
+              {selected.model_name && (
+                <p className="text-gray-400">Model:{' '}
+                  <button
+                    onClick={() => navigate(`/lineage?focus=${encodeURIComponent(selected.model_name!)}`)}
+                    className="text-indigo-400 hover:text-indigo-300 font-mono hover:underline transition-colors"
+                    title="View in lineage graph"
+                  >
+                    {selected.model_name}
+                  </button>
+                  <span className="ml-2 text-gray-600 text-xs">↗ view in lineage</span>
+                </p>
+              )}
             </div>
 
             <div>

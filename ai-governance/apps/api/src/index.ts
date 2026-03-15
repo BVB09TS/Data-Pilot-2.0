@@ -26,6 +26,7 @@ import { webhookRouter, githubRouter } from './routes/github.js';
 import { auditMiddleware } from './middleware/auditMiddleware.js';
 import datapilotRouter from './routes/datapilot.js';
 import chatRouter from './routes/chat.js';
+import settingsRouter from './routes/settings.js';
 
 const app = express();
 const PORT = process.env.PORT ?? 3000;
@@ -132,6 +133,7 @@ app.use('/api/workspaces/:workspaceId/audit',        auditLogRouter);
 app.use('/api/workspaces/:workspaceId/github',       githubRouter);
 app.use('/api/workspaces/:workspaceId/datapilot',   datapilotRouter);
 app.use('/api/workspaces/:workspaceId/chat',        chatRouter);
+app.use('/api/workspaces/:workspaceId/settings',    settingsRouter);
 
 // ── Start ─────────────────────────────────────────────────────────────────────
 

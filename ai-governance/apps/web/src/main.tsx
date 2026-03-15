@@ -32,6 +32,7 @@ import Policies    from './pages/Policies';
 import AuditLog    from './pages/AuditLog';
 import PRReviews   from './pages/PRReviews';
 import Findings    from './pages/Findings';
+import Settings    from './pages/Settings';
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
@@ -65,6 +66,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
             <Route path="/audit"       element={<AuditLog />} />
             <Route path="/pr-reviews"  element={<PRReviews />} />
             <Route path="/findings"    element={<Findings />} />
+            <Route path="/settings"    element={<Settings />} />
           </Route>
 
           {/* ── Fallback ── */}

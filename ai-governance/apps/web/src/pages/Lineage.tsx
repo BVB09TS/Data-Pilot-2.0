@@ -1,4 +1,5 @@
 import { useState, useCallback, useEffect, useRef, createContext, useContext } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import {
   ReactFlow, Background, Controls,
   useNodesState, useEdgesState,
@@ -548,8 +549,44 @@ function LineageModal({ initialId, onClose, onNavigate }: {
             </div>
           </div>
 
+          {/* Depth controls */}
+          <div className="flex items-center gap-4 mt-2 flex-wrap">
+            <span className="text-xs" style={{ color: T.faint }}>Depth:</span>
+            {/* Upstream depth */}
+            <div className="flex items-center gap-1">
+              <span className="text-xs" style={{ color: T.muted }}>↑ Up</span>
+              <button
+                onClick={() => setApplied(a => ({ ...a, upDepth: Math.max(0, a.upDepth === 99 ? 5 : a.upDepth - 1) }))}
+                className="w-6 h-6 rounded text-xs flex items-center justify-center transition-colors hover:opacity-80"
+                style={{ background: T.secondary, color: T.text }}>−</button>
+              <span className="text-xs font-mono w-6 text-center" style={{ color: T.text }}>
+                {applied.upDepth === 99 ? '∞' : applied.upDepth}
+              </span>
+              <button
+                onClick={() => setApplied(a => ({ ...a, upDepth: a.upDepth >= 5 ? 99 : a.upDepth + 1 }))}
+                className="w-6 h-6 rounded text-xs flex items-center justify-center transition-colors hover:opacity-80"
+                style={{ background: T.secondary, color: T.text }}>+</button>
+            </div>
+            {/* Downstream depth */}
+            <div className="flex items-center gap-1">
+              <span className="text-xs" style={{ color: T.muted }}>↓ Down</span>
+              <button
+                onClick={() => setApplied(a => ({ ...a, downDepth: Math.max(0, a.downDepth === 99 ? 5 : a.downDepth - 1) }))}
+                className="w-6 h-6 rounded text-xs flex items-center justify-center transition-colors hover:opacity-80"
+                style={{ background: T.secondary, color: T.text }}>−</button>
+              <span className="text-xs font-mono w-6 text-center" style={{ color: T.text }}>
+                {applied.downDepth === 99 ? '∞' : applied.downDepth}
+              </span>
+              <button
+                onClick={() => setApplied(a => ({ ...a, downDepth: a.downDepth >= 5 ? 99 : a.downDepth + 1 }))}
+                className="w-6 h-6 rounded text-xs flex items-center justify-center transition-colors hover:opacity-80"
+                style={{ background: T.secondary, color: T.text }}>+</button>
+            </div>
+            <span className="text-xs" style={{ color: T.faint }}>or use syntax below</span>
+          </div>
+
           {/* Quick examples */}
-          <div className="flex items-center gap-2 mt-2 flex-wrap">
+          <div className="flex items-center gap-2 mt-1 flex-wrap">
             <span className="text-xs" style={{ color: T.faint }}>Examples:</span>
             {[
               [initialId,           `${initialId} only`],
@@ -939,14 +976,22 @@ function AiChat({ selectedModelId, open, onToggle }: {
 // ── Main ───────────────────────────────────────────────────────────────────────
 
 export default function Lineage() {
+  const [searchParams] = useSearchParams();
+  const focusParam = searchParams.get('focus');
+
   const [theme, setTheme]       = useState<Theme>('dark');
-  const [selectedId, setSelected] = useState<string | null>(null);
+  const [selectedId, setSelected] = useState<string | null>(focusParam ?? null);
   const [aiOpen, setAiOpen]     = useState(true);
   const [treeWidth, setTreeWidth] = useState(240);
   const dragging = useRef(false);
   const dragStart = useRef({ x: 0, w: 0 });
 
   const T = THEME[theme];
+
+  // Sync ?focus= param whenever it changes (e.g. navigated from Findings)
+  useEffect(() => {
+    if (focusParam) setSelected(focusParam);
+  }, [focusParam]);
 
   // Drag-resize the tree panel
   useEffect(() => {

@@ -95,3 +95,31 @@ export const datapilotApi = {
   getQuota: (wid: string) =>
     api.get(`/workspaces/${wid}/datapilot/quota`),
 };
+
+export const settingsApi = {
+  get:    (wid: string) => api.get<{
+    groq_api_key: string | null;
+    openai_api_key: string | null;
+    anthropic_api_key: string | null;
+    default_project_path: string | null;
+    updated_at: string | null;
+  }>(`/workspaces/${wid}/settings`),
+  update: (wid: string, body: {
+    groq_api_key?: string;
+    openai_api_key?: string;
+    anthropic_api_key?: string;
+    default_project_path?: string;
+  }) => api.patch(`/workspaces/${wid}/settings`, body),
+};
+
+export const chatApi = {
+  send: (
+    wid: string,
+    body: {
+      message: string;
+      history?: Array<{ role: 'user' | 'assistant'; content: string }>;
+      context_finding_id?: string;
+      context_model_name?: string;
+    }
+  ) => api.post<{ reply: string; cost_usd: number; model: string }>(`/workspaces/${wid}/chat`, body),
+};
