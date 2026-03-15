@@ -71,14 +71,14 @@ const baseProject: ParsedProject = {
 // ── Orphan agent ───────────────────────────────────────────────────────────────
 
 describe('analyzeOrphans', () => {
-  beforeEach(() => vi.clearAllMocks());
+  beforeEach(() => { vi.clearAllMocks(); });
 
   it('detects the orphan model (no upstream, no downstream)', async () => {
     mockLlmCall.mockResolvedValue({ text: '{"findings":[]}', cost_usd: 0 });
     mockParseJsonResponse.mockReturnValue({ findings: [] });
 
     const { analyzeOrphans } = await import('./orphans.js');
-    const findings = await analyzeOrphans(baseProject);
+    await analyzeOrphans(baseProject);
 
     // Orphan model has no dependsOn AND nobody depends on it
     // But LLM returned empty findings — fallback should still produce a finding
@@ -102,7 +102,7 @@ describe('analyzeOrphans', () => {
 // ── Dead models agent ──────────────────────────────────────────────────────────
 
 describe('analyzeDeadModels', () => {
-  beforeEach(() => vi.clearAllMocks());
+  beforeEach(() => { vi.clearAllMocks(); });
 
   it('returns empty when all models have consumers', async () => {
     const project: ParsedProject = {
@@ -110,7 +110,7 @@ describe('analyzeDeadModels', () => {
       models: baseProject.models.filter(m => m.name !== 'orphan'),
     };
     const { analyzeDeadModels } = await import('./deadModels.js');
-    const findings = await analyzeDeadModels(project, {});
+    await analyzeDeadModels(project, {});
     // orders is depended on by nothing, but raw_orders is depended on by orders
     // orphan is removed — only orders is "dead" (no downstream)
     expect(mockLlmCall).toHaveBeenCalledOnce();
@@ -128,7 +128,7 @@ describe('analyzeDeadModels', () => {
 // ── Broken refs agent ─────────────────────────────────────────────────────────
 
 describe('analyzeBrokenRefs', () => {
-  beforeEach(() => vi.clearAllMocks());
+  beforeEach(() => { vi.clearAllMocks(); });
 
   it('finds no broken refs when all deps exist', async () => {
     const { analyzeBrokenRefs } = await import('./brokenRefs.js');
@@ -161,7 +161,7 @@ describe('analyzeBrokenRefs', () => {
 // ── Missing tests agent ───────────────────────────────────────────────────────
 
 describe('analyzeMissingTests', () => {
-  beforeEach(() => vi.clearAllMocks());
+  beforeEach(() => { vi.clearAllMocks(); });
 
   it('flags models with no tests and falls back to deterministic when LLM fails', async () => {
     mockLlmCall.mockRejectedValue(new Error('LLM down'));
@@ -177,7 +177,7 @@ describe('analyzeMissingTests', () => {
 // ── Grain joins agent ─────────────────────────────────────────────────────────
 
 describe('analyzeGrainJoins', () => {
-  beforeEach(() => vi.clearAllMocks());
+  beforeEach(() => { vi.clearAllMocks(); });
 
   it('returns empty for project with no joins', async () => {
     const { analyzeGrainJoins } = await import('./grainJoins.js');
@@ -302,7 +302,7 @@ describe('rateLimiter', () => {
 
     limit(req, makeRes() as never, next);
     limit(req, makeRes() as never, next);
-    limit(req, makeRes() as never, vi.fn()); // 3rd request should be blocked
+    limit(req, makeRes() as never, vi.fn() as never); // 3rd request should be blocked
 
     expect(lastStatus).toBe(429);
   });

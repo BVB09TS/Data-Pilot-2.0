@@ -1,10 +1,10 @@
-import { Router, Request, Response } from 'express';
+import { Router, IRouter, Request, Response } from 'express';
 import { pool } from '../db/pool.js';
 import { requireAuth } from '../middleware/requireAuth.js';
 import { encrypt, decrypt } from '../utils/crypto.js';
 import { checkHealth } from '../services/healthCheck.js';
 
-const router = Router({ mergeParams: true });
+const router: IRouter = Router({ mergeParams: true });
 
 // All routes require auth
 router.use(requireAuth);

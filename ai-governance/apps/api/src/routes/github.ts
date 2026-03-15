@@ -12,7 +12,7 @@
  *   GET    /api/workspaces/:wid/github/reviews/:id         — get one PR review
  */
 
-import { Router, Request, Response } from 'express';
+import { Router, IRouter, Request, Response } from 'express';
 import crypto from 'crypto';
 import { pool } from '../db/pool.js';
 import { requireAuth } from '../middleware/requireAuth.js';
@@ -27,7 +27,7 @@ import {
 
 // ── Webhook router (public — no auth, verified by HMAC) ───────────────────────
 
-export const webhookRouter = Router();
+export const webhookRouter: IRouter = Router();
 
 webhookRouter.post('/github/webhook', async (req: Request, res: Response): Promise<void> => {
   const event = req.headers['x-github-event'] as string | undefined;
@@ -175,7 +175,7 @@ webhookRouter.post('/github/webhook', async (req: Request, res: Response): Promi
 
 // ── Workspace-scoped router (requires auth) ───────────────────────────────────
 
-export const githubRouter = Router({ mergeParams: true });
+export const githubRouter: IRouter = Router({ mergeParams: true });
 
 githubRouter.use(requireAuth);
 

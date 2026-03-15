@@ -69,7 +69,7 @@ function makeEdge(s: string, t: string): LineageEdge {
 }
 
 describe('buildLineageGraph', () => {
-  beforeEach(() => vi.clearAllMocks());
+  beforeEach(() => { vi.clearAllMocks(); });
 
   function mockDB(nodes: LineageNode[], edges: LineageEdge[]) {
     (pool.query as ReturnType<typeof vi.fn>)

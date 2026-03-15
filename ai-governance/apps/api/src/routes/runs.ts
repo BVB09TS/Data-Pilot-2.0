@@ -1,8 +1,8 @@
-import { Router, Request, Response } from 'express';
+import { Router, IRouter, Request, Response } from 'express';
 import { pool } from '../db/pool.js';
 import { requireAuth } from '../middleware/requireAuth.js';
 
-const router = Router({ mergeParams: true });
+const router: IRouter = Router({ mergeParams: true });
 router.use(requireAuth);
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -229,9 +229,9 @@ router.post('/:id/logs', async (req: Request, res: Response): Promise<void> => {
 
   // Stamp any entries missing a timestamp
   const stamped = entries.map(e => ({
-    ts: new Date().toISOString(),
-    level: 'info',
     ...e,
+    ts: (e as Record<string, unknown>).ts ?? new Date().toISOString(),
+    level: (e as Record<string, unknown>).level ?? 'info',
   }));
 
   const result = await pool.query(

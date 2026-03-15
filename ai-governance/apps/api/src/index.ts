@@ -28,6 +28,22 @@ import datapilotRouter from './routes/datapilot.js';
 import chatRouter from './routes/chat.js';
 import settingsRouter from './routes/settings.js';
 
+// ── Startup env validation ────────────────────────────────────────────────────
+
+const REQUIRED_ENV: string[] = ['DATABASE_URL', 'SERVER_SECRET'];
+const missing = REQUIRED_ENV.filter(k => !process.env[k]);
+if (missing.length > 0) {
+  console.error(`\n❌ Missing required environment variables: ${missing.join(', ')}`);
+  console.error('   Copy apps/api/.env.example to apps/api/.env and fill in the values.\n');
+  process.exit(1);
+}
+
+const anyLlmKey = process.env.GROQ_API_KEY || process.env.OPENAI_API_KEY || process.env.ANTHROPIC_API_KEY;
+if (!anyLlmKey) {
+  console.warn('\n⚠️  No LLM API key found (GROQ_API_KEY / OPENAI_API_KEY / ANTHROPIC_API_KEY).');
+  console.warn('   AI features (chat, audit agents) will be unavailable until a key is set.\n');
+}
+
 const app = express();
 const PORT = process.env.PORT ?? 3000;
 const FRONTEND_URL = process.env.FRONTEND_URL ?? 'http://localhost:5173';

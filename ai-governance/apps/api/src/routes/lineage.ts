@@ -1,9 +1,9 @@
-import { Router, Request, Response } from 'express';
+import { Router, IRouter, Request, Response } from 'express';
 import { requireAuth } from '../middleware/requireAuth.js';
 import { buildLineageGraph, topologicalSort } from '../services/lineage.js';
 import { pool } from '../db/pool.js';
 
-const router = Router({ mergeParams: true });
+const router: IRouter = Router({ mergeParams: true });
 router.use(requireAuth);
 
 async function assertWorkspaceAccess(userId: string, workspaceId: string): Promise<boolean> {

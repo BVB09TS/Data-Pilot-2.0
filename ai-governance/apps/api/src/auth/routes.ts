@@ -114,7 +114,7 @@ router.post('/register', async (req: Request, res: Response): Promise<void> => {
     return;
   }
 
-  const passwordHash = await bcrypt.hash(password, BCRYPT_ROUNDS);
+  const passwordHash = await bcrypt.hash(password!, BCRYPT_ROUNDS);
   const result = await pool.query<{ id: string }>(
     `INSERT INTO users (email, name, provider, provider_id, password_hash)
      VALUES ($1, $2, 'local', $1, $3)
@@ -122,11 +122,11 @@ router.post('/register', async (req: Request, res: Response): Promise<void> => {
     [email, name ?? null, passwordHash]
   );
 
-  const userId = result.rows[0].id;
+  const userId = result.rows[0]!.id;
   const slug = `ws-${userId.slice(0, 8)}`;
   const ws = await pool.query<{ id: string }>(
     `INSERT INTO workspaces (name, slug, owner_id) VALUES ($1, $2, $3) RETURNING id`,
-    [`${(name ?? email).split('@')[0]}'s Workspace`, slug, userId]
+    [`${(name ?? email!).split('@')[0]}'s Workspace`, slug, userId]
   );
   await pool.query(
     `INSERT INTO workspace_members (workspace_id, user_id, role) VALUES ($1, $2, 'owner')`,
@@ -161,7 +161,7 @@ router.post('/login', async (req: Request, res: Response): Promise<void> => {
     return;
   }
 
-  const valid = await bcrypt.compare(password, result.rows[0].password_hash);
+  const valid = await bcrypt.compare(password!, result.rows[0].password_hash);
   if (!valid) {
     res.status(401).json({ error: 'Invalid email or password' });
     return;
@@ -174,7 +174,7 @@ router.post('/login', async (req: Request, res: Response): Promise<void> => {
 // ── Dev login (development only — not registered in production) ───────────────
 
 if (process.env.NODE_ENV !== 'production') {
-  router.post('/dev-login', async (req: Request, res: Response): Promise<void> => {
+  router.post('/dev-login', async (_req: Request, res: Response): Promise<void> => {
     const userResult = await pool.query<{ id: string }>(
       `INSERT INTO users (email, name, provider, provider_id)
        VALUES ('dev@localhost', 'Dev User', 'dev', 'dev')

@@ -91,7 +91,7 @@ ${modelData}`;
       { tier: 'premium', jsonMode: true, maxTokens: 2000 },
     );
 
-    const parsed = parseJsonResponse<{ findings: Array<{ models: string[]; metric: string; title: string; description: string; recommendation: string; severity: 'high' }> }>(response.text);
+    const parsed = parseJsonResponse<{ findings: Array<{ models: string[]; metric: string; title: string; description: string; recommendation: string; severity: 'high'; confidence?: number }> }>(response.text);
 
     for (const f of parsed.findings) {
       const confidence = typeof f.confidence === 'number' ? Math.min(1, Math.max(0, f.confidence)) : 0.8;

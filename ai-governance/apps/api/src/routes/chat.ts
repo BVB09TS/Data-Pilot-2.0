@@ -8,7 +8,7 @@
  * and returns a streaming-compatible JSON response.
  */
 
-import { Router, Request, Response } from 'express';
+import { Router, IRouter, Request, Response } from 'express';
 import { pool } from '../db/pool.js';
 import { requireAuth } from '../middleware/requireAuth.js';
 import { llmCall, type WorkspaceApiKeys } from '../datapilot/llmGateway.js';
@@ -24,7 +24,7 @@ async function getWorkspaceKeys(workspaceId: string): Promise<WorkspaceApiKeys> 
   return { groq: groq_api_key, openai: openai_api_key, anthropic: anthropic_api_key };
 }
 
-const router = Router({ mergeParams: true });
+const router: IRouter = Router({ mergeParams: true });
 router.use(requireAuth);
 
 interface ChatMessage {

@@ -5,7 +5,7 @@ import { checkHealth } from './healthCheck.js';
 const mockFetch = vi.fn();
 vi.stubGlobal('fetch', mockFetch);
 
-afterEach(() => vi.clearAllMocks());
+afterEach(() => { vi.clearAllMocks(); });
 
 function fakeResponse(status: number): Response {
   return { ok: status >= 200 && status < 300, status } as Response;

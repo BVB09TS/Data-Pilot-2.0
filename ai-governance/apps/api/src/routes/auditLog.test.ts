@@ -13,7 +13,7 @@ import { pool } from '../db/pool.js';
 
 const mockQuery = pool.query as ReturnType<typeof vi.fn>;
 
-beforeEach(() => vi.clearAllMocks());
+beforeEach(() => { vi.clearAllMocks(); });
 
 // ── Pagination clamping ───────────────────────────────────────────────────────
 

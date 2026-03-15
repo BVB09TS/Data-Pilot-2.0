@@ -1,10 +1,10 @@
-import { Router, Request, Response } from 'express';
+import { Router, IRouter, Request, Response } from 'express';
 import { pool } from '../db/pool.js';
 import { requireAuth } from '../middleware/requireAuth.js';
 import { evaluatePolicy } from '../services/policyEngine.js';
 import type { PolicyRule, EvaluationSubject } from '../services/policyEngine.js';
 
-const router = Router({ mergeParams: true });
+const router: IRouter = Router({ mergeParams: true });
 router.use(requireAuth);
 
 async function assertWorkspaceAccess(userId: string, workspaceId: string): Promise<boolean> {
