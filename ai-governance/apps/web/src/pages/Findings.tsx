@@ -113,49 +113,68 @@ export default function Findings() {
       </div>
 
       {/* Trigger Audit */}
-      <div className="rounded-xl border border-white/10 bg-white/5 p-4 space-y-3">
-        <p className="text-sm font-medium text-neutral-900 dark:text-white">Run New Audit</p>
+      <div className="rounded-xl border border-white/[0.08] bg-white/[0.02] p-5 space-y-3">
+        <div>
+          <p className="text-sm font-semibold text-neutral-900 dark:text-white">Run New Audit</p>
+          <p className="text-xs text-neutral-500 dark:text-neutral-500 mt-0.5">
+            Provide the absolute path to your project directory. The audit runs all 8 AI agents in parallel.
+          </p>
+        </div>
         <div className="flex gap-2">
           <input
             value={projectPath}
             onChange={e => setProjectPath(e.target.value)}
-            placeholder="/absolute/path/to/dbt/project"
-            className="flex-1 rounded-lg bg-white/10 border border-white/10 px-3 py-2 text-sm text-neutral-900 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            onKeyDown={e => { if (e.key === 'Enter') triggerAudit(); }}
+            placeholder="/absolute/path/to/project"
+            className="flex-1 rounded-lg bg-white/[0.06] border border-white/[0.08] px-3 py-2 text-sm text-neutral-900 dark:text-white placeholder-neutral-600 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500/50 transition"
           />
           <button
             onClick={triggerAudit}
             disabled={triggering || !projectPath.trim()}
-            className="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 disabled:opacity-40 text-neutral-900 dark:text-white text-sm font-medium transition"
+            className="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 disabled:opacity-40 text-white text-sm font-medium transition shrink-0"
           >
             {triggering ? 'Starting…' : 'Run Audit'}
           </button>
         </div>
         {triggerMsg && (
-          <p className={`text-xs ${triggerMsg.startsWith('Error') ? 'text-red-400' : 'text-green-400'}`}>
+          <p className={`text-xs ${triggerMsg.startsWith('Error') ? 'text-red-400' : 'text-emerald-400'}`}>
             {triggerMsg}
           </p>
         )}
       </div>
 
       {/* Filters */}
-      <div className="flex gap-3 flex-wrap">
+      <div className="flex items-center gap-3 flex-wrap">
         <select
           value={severityFilter}
           onChange={e => { setSeverityFilter(e.target.value); setOffset(0); }}
-          className="rounded-lg bg-white/10 border border-white/10 px-3 py-1.5 text-sm text-neutral-900 dark:text-white focus:outline-none"
+          className="rounded-lg bg-white/[0.05] border border-white/[0.08] px-3 py-1.5 text-sm text-neutral-700 dark:text-neutral-300 focus:outline-none focus:ring-1 focus:ring-blue-500 transition"
         >
-          <option value="">All Severities</option>
+          <option value="">All severities</option>
           {SEVERITIES.map(s => <option key={s} value={s}>{s.charAt(0).toUpperCase() + s.slice(1)}</option>)}
         </select>
 
         <select
           value={typeFilter}
           onChange={e => { setTypeFilter(e.target.value); setOffset(0); }}
-          className="rounded-lg bg-white/10 border border-white/10 px-3 py-1.5 text-sm text-neutral-900 dark:text-white focus:outline-none"
+          className="rounded-lg bg-white/[0.05] border border-white/[0.08] px-3 py-1.5 text-sm text-neutral-700 dark:text-neutral-300 focus:outline-none focus:ring-1 focus:ring-blue-500 transition"
         >
-          <option value="">All Types</option>
+          <option value="">All types</option>
           {TYPES.map(t => <option key={t} value={t}>{TYPE_LABEL[t]}</option>)}
         </select>
+
+        {(severityFilter || typeFilter) && (
+          <button
+            onClick={() => { setSeverityFilter(''); setTypeFilter(''); setOffset(0); }}
+            className="text-xs text-neutral-500 hover:text-neutral-300 transition-colors"
+          >
+            Clear filters ✕
+          </button>
+        )}
+
+        {total > 0 && (
+          <span className="ml-auto text-xs text-neutral-500">{total} finding{total !== 1 ? 's' : ''}</span>
+        )}
       </div>
 
       {/* Table */}
@@ -175,7 +194,17 @@ export default function Findings() {
               <tr><td colSpan={5} className="text-center py-8 text-neutral-500 dark:text-neutral-500">Loading…</td></tr>
             )}
             {!loading && findings.length === 0 && (
-              <tr><td colSpan={5} className="text-center py-8 text-neutral-500 dark:text-neutral-500">No findings. Run an audit to get started.</td></tr>
+              <tr>
+                <td colSpan={5} className="py-16 text-center">
+                  <div className="flex flex-col items-center gap-2">
+                    <svg className="w-8 h-8 text-neutral-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                    </svg>
+                    <p className="text-sm text-neutral-500 dark:text-neutral-500">No findings found.</p>
+                    <p className="text-xs text-neutral-600">{severityFilter || typeFilter ? 'Try adjusting your filters.' : 'Run an audit above to get started.'}</p>
+                  </div>
+                </td>
+              </tr>
             )}
             {findings.map(f => (
               <tr

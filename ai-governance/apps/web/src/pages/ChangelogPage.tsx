@@ -3,92 +3,112 @@ import { PublicFooter } from '../components/public/PublicFooter'
 
 const releases = [
   {
-    version: '2.0.0',
+    version: '2.0.1',
     date: 'March 2026',
     tag: 'Latest',
-    tagColor: 'bg-blue-500/20 text-blue-400 border-blue-500/30',
-    summary: 'Major release. Full rewrite of the audit engine with 8 specialist AI agents, React lineage explorer, and enterprise integrations.',
+    tagColor: 'bg-blue-500/15 text-blue-400 border-blue-500/25',
+    dotColor: 'bg-blue-500',
+    summary: 'Patch: workspace settings, chat panel improvements, and policy evaluation fixes.',
     changes: {
       added: [
-        'New React + D3 lineage explorer with upstream/downstream depth control',
-        '8 specialist AI audit agents running in parallel (ThreadPoolExecutor)',
-        'AI chat panel with model context auto-injection',
-        'Multi-provider LLM routing: Groq → OpenAI → Anthropic with fallback',
-        'SARIF 2.1.0 export for GitHub/GitLab security scanning',
-        'Jira ticket export format',
-        'Airflow DAG generation CLI command',
-        'Kubernetes manifest generation CLI command',
-        'REST API: /api/v1/health, /report, /audit/trigger, /metrics',
-        'Enterprise integrations: Snowflake, Azure, AWS, GitLab, Power BI, Kubernetes',
-        'FeedbackStore for append-only run history',
-        'Pydantic v2 configuration with full YAML support',
-        'Docker + Docker Compose support',
-        'GitHub Actions CI with SARIF upload',
+        'Workspace-scoped LLM API key management in Settings',
+        'Chat panel retains conversation history across page navigation',
+        'GitHub Actions SARIF upload step added to CI workflow',
       ],
       changed: [
-        'Complete rewrite from monolithic agent to pipeline + router architecture',
-        'Severity mapping now uses 4 levels: critical, high, medium, low',
-        'Report format upgraded — includes cost_usd estimates per finding',
-        'CLI rebuilt with Click 8, replacing argparse',
+        'Policy evaluation now returns structured violation details per rule',
+        'Findings table now links model names directly to lineage graph with focus mode',
+      ],
+      fixed: [
+        'Rate limiter no longer resets on API server restart',
+        'Audit log pagination offset correctly handles large event counts',
+        'CSRF middleware now allows same-origin requests from Vite dev server',
+      ],
+    },
+  },
+  {
+    version: '2.0.0',
+    date: 'February 2026',
+    tag: 'Major release',
+    tagColor: 'bg-violet-500/15 text-violet-400 border-violet-500/25',
+    dotColor: 'bg-violet-500',
+    summary: 'Full platform rewrite. New TypeScript governance API, React dashboard, 8 specialist AI agents, and enterprise integrations.',
+    changes: {
+      added: [
+        'TypeScript Express API with PostgreSQL — full replacement of legacy Flask backend',
+        'React + Vite + Tailwind SPA with dark/light mode',
+        'ReactFlow lineage explorer with upstream/downstream depth control and focus mode',
+        '8 specialist AI audit agents running in parallel (dead models, orphans, broken refs, grain joins, duplicate metrics, missing tests, logic drift, deprecated sources)',
+        'Multi-provider LLM routing: Groq → OpenAI → Anthropic with automatic fallback',
+        'AI chat panel (Voro) with findings context auto-injection',
+        'GitHub OAuth, GitLab OAuth, and Google OAuth login',
+        'SARIF 2.1.0 export for GitHub and GitLab security scanning dashboards',
+        'Jira ticket export format for issue tracking integration',
+        'Governance policies — define rules (require_field, deny_value, max_runs) and evaluate against runs',
+        'Immutable audit event log with resource-type and action filtering',
+        'GitHub PR review bot — auto-reviews pull requests and posts structured findings',
+        'Enterprise integrations: Snowflake, Azure, AWS S3, GitLab, Power BI, Airflow, Kubernetes',
+        'Kubernetes manifest generation CLI command',
+        'Airflow DAG generation CLI command',
+        'Pydantic v2 configuration with full YAML support',
+        'Docker + Docker Compose support with optional Redis profile',
+        'Sequential SQL migration runner — automatic schema management on startup',
+        'JWT HttpOnly cookie auth with sliding-window rate limiting and CSRF protection',
+        'Structured JSON request logging with request IDs',
+      ],
+      changed: [
+        'Complete architecture rewrite — pipeline + router replaces monolithic v1 agent',
+        'Severity system upgraded to 4 levels: critical, high, medium, low',
+        'Report format now includes cost_usd estimates per finding',
+        'CLI rebuilt with Click 8 — replaces argparse',
+        'Lineage DAG now uses NetworkX 3 with correct circular reference detection',
       ],
       fixed: [
         'LLM output parser now handles markdown-wrapped and partial JSON gracefully',
-        'Lineage DAG correctly handles circular reference detection',
+        'Project path validation prevents path traversal in audit triggers',
       ],
     },
   },
   {
     version: '1.4.2',
     date: 'January 2026',
-    tag: 'Stable',
-    tagColor: 'bg-gray-500/20 text-gray-400 border-gray-500/30',
-    summary: 'Bug fixes and stability improvements for the v1 agent.',
+    tag: 'Previous stable',
+    tagColor: 'bg-gray-500/15 text-gray-400 border-gray-500/25',
+    dotColor: 'bg-gray-600',
+    summary: 'Stability improvements and LLM provider upgrade for the v1 audit agent.',
     changes: {
       added: [
-        'Query history JSON parsing for 180-day usage stats',
-        'Dead model detection now considers query frequency thresholds',
+        'Query history JSON parsing for 180-day usage statistics',
+        'Dead model detection now considers configurable query frequency thresholds',
+        'HTML report export with embedded D3 lineage graph',
       ],
       changed: [
-        'Groq API upgraded to llama-3.3-70b-versatile',
+        'Groq provider upgraded to llama-3.3-70b-versatile',
+        'Improved LLM prompts for grain join and duplicate metric detection',
       ],
       fixed: [
-        'Fixed YAML parsing failure on models with empty description blocks',
-        'Fixed broken ref detection missing indirect dependencies',
+        'YAML parsing no longer fails on models with empty description blocks',
+        'Broken ref detection now correctly follows indirect dependencies',
+        'Cost estimate calculation fixed for multi-layer orphan chains',
       ],
-    },
-  },
-  {
-    version: '1.3.0',
-    date: 'November 2025',
-    tag: '',
-    tagColor: '',
-    summary: 'Added orphan detection and duplicate metric analysis.',
-    changes: {
-      added: [
-        'Orphaned model detection (no downstream consumers)',
-        'Duplicate metric analysis across model layers',
-        'HTML report export',
-      ],
-      changed: [
-        'Improved LLM prompt quality for grain join detection',
-      ],
-      fixed: [],
     },
   },
   {
     version: '1.0.0',
     date: 'September 2025',
     tag: 'Initial release',
-    tagColor: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30',
-    summary: 'First public release. Basic dbt project parsing, lineage DAG, and dead model detection.',
+    tagColor: 'bg-emerald-500/15 text-emerald-400 border-emerald-500/25',
+    dotColor: 'bg-emerald-600',
+    summary: 'First public release. dbt project parsing, lineage DAG, dead model and broken ref detection.',
     changes: {
       added: [
-        'dbt project parser (SQL + YAML)',
-        'NetworkX lineage DAG',
-        'Dead model detection',
-        'Broken ref detection',
-        'JSON and CSV export',
-        'Flask web dashboard',
+        'dbt project parser — SQL + YAML + query history',
+        'NetworkX lineage DAG builder',
+        'Dead model detection (0 queries in 90 days)',
+        'Broken ref detection (ref() to non-existent models)',
+        'JSON and CSV report export',
+        'Flask web dashboard with D3 lineage graph',
+        'Groq Llama integration for AI-assisted analysis',
       ],
       changed: [],
       fixed: [],
@@ -96,16 +116,10 @@ const releases = [
   },
 ]
 
-const tagLabels: Record<string, string> = {
-  added: '+ Added',
-  changed: '~ Changed',
-  fixed: '✓ Fixed',
-}
-
-const tagStyles: Record<string, string> = {
-  added: 'text-green-400',
-  changed: 'text-yellow-400',
-  fixed: 'text-blue-400',
+const tagStyles: Record<string, { label: string; cls: string }> = {
+  added:   { label: 'Added',   cls: 'text-emerald-400' },
+  changed: { label: 'Changed', cls: 'text-yellow-400' },
+  fixed:   { label: 'Fixed',   cls: 'text-blue-400' },
 }
 
 export function ChangelogPage() {
@@ -114,42 +128,47 @@ export function ChangelogPage() {
       <PublicNavbar />
 
       <div className="max-w-3xl mx-auto px-6 pt-32 pb-24">
+        {/* Header */}
         <div className="mb-16">
-          <h1 className="text-4xl font-bold mb-3">Changelog</h1>
-          <p className="text-gray-400">Every release, documented. Subscribe to our newsletter to get notified.</p>
+          <h1 className="text-4xl font-bold mb-3 tracking-tight">Changelog</h1>
+          <p className="text-gray-400">Every DataPilot release, documented. Always up to date.</p>
         </div>
 
-        <div className="space-y-16">
+        {/* Timeline */}
+        <div className="space-y-14">
           {releases.map(rel => (
-            <div key={rel.version} className="relative pl-8 border-l border-white/10">
-              {/* Dot */}
-              <div className="absolute -left-1.5 top-1.5 w-3 h-3 rounded-full bg-gray-700 border-2 border-gray-600" />
+            <div key={rel.version} className="relative pl-8 border-l border-white/[0.08]">
+              {/* Timeline dot */}
+              <div className={`absolute -left-[5px] top-1.5 w-2.5 h-2.5 rounded-full ${rel.dotColor} shadow-lg`} />
 
+              {/* Header */}
               <div className="mb-4 flex items-center gap-3 flex-wrap">
-                <h2 className="text-2xl font-bold text-white">v{rel.version}</h2>
+                <h2 className="text-xl font-bold text-white tracking-tight">v{rel.version}</h2>
                 {rel.tag && (
                   <span className={`text-xs font-medium px-2.5 py-0.5 rounded-full border ${rel.tagColor}`}>
                     {rel.tag}
                   </span>
                 )}
-                <span className="text-gray-500 text-sm">{rel.date}</span>
+                <span className="text-gray-600 text-sm">{rel.date}</span>
               </div>
 
               <p className="text-gray-400 text-sm leading-relaxed mb-6">{rel.summary}</p>
 
+              {/* Change groups */}
               {(['added', 'changed', 'fixed'] as const).map(type => {
                 const items = rel.changes[type]
                 if (!items.length) return null
+                const { label, cls } = tagStyles[type]
                 return (
                   <div key={type} className="mb-5">
-                    <p className={`text-xs font-semibold uppercase tracking-widest mb-2 ${tagStyles[type]}`}>
-                      {tagLabels[type]}
+                    <p className={`text-[11px] font-semibold uppercase tracking-[0.12em] mb-2.5 ${cls}`}>
+                      {label}
                     </p>
-                    <ul className="space-y-1.5">
+                    <ul className="space-y-2">
                       {items.map(item => (
-                        <li key={item} className="text-sm text-gray-300 flex gap-2">
-                          <span className="text-gray-600 shrink-0">—</span>
-                          {item}
+                        <li key={item} className="text-sm text-gray-400 flex gap-2.5 leading-relaxed">
+                          <span className="text-gray-700 shrink-0 mt-0.5">—</span>
+                          <span>{item}</span>
                         </li>
                       ))}
                     </ul>

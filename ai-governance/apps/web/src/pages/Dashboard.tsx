@@ -93,7 +93,7 @@ export default function Dashboard() {
             {greeting}, {firstName}
           </h1>
           <p className="text-sm text-neutral-500 dark:text-neutral-400 mt-1">
-            Workspace overview
+            Workspace overview — {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
           </p>
         </div>
         <button onClick={() => navigate('/findings')} className="btn-ghost shrink-0">
@@ -112,9 +112,25 @@ export default function Dashboard() {
           iconPath="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
         <StatCard label="Findings" value={stats.findings} sub="total issues"
           iconPath="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-        <StatCard label="Critical" value={stats.criticalFindings} sub="need attention"
+        <StatCard label="Critical" value={stats.criticalFindings} sub={stats.criticalFindings > 0 ? 'need attention now' : 'all clear'}
           iconPath="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
       </div>
+
+      {/* Critical alert banner */}
+      {stats.criticalFindings > 0 && (
+        <div
+          className="flex items-center justify-between gap-4 rounded-xl border border-red-500/20 bg-red-500/5 px-5 py-4 cursor-pointer hover:bg-red-500/10 transition-colors"
+          onClick={() => navigate('/findings')}
+        >
+          <div className="flex items-center gap-3">
+            <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse shrink-0" />
+            <p className="text-sm font-medium text-red-400">
+              {stats.criticalFindings} critical finding{stats.criticalFindings !== 1 ? 's' : ''} require your attention
+            </p>
+          </div>
+          <span className="text-xs text-red-500 shrink-0">View findings →</span>
+        </div>
+      )}
 
       {/* Quick actions */}
       <div>
@@ -165,11 +181,22 @@ export default function Dashboard() {
 
         <div className="card p-0 overflow-hidden">
           {stats.recentRuns.length === 0 ? (
-            <div className="px-5 py-10 text-center">
-              <p className="text-sm text-neutral-500 dark:text-neutral-400">No runs yet.</p>
-              <p className="text-xs text-neutral-400 dark:text-neutral-600 mt-1">
-                Trigger your first audit from the Findings page.
+            <div className="px-5 py-12 text-center">
+              <div className="w-10 h-10 rounded-full border border-neutral-200 dark:border-neutral-800 flex items-center justify-center mx-auto mb-3">
+                <svg className="w-5 h-5 text-neutral-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+                </svg>
+              </div>
+              <p className="text-sm font-medium text-neutral-700 dark:text-neutral-300">No runs yet</p>
+              <p className="text-xs text-neutral-400 dark:text-neutral-600 mt-1 mb-4">
+                Trigger your first audit to start seeing results here.
               </p>
+              <button
+                onClick={() => navigate('/findings')}
+                className="text-xs text-blue-500 hover:text-blue-400 font-medium transition-colors"
+              >
+                Run your first audit →
+              </button>
             </div>
           ) : (
             <div className="divide-y divide-neutral-200 dark:divide-neutral-800">

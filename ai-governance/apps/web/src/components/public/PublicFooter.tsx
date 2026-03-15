@@ -14,7 +14,7 @@ export function PublicFooter() {
               <span className="text-white font-semibold">DataPilot</span>
             </div>
             <p className="text-gray-500 text-sm leading-relaxed">
-              AI-powered dbt auditor for modern data teams. Find problems before they find you.
+              AI-powered governance for modern data platforms. Find problems before they cost you.
             </p>
           </div>
 
@@ -24,7 +24,6 @@ export function PublicFooter() {
             <ul className="space-y-3">
               {[
                 { to: '/docs', label: 'Documentation' },
-                { to: '/pricing', label: 'Pricing' },
                 { to: '/changelog', label: 'Changelog' },
                 { to: '/dashboard', label: 'Dashboard' },
               ].map(l => (

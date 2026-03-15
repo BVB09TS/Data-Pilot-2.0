@@ -13,7 +13,6 @@ import Layout from './components/Layout';
 import { LandingPage }  from './pages/LandingPage';
 import { DocsPage }     from './pages/DocsPage';
 import { CommunityPage } from './pages/CommunityPage';
-import { PricingPage }  from './pages/PricingPage';
 import { PrivacyPage }  from './pages/PrivacyPage';
 import { TermsPage }    from './pages/TermsPage';
 import { ChangelogPage } from './pages/ChangelogPage';
@@ -44,7 +43,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
           <Route path="/"          element={<LandingPage />} />
           <Route path="/docs"      element={<DocsPage />} />
           <Route path="/community" element={<CommunityPage />} />
-          <Route path="/pricing"   element={<PricingPage />} />
+          <Route path="/pricing"   element={<Navigate to="/" replace />} />
           <Route path="/privacy"   element={<PrivacyPage />} />
           <Route path="/terms"     element={<TermsPage />} />
           <Route path="/changelog" element={<ChangelogPage />} />

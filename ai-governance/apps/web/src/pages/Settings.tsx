@@ -96,7 +96,7 @@ export default function Settings() {
     <div className="p-6 max-w-2xl space-y-8">
       <div>
         <h1 className="text-2xl font-bold text-neutral-900 dark:text-white">Settings</h1>
-        <p className="text-sm text-neutral-500 dark:text-neutral-400 mt-1">Configure LLM API keys and default project path for this workspace.</p>
+        <p className="text-sm text-neutral-500 dark:text-neutral-400 mt-1">LLM API keys and workspace configuration. Keys are stored encrypted and never exposed in plaintext.</p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
@@ -105,8 +105,8 @@ export default function Settings() {
         <div className="rounded-xl border border-white/10 bg-white/5 p-5 space-y-4">
           <p className="text-sm font-semibold text-neutral-900 dark:text-white">LLM API Keys</p>
           <p className="text-xs text-neutral-500 dark:text-neutral-500">
-            Keys are stored securely and shown masked after saving. Leave a field blank to keep the existing value.
-            Enter a new value to replace it.
+            At minimum you need a Groq key (free). Anthropic and OpenAI unlock premium analysis agents.
+            Leave a field blank to keep the existing value.
           </p>
 
           <KeyField
@@ -139,14 +139,14 @@ export default function Settings() {
         <div className="rounded-xl border border-white/10 bg-white/5 p-5 space-y-3">
           <p className="text-sm font-semibold text-neutral-900 dark:text-white">Default Project Path</p>
           <p className="text-xs text-neutral-500 dark:text-neutral-500">
-            Pre-fill the dbt project path when triggering audits from the Findings page.
+            Pre-fills the project path when triggering audits from the Findings page. Use an absolute path.
           </p>
           <input
             id="default_project_path"
             type="text"
             value={form.default_project_path}
             onChange={e => set('default_project_path', e.target.value)}
-            placeholder="/absolute/path/to/dbt/project"
+            placeholder="/absolute/path/to/project"
             className="w-full rounded-lg bg-white/10 border border-white/10 px-3 py-2 text-sm text-neutral-900 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
@@ -156,9 +156,9 @@ export default function Settings() {
           <button
             type="submit"
             disabled={saving}
-            className="px-5 py-2 rounded-lg bg-neutral-900 dark:bg-white hover:bg-neutral-700 dark:hover:bg-neutral-100 disabled:opacity-40 text-neutral-900 dark:text-white text-sm font-medium transition"
+            className="px-5 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 disabled:opacity-40 text-white text-sm font-medium transition"
           >
-            {saving ? 'Saving…' : 'Save Settings'}
+            {saving ? 'Saving…' : 'Save settings'}
           </button>
           {savedMsg && <span className="text-sm text-green-400">{savedMsg}</span>}
           {errorMsg && <span className="text-sm text-red-400">{errorMsg}</span>}

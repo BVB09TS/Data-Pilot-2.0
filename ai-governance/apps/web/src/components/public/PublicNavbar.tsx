@@ -7,9 +7,8 @@ export function PublicNavbar() {
 
   const links = [
     { to: '/docs', label: 'Docs' },
-    { to: '/pricing', label: 'Pricing' },
-    { to: '/community', label: 'Community' },
     { to: '/changelog', label: 'Changelog' },
+    { to: '/community', label: 'Community' },
   ]
 
   return (
