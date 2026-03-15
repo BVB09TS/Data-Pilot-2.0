@@ -16,3 +16,6 @@ output/
 datapilot.yaml
 *.sarif
 venv/
+datapilot_report.json
+datapilot_graph.json
+datapilot_feedback.json
