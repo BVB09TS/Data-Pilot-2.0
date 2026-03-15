@@ -29,11 +29,19 @@ export interface LLMResponse {
   output_tokens: number;
 }
 
+export interface WorkspaceApiKeys {
+  groq?: string | null;
+  openai?: string | null;
+  anthropic?: string | null;
+}
+
 export interface LLMRequestOptions {
   tier?: LLMTier;
   maxTokens?: number;
   temperature?: number;
   jsonMode?: boolean;
+  /** Workspace-level key overrides — take precedence over env vars */
+  apiKeys?: WorkspaceApiKeys;
 }
 
 // ── Quota tracker ─────────────────────────────────────────────────────────────
@@ -70,18 +78,22 @@ export function getQuotaStatus(): { used_usd: number; limit_usd: number; window_
 
 // ── Provider availability ─────────────────────────────────────────────────────
 
-function availableProviders(): LLMTier[] {
+function resolveKey(envVar: string, override?: string | null): string | undefined {
+  return (override && override.length > 4) ? override : (process.env[envVar] ?? undefined);
+}
+
+function availableProviders(keys?: WorkspaceApiKeys): LLMTier[] {
   const available: LLMTier[] = [];
-  if (process.env.GROQ_API_KEY) available.push('free');
-  if (process.env.OPENAI_API_KEY) available.push('standard');
-  if (process.env.ANTHROPIC_API_KEY) available.push('premium');
+  if (resolveKey('GROQ_API_KEY', keys?.groq)) available.push('free');
+  if (resolveKey('OPENAI_API_KEY', keys?.openai)) available.push('standard');
+  if (resolveKey('ANTHROPIC_API_KEY', keys?.anthropic)) available.push('premium');
   return available;
 }
 
-function resolveTier(requested: LLMTier): LLMTier {
-  const available = availableProviders();
+function resolveTier(requested: LLMTier, keys?: WorkspaceApiKeys): LLMTier {
+  const available = availableProviders(keys);
   if (available.length === 0) {
-    throw new Error('No LLM provider configured. Set GROQ_API_KEY, OPENAI_API_KEY, or ANTHROPIC_API_KEY.');
+    throw new Error('No LLM provider configured. Set GROQ_API_KEY, OPENAI_API_KEY, or ANTHROPIC_API_KEY in env or workspace settings.');
   }
   const order: LLMTier[] = ['premium', 'standard', 'free'];
   // Try from requested tier downward, then upward
@@ -121,11 +133,12 @@ async function callGroq(messages: LLMMessage[], opts: LLMRequestOptions): Promis
     ...(opts.jsonMode ? { response_format: { type: 'json_object' } } : {}),
   };
 
+  const apiKey = resolveKey('GROQ_API_KEY', opts.apiKeys?.groq);
   const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${process.env.GROQ_API_KEY}`,
+      Authorization: `Bearer ${apiKey}`,
     },
     body: JSON.stringify(body),
   });
@@ -164,11 +177,12 @@ async function callOpenAI(messages: LLMMessage[], opts: LLMRequestOptions): Prom
     ...(opts.jsonMode ? { response_format: { type: 'json_object' } } : {}),
   };
 
+  const apiKey = resolveKey('OPENAI_API_KEY', opts.apiKeys?.openai);
   const res = await fetch('https://api.openai.com/v1/chat/completions', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+      Authorization: `Bearer ${apiKey}`,
     },
     body: JSON.stringify(body),
   });
@@ -210,11 +224,12 @@ async function callAnthropic(messages: LLMMessage[], opts: LLMRequestOptions): P
     messages: userMessages,
   };
 
+  const apiKey = resolveKey('ANTHROPIC_API_KEY', opts.apiKeys?.anthropic);
   const res = await fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'x-api-key': process.env.ANTHROPIC_API_KEY!,
+      'x-api-key': apiKey!,
       'anthropic-version': '2023-06-01',
     },
     body: JSON.stringify(body),
@@ -253,7 +268,7 @@ export async function llmCall(
   messages: LLMMessage[],
   opts: LLMRequestOptions = {},
 ): Promise<LLMResponse> {
-  const tier = resolveTier(opts.tier ?? 'free');
+  const tier = resolveTier(opts.tier ?? 'free', opts.apiKeys);
   const estimated = 0.001; // conservative $0.001 pre-check
   checkQuota(estimated);
 

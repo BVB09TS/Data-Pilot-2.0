@@ -11,8 +11,18 @@
 import { Router, Request, Response } from 'express';
 import { pool } from '../db/pool.js';
 import { requireAuth } from '../middleware/requireAuth.js';
-import { llmCall } from '../datapilot/llmGateway.js';
+import { llmCall, type WorkspaceApiKeys } from '../datapilot/llmGateway.js';
 import { validate, required, isString, maxLen } from '../middleware/validate.js';
+
+async function getWorkspaceKeys(workspaceId: string): Promise<WorkspaceApiKeys> {
+  const r = await pool.query<{ groq_api_key: string | null; openai_api_key: string | null; anthropic_api_key: string | null }>(
+    `SELECT groq_api_key, openai_api_key, anthropic_api_key FROM workspace_settings WHERE workspace_id = $1`,
+    [workspaceId],
+  );
+  if (r.rows.length === 0) return {};
+  const { groq_api_key, openai_api_key, anthropic_api_key } = r.rows[0];
+  return { groq: groq_api_key, openai: openai_api_key, anthropic: anthropic_api_key };
+}
 
 const router = Router({ mergeParams: true });
 router.use(requireAuth);
@@ -102,13 +112,15 @@ ${contextBlock}`;
     { role: 'user', content: message },
   ];
 
+  const apiKeys = await getWorkspaceKeys(workspaceId);
+
   try {
     const response = await llmCall(
       [
         { role: 'system', content: systemPrompt },
         ...messages,
       ],
-      { tier: 'standard', maxTokens: 1000 },
+      { tier: 'standard', maxTokens: 1000, apiKeys },
     );
 
     res.json({
