@@ -85,10 +85,10 @@ function ConnectRepoModal({ workspaceId, onClose, onConnected }: {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-      <div className="w-full max-w-lg bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-white/10 shadow-2xl">
+      <div className="w-full max-w-lg bg-white dark:bg-white dark:bg-neutral-900 rounded-2xl border border-gray-200 dark:border-white/10 shadow-2xl">
         <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-white/10">
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Connect GitHub Repository</h2>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors">
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-neutral-900 dark:text-white">Connect GitHub Repository</h2>
+          <button onClick={onClose} className="text-neutral-500 dark:text-neutral-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors">
             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
@@ -106,7 +106,7 @@ function ConnectRepoModal({ workspaceId, onClose, onConnected }: {
 
             {success.webhook_secret && (
               <div className="space-y-2">
-                <p className="text-sm font-medium text-gray-700 dark:text-gray-300">Webhook registered automatically.</p>
+                <p className="text-sm font-medium text-gray-700 dark:text-neutral-600 dark:text-neutral-300">Webhook registered automatically.</p>
               </div>
             )}
 
@@ -124,14 +124,14 @@ function ConnectRepoModal({ workspaceId, onClose, onConnected }: {
               </div>
             )}
 
-            <button onClick={onClose} className="w-full py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-medium transition-colors">
+            <button onClick={onClose} className="w-full py-2.5 rounded-xl bg-neutral-900 dark:bg-white hover:bg-neutral-700 dark:hover:bg-neutral-100 text-neutral-900 dark:text-white text-sm font-medium transition-colors">
               Done
             </button>
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="p-6 space-y-5">
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+              <label className="block text-sm font-medium text-gray-700 dark:text-neutral-600 dark:text-neutral-300 mb-1.5">
                 Repository <span className="text-red-500">*</span>
               </label>
               <input
@@ -140,13 +140,13 @@ function ConnectRepoModal({ workspaceId, onClose, onConnected }: {
                 onChange={e => setRepo(e.target.value)}
                 placeholder="owner/repo-name"
                 required
-                className="w-full bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-white/10 rounded-xl px-4 py-3 text-gray-900 dark:text-white text-sm placeholder-gray-400 dark:placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                className="w-full bg-gray-50 dark:bg-neutral-100 dark:bg-neutral-800 border border-gray-200 dark:border-white/10 rounded-xl px-4 py-3 text-gray-900 dark:text-white text-sm placeholder-gray-400 dark:placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-neutral-900 dark:focus:ring-white focus:border-transparent"
               />
-              <p className="mt-1 text-xs text-gray-500 dark:text-gray-500">e.g. <code>acme-corp/analytics</code></p>
+              <p className="mt-1 text-xs text-neutral-500 dark:text-neutral-500 dark:text-neutral-500 dark:text-neutral-500">e.g. <code>acme-corp/analytics</code></p>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+              <label className="block text-sm font-medium text-gray-700 dark:text-neutral-600 dark:text-neutral-300 mb-1.5">
                 GitHub Personal Access Token <span className="text-red-500">*</span>
               </label>
               <input
@@ -155,25 +155,25 @@ function ConnectRepoModal({ workspaceId, onClose, onConnected }: {
                 onChange={e => setToken(e.target.value)}
                 placeholder="ghp_••••••••••••••••"
                 required
-                className="w-full bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-white/10 rounded-xl px-4 py-3 text-gray-900 dark:text-white text-sm placeholder-gray-400 dark:placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                className="w-full bg-gray-50 dark:bg-neutral-100 dark:bg-neutral-800 border border-gray-200 dark:border-white/10 rounded-xl px-4 py-3 text-gray-900 dark:text-white text-sm placeholder-gray-400 dark:placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-neutral-900 dark:focus:ring-white focus:border-transparent"
               />
-              <p className="mt-1 text-xs text-gray-500 dark:text-gray-500">
-                Needs <code>repo</code> scope. <a href="https://github.com/settings/tokens/new" target="_blank" rel="noreferrer" className="text-indigo-500 hover:text-indigo-400 underline">Create one here</a>.
+              <p className="mt-1 text-xs text-neutral-500 dark:text-neutral-500 dark:text-neutral-500 dark:text-neutral-500">
+                Needs <code>repo</code> scope. <a href="https://github.com/settings/tokens/new" target="_blank" rel="noreferrer" className="text-indigo-500 hover:text-neutral-700 dark:text-neutral-300 underline">Create one here</a>.
               </p>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                Webhook URL <span className="text-gray-400 font-normal">(optional — auto-registers)</span>
+              <label className="block text-sm font-medium text-gray-700 dark:text-neutral-600 dark:text-neutral-300 mb-1.5">
+                Webhook URL <span className="text-neutral-500 dark:text-neutral-400 font-normal">(optional — auto-registers)</span>
               </label>
               <input
                 type="url"
                 value={webhookUrl}
                 onChange={e => setWebhookUrl(e.target.value)}
                 placeholder="https://your-datapilot-url.com/api/github/webhook"
-                className="w-full bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-white/10 rounded-xl px-4 py-3 text-gray-900 dark:text-white text-sm placeholder-gray-400 dark:placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                className="w-full bg-gray-50 dark:bg-neutral-100 dark:bg-neutral-800 border border-gray-200 dark:border-white/10 rounded-xl px-4 py-3 text-gray-900 dark:text-white text-sm placeholder-gray-400 dark:placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-neutral-900 dark:focus:ring-white focus:border-transparent"
               />
-              <p className="mt-1 text-xs text-gray-500 dark:text-gray-500">If omitted, you'll set up the webhook manually after connecting.</p>
+              <p className="mt-1 text-xs text-neutral-500 dark:text-neutral-500 dark:text-neutral-500 dark:text-neutral-500">If omitted, you'll set up the webhook manually after connecting.</p>
             </div>
 
             {error && (
@@ -181,10 +181,10 @@ function ConnectRepoModal({ workspaceId, onClose, onConnected }: {
             )}
 
             <div className="flex gap-3 pt-2">
-              <button type="button" onClick={onClose} className="flex-1 py-2.5 rounded-xl border border-gray-200 dark:border-white/10 text-gray-700 dark:text-gray-300 text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+              <button type="button" onClick={onClose} className="flex-1 py-2.5 rounded-xl border border-gray-200 dark:border-white/10 text-gray-700 dark:text-neutral-600 dark:text-neutral-300 text-sm font-medium hover:bg-gray-50 dark:hover:bg-neutral-100 dark:bg-neutral-800 transition-colors">
                 Cancel
               </button>
-              <button type="submit" disabled={loading} className="flex-1 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 disabled:opacity-60 text-white text-sm font-medium transition-colors">
+              <button type="submit" disabled={loading} className="flex-1 py-2.5 rounded-xl bg-neutral-900 dark:bg-white hover:bg-neutral-700 dark:hover:bg-neutral-100 disabled:opacity-60 text-neutral-900 dark:text-white text-sm font-medium transition-colors">
                 {loading ? 'Connecting…' : 'Connect repository'}
               </button>
             </div>
@@ -245,14 +245,14 @@ export default function PRReviews() {
       {/* Header */}
       <div className="flex items-start justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">PR Reviews</h1>
-          <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-neutral-900 dark:text-white">PR Reviews</h1>
+          <p className="text-neutral-500 dark:text-neutral-500 dark:text-neutral-500 dark:text-neutral-400 text-sm mt-1">
             Automated dbt code review on every pull request — powered by DataPilot agents.
           </p>
         </div>
         <button
           onClick={() => setShowConnect(true)}
-          className="flex items-center gap-2 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-sm font-medium transition-colors shadow-sm shadow-indigo-500/20"
+          className="flex items-center gap-2 px-4 py-2.5 bg-neutral-900 dark:bg-white hover:bg-neutral-700 dark:hover:bg-neutral-100 text-neutral-900 dark:text-white rounded-xl text-sm font-medium transition-colors shadow-sm shadow-indigo-500/20"
         >
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -263,16 +263,16 @@ export default function PRReviews() {
 
       {/* How it works — shown when no repos connected */}
       {!loading && installations.length === 0 && (
-        <div className="rounded-2xl border border-dashed border-gray-300 dark:border-gray-700 p-8">
+        <div className="rounded-2xl border border-dashed border-gray-300 dark:border-neutral-300 dark:border-neutral-700 p-8">
           <div className="max-w-2xl mx-auto space-y-6">
             <div className="text-center">
               <div className="w-14 h-14 rounded-2xl bg-indigo-50 dark:bg-indigo-900/30 flex items-center justify-center mx-auto mb-4">
-                <svg className="w-7 h-7 text-indigo-600 dark:text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg className="w-7 h-7 text-neutral-900 dark:text-white dark:text-neutral-700 dark:text-neutral-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
                 </svg>
               </div>
               <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">AI-powered PR reviews for your dbt project</h2>
-              <p className="text-gray-500 dark:text-gray-400 text-sm">Connect a GitHub repository to automatically review pull requests with 4 specialist agents.</p>
+              <p className="text-neutral-500 dark:text-neutral-500 dark:text-neutral-500 dark:text-neutral-400 text-sm">Connect a GitHub repository to automatically review pull requests with 4 specialist agents.</p>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
@@ -284,8 +284,8 @@ export default function PRReviews() {
               ].map(a => (
                 <div key={a.title} className="p-4 rounded-xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-white/10">
                   <div className="text-xl mb-2">{a.icon}</div>
-                  <p className="text-sm font-medium text-gray-900 dark:text-white">{a.title}</p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{a.desc}</p>
+                  <p className="text-sm font-medium text-gray-900 dark:text-neutral-900 dark:text-white">{a.title}</p>
+                  <p className="text-xs text-neutral-500 dark:text-neutral-500 dark:text-neutral-500 dark:text-neutral-400 mt-0.5">{a.desc}</p>
                 </div>
               ))}
             </div>
@@ -293,7 +293,7 @@ export default function PRReviews() {
             <div className="text-center">
               <button
                 onClick={() => setShowConnect(true)}
-                className="inline-flex items-center gap-2 px-6 py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-sm font-medium transition-colors"
+                className="inline-flex items-center gap-2 px-6 py-3 bg-neutral-900 dark:bg-white hover:bg-neutral-700 dark:hover:bg-neutral-100 text-neutral-900 dark:text-white rounded-xl text-sm font-medium transition-colors"
               >
                 Connect your first repository
               </button>
@@ -305,20 +305,20 @@ export default function PRReviews() {
       {/* Connected repositories */}
       {installations.length > 0 && (
         <section>
-          <h2 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3">
+          <h2 className="text-sm font-semibold text-neutral-500 dark:text-neutral-500 dark:text-neutral-500 dark:text-neutral-400 uppercase tracking-wider mb-3">
             Connected Repositories
           </h2>
           <div className="space-y-2">
             {installations.map(inst => (
-              <div key={inst.id} className="flex items-center gap-4 p-4 rounded-xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-white/10">
-                <div className="w-9 h-9 rounded-lg bg-gray-900 dark:bg-gray-800 flex items-center justify-center flex-shrink-0">
-                  <svg className="w-5 h-5 text-white" viewBox="0 0 24 24" fill="currentColor">
+              <div key={inst.id} className="flex items-center gap-4 p-4 rounded-xl bg-white dark:bg-white dark:bg-neutral-900 border border-gray-200 dark:border-white/10">
+                <div className="w-9 h-9 rounded-lg bg-white dark:bg-neutral-900 dark:bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center flex-shrink-0">
+                  <svg className="w-5 h-5 text-neutral-900 dark:text-white" viewBox="0 0 24 24" fill="currentColor">
                     <path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0 1 12 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z" />
                   </svg>
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium text-gray-900 dark:text-white font-mono">{inst.repo_full_name}</p>
-                  <p className="text-xs text-gray-500 dark:text-gray-500 mt-0.5">
+                  <p className="text-xs text-neutral-500 dark:text-neutral-500 dark:text-neutral-500 dark:text-neutral-500 mt-0.5">
                     Connected {timeAgo(inst.created_at)} · {inst.webhook_id ? 'Webhook active' : 'Manual webhook setup needed'}
                   </p>
                 </div>
@@ -328,7 +328,7 @@ export default function PRReviews() {
                 <button
                   onClick={() => removeInstallation(inst.id)}
                   disabled={removingId === inst.id}
-                  className="text-gray-400 hover:text-red-500 dark:hover:text-red-400 transition-colors disabled:opacity-40"
+                  className="text-neutral-500 dark:text-neutral-400 hover:text-red-500 dark:hover:text-red-400 transition-colors disabled:opacity-40"
                   title="Disconnect"
                 >
                   {removingId === inst.id ? (
@@ -352,34 +352,34 @@ export default function PRReviews() {
       {reviews.length > 0 && (
         <section>
           <div className="flex items-center justify-between mb-3">
-            <h2 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+            <h2 className="text-sm font-semibold text-neutral-500 dark:text-neutral-500 dark:text-neutral-500 dark:text-neutral-400 uppercase tracking-wider">
               Recent Reviews
             </h2>
-            <span className="text-xs text-gray-400 dark:text-gray-600">{totalReviews} total</span>
+            <span className="text-xs text-neutral-500 dark:text-neutral-400 dark:text-gray-600">{totalReviews} total</span>
           </div>
           <div className="space-y-2">
             {reviews.map(r => (
-              <div key={r.id} className="p-4 rounded-xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-white/10">
+              <div key={r.id} className="p-4 rounded-xl bg-white dark:bg-white dark:bg-neutral-900 border border-gray-200 dark:border-white/10">
                 <div className="flex items-start gap-3">
                   <span className={`text-xs px-2.5 py-1 rounded-full border font-medium flex-shrink-0 mt-0.5 ${STATUS_STYLES[r.status]}`}>
                     {r.status}
                   </span>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-baseline gap-2 flex-wrap">
-                      <span className="text-xs font-mono text-gray-500 dark:text-gray-500">{r.repo_full_name}#{r.pr_number}</span>
+                      <span className="text-xs font-mono text-neutral-500 dark:text-neutral-500 dark:text-neutral-500 dark:text-neutral-500">{r.repo_full_name}#{r.pr_number}</span>
                       <span className="text-sm font-medium text-gray-900 dark:text-white truncate">{r.pr_title}</span>
                     </div>
                     {r.summary && (
-                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 line-clamp-2">{r.summary}</p>
+                      <p className="text-xs text-neutral-500 dark:text-neutral-500 dark:text-neutral-500 dark:text-neutral-400 mt-1 line-clamp-2">{r.summary}</p>
                     )}
                     <div className="flex items-center gap-4 mt-2">
-                      <span className="text-xs text-gray-400 dark:text-gray-600">
+                      <span className="text-xs text-neutral-500 dark:text-neutral-400 dark:text-gray-600">
                         {r.dbt_files_found} dbt file{r.dbt_files_found !== 1 ? 's' : ''} · {r.finding_count} finding{r.finding_count !== 1 ? 's' : ''}
                       </span>
-                      <span className="text-xs text-gray-400 dark:text-gray-600">
+                      <span className="text-xs text-neutral-500 dark:text-neutral-400 dark:text-gray-600">
                         {r.head_branch} → {r.base_branch}
                       </span>
-                      <span className="text-xs text-gray-400 dark:text-gray-600 ml-auto">
+                      <span className="text-xs text-neutral-500 dark:text-neutral-400 dark:text-gray-600 ml-auto">
                         {timeAgo(r.created_at)}
                       </span>
                     </div>
@@ -394,13 +394,13 @@ export default function PRReviews() {
       {/* Empty reviews (repos connected but no reviews yet) */}
       {!loading && installations.length > 0 && reviews.length === 0 && (
         <div className="text-center py-12">
-          <div className="w-12 h-12 rounded-xl bg-gray-100 dark:bg-gray-800 flex items-center justify-center mx-auto mb-4">
-            <svg className="w-6 h-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <div className="w-12 h-12 rounded-xl bg-gray-100 dark:bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center mx-auto mb-4">
+            <svg className="w-6 h-6 text-neutral-500 dark:text-neutral-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
             </svg>
           </div>
-          <p className="text-gray-500 dark:text-gray-400 text-sm font-medium">No reviews yet</p>
-          <p className="text-gray-400 dark:text-gray-600 text-xs mt-1">Open a pull request on a connected repo to trigger your first review.</p>
+          <p className="text-neutral-500 dark:text-neutral-500 dark:text-neutral-500 dark:text-neutral-400 text-sm font-medium">No reviews yet</p>
+          <p className="text-neutral-500 dark:text-neutral-400 dark:text-gray-600 text-xs mt-1">Open a pull request on a connected repo to trigger your first review.</p>
         </div>
       )}
 

@@ -101,12 +101,12 @@ export default function Findings() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-white">Findings</h1>
-          <p className="text-sm text-gray-400 mt-1">DataPilot audit results — {total} total findings</p>
+          <h1 className="text-2xl font-bold text-neutral-900 dark:text-white">Findings</h1>
+          <p className="text-sm text-neutral-500 dark:text-neutral-400 mt-1">DataPilot audit results — {total} total findings</p>
         </div>
         <button
           onClick={load}
-          className="px-3 py-1.5 text-sm rounded bg-white/10 hover:bg-white/20 text-white transition"
+          className="px-3 py-1.5 text-sm rounded bg-white/10 hover:bg-white/20 text-neutral-900 dark:text-white transition"
         >
           Refresh
         </button>
@@ -114,18 +114,18 @@ export default function Findings() {
 
       {/* Trigger Audit */}
       <div className="rounded-xl border border-white/10 bg-white/5 p-4 space-y-3">
-        <p className="text-sm font-medium text-white">Run New Audit</p>
+        <p className="text-sm font-medium text-neutral-900 dark:text-white">Run New Audit</p>
         <div className="flex gap-2">
           <input
             value={projectPath}
             onChange={e => setProjectPath(e.target.value)}
             placeholder="/absolute/path/to/dbt/project"
-            className="flex-1 rounded-lg bg-white/10 border border-white/10 px-3 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="flex-1 rounded-lg bg-white/10 border border-white/10 px-3 py-2 text-sm text-neutral-900 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
           <button
             onClick={triggerAudit}
             disabled={triggering || !projectPath.trim()}
-            className="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 disabled:opacity-40 text-white text-sm font-medium transition"
+            className="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 disabled:opacity-40 text-neutral-900 dark:text-white text-sm font-medium transition"
           >
             {triggering ? 'Starting…' : 'Run Audit'}
           </button>
@@ -142,7 +142,7 @@ export default function Findings() {
         <select
           value={severityFilter}
           onChange={e => { setSeverityFilter(e.target.value); setOffset(0); }}
-          className="rounded-lg bg-white/10 border border-white/10 px-3 py-1.5 text-sm text-white focus:outline-none"
+          className="rounded-lg bg-white/10 border border-white/10 px-3 py-1.5 text-sm text-neutral-900 dark:text-white focus:outline-none"
         >
           <option value="">All Severities</option>
           {SEVERITIES.map(s => <option key={s} value={s}>{s.charAt(0).toUpperCase() + s.slice(1)}</option>)}
@@ -151,7 +151,7 @@ export default function Findings() {
         <select
           value={typeFilter}
           onChange={e => { setTypeFilter(e.target.value); setOffset(0); }}
-          className="rounded-lg bg-white/10 border border-white/10 px-3 py-1.5 text-sm text-white focus:outline-none"
+          className="rounded-lg bg-white/10 border border-white/10 px-3 py-1.5 text-sm text-neutral-900 dark:text-white focus:outline-none"
         >
           <option value="">All Types</option>
           {TYPES.map(t => <option key={t} value={t}>{TYPE_LABEL[t]}</option>)}
@@ -163,19 +163,19 @@ export default function Findings() {
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-white/10 bg-white/5">
-              <th className="text-left px-4 py-3 text-gray-400 font-medium">Severity</th>
-              <th className="text-left px-4 py-3 text-gray-400 font-medium">Type</th>
-              <th className="text-left px-4 py-3 text-gray-400 font-medium">Title</th>
-              <th className="text-left px-4 py-3 text-gray-400 font-medium">Model</th>
-              <th className="text-left px-4 py-3 text-gray-400 font-medium">Date</th>
+              <th className="text-left px-4 py-3 text-neutral-500 dark:text-neutral-400 font-medium">Severity</th>
+              <th className="text-left px-4 py-3 text-neutral-500 dark:text-neutral-400 font-medium">Type</th>
+              <th className="text-left px-4 py-3 text-neutral-500 dark:text-neutral-400 font-medium">Title</th>
+              <th className="text-left px-4 py-3 text-neutral-500 dark:text-neutral-400 font-medium">Model</th>
+              <th className="text-left px-4 py-3 text-neutral-500 dark:text-neutral-400 font-medium">Date</th>
             </tr>
           </thead>
           <tbody>
             {loading && (
-              <tr><td colSpan={5} className="text-center py-8 text-gray-500">Loading…</td></tr>
+              <tr><td colSpan={5} className="text-center py-8 text-neutral-500 dark:text-neutral-500">Loading…</td></tr>
             )}
             {!loading && findings.length === 0 && (
-              <tr><td colSpan={5} className="text-center py-8 text-gray-500">No findings. Run an audit to get started.</td></tr>
+              <tr><td colSpan={5} className="text-center py-8 text-neutral-500 dark:text-neutral-500">No findings. Run an audit to get started.</td></tr>
             )}
             {findings.map(f => (
               <tr
@@ -184,24 +184,24 @@ export default function Findings() {
                 className="border-b border-white/5 hover:bg-white/5 cursor-pointer transition"
               >
                 <td className="px-4 py-3">
-                  <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-medium ${SEVERITY_COLOR[f.severity] ?? 'bg-gray-500/20 text-gray-400'}`}>
+                  <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-medium ${SEVERITY_COLOR[f.severity] ?? 'bg-gray-500/20 text-neutral-500 dark:text-neutral-400'}`}>
                     {f.severity}
                   </span>
                 </td>
-                <td className="px-4 py-3 text-gray-300">{TYPE_LABEL[f.type] ?? f.type}</td>
-                <td className="px-4 py-3 text-white font-medium max-w-xs truncate">{f.title}</td>
+                <td className="px-4 py-3 text-neutral-600 dark:text-neutral-300">{TYPE_LABEL[f.type] ?? f.type}</td>
+                <td className="px-4 py-3 text-neutral-900 dark:text-white font-medium max-w-xs truncate">{f.title}</td>
                 <td className="px-4 py-3">
                   {f.model_name ? (
                     <button
                       onClick={e => { e.stopPropagation(); navigate(`/lineage?focus=${encodeURIComponent(f.model_name!)}`); }}
-                      className="font-mono text-indigo-400 hover:text-indigo-300 hover:underline transition-colors"
+                      className="font-mono text-neutral-700 dark:text-neutral-300 hover:text-indigo-300 hover:underline transition-colors"
                       title="View in lineage graph"
                     >
                       {f.model_name}
                     </button>
-                  ) : <span className="text-gray-500">—</span>}
+                  ) : <span className="text-neutral-500 dark:text-neutral-500">—</span>}
                 </td>
-                <td className="px-4 py-3 text-gray-500 whitespace-nowrap">
+                <td className="px-4 py-3 text-neutral-500 dark:text-neutral-500 whitespace-nowrap">
                   {new Date(f.created_at).toLocaleDateString()}
                 </td>
               </tr>
@@ -212,7 +212,7 @@ export default function Findings() {
 
       {/* Pagination */}
       {pages > 1 && (
-        <div className="flex items-center justify-between text-sm text-gray-400">
+        <div className="flex items-center justify-between text-sm text-neutral-500 dark:text-neutral-400">
           <span>Page {page + 1} of {pages}</span>
           <div className="flex gap-2">
             <button
@@ -236,25 +236,25 @@ export default function Findings() {
           onClick={() => setSelected(null)}
         >
           <div
-            className="w-full max-w-lg h-full bg-gray-900 border-l border-white/10 overflow-y-auto p-6 space-y-4"
+            className="w-full max-w-lg h-full bg-white dark:bg-neutral-900 border-l border-white/10 overflow-y-auto p-6 space-y-4"
             onClick={e => e.stopPropagation()}
           >
             <div className="flex items-start justify-between">
               <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-medium ${SEVERITY_COLOR[selected.severity] ?? ''}`}>
                 {selected.severity}
               </span>
-              <button onClick={() => setSelected(null)} className="text-gray-500 hover:text-white text-lg">✕</button>
+              <button onClick={() => setSelected(null)} className="text-neutral-500 dark:text-neutral-500 hover:text-white text-lg">✕</button>
             </div>
 
-            <h2 className="text-lg font-bold text-white">{selected.title}</h2>
+            <h2 className="text-lg font-bold text-neutral-900 dark:text-white">{selected.title}</h2>
 
             <div className="space-y-1 text-sm">
-              <p className="text-gray-400">Type: <span className="text-white">{TYPE_LABEL[selected.type] ?? selected.type}</span></p>
+              <p className="text-neutral-500 dark:text-neutral-400">Type: <span className="text-neutral-900 dark:text-white">{TYPE_LABEL[selected.type] ?? selected.type}</span></p>
               {selected.model_name && (
-                <p className="text-gray-400">Model:{' '}
+                <p className="text-neutral-500 dark:text-neutral-400">Model:{' '}
                   <button
                     onClick={() => navigate(`/lineage?focus=${encodeURIComponent(selected.model_name!)}`)}
-                    className="text-indigo-400 hover:text-indigo-300 font-mono hover:underline transition-colors"
+                    className="text-neutral-700 dark:text-neutral-300 hover:text-indigo-300 font-mono hover:underline transition-colors"
                     title="View in lineage graph"
                   >
                     {selected.model_name}
@@ -265,21 +265,21 @@ export default function Findings() {
             </div>
 
             <div>
-              <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Description</p>
-              <p className="text-sm text-gray-300 leading-relaxed">{selected.description}</p>
+              <p className="text-xs text-neutral-500 dark:text-neutral-500 uppercase tracking-wider mb-1">Description</p>
+              <p className="text-sm text-neutral-600 dark:text-neutral-300 leading-relaxed">{selected.description}</p>
             </div>
 
             {selected.recommendation && (
               <div>
-                <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Recommendation</p>
-                <p className="text-sm text-gray-300 leading-relaxed">{selected.recommendation}</p>
+                <p className="text-xs text-neutral-500 dark:text-neutral-500 uppercase tracking-wider mb-1">Recommendation</p>
+                <p className="text-sm text-neutral-600 dark:text-neutral-300 leading-relaxed">{selected.recommendation}</p>
               </div>
             )}
 
             {Object.keys(selected.metadata ?? {}).length > 0 && (
               <div>
-                <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Metadata</p>
-                <pre className="text-xs text-gray-400 bg-white/5 rounded p-3 overflow-x-auto">
+                <p className="text-xs text-neutral-500 dark:text-neutral-500 uppercase tracking-wider mb-1">Metadata</p>
+                <pre className="text-xs text-neutral-500 dark:text-neutral-400 bg-white/5 rounded p-3 overflow-x-auto">
                   {JSON.stringify(selected.metadata, null, 2)}
                 </pre>
               </div>

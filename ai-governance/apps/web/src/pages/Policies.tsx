@@ -32,14 +32,14 @@ interface Evaluation {
 const STATUS_COLOR: Record<string, string> = {
   active:   'bg-green-500/20 text-green-400',
   draft:    'bg-yellow-500/20 text-yellow-400',
-  inactive: 'bg-gray-500/20 text-gray-400',
+  inactive: 'bg-gray-500/20 text-neutral-500 dark:text-neutral-400',
 };
 
 const RESULT_COLOR: Record<string, string> = {
   pass: 'bg-green-500/20 text-green-400',
   fail: 'bg-red-500/20 text-red-400',
   warn: 'bg-yellow-500/20 text-yellow-400',
-  skip: 'bg-gray-500/20 text-gray-400',
+  skip: 'bg-gray-500/20 text-neutral-500 dark:text-neutral-400',
 };
 
 const RULE_TYPES = ['require_field', 'deny_value', 'require_connection', 'max_runs'];
@@ -113,8 +113,8 @@ export default function Policies() {
     <div className="p-8 space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-white">Policies</h1>
-          <p className="text-sm text-gray-400 mt-1">Define and enforce AI governance rules</p>
+          <h1 className="text-2xl font-bold text-neutral-900 dark:text-white">Policies</h1>
+          <p className="text-sm text-neutral-500 dark:text-neutral-400 mt-1">Define and enforce AI governance rules</p>
         </div>
         <button className="btn-primary" onClick={() => setShowForm(v => !v)}>
           {showForm ? 'Cancel' : '+ New Policy'}
@@ -123,7 +123,7 @@ export default function Policies() {
 
       {showForm && (
         <div className="card space-y-4">
-          <h2 className="text-sm font-semibold text-white">New Policy</h2>
+          <h2 className="text-sm font-semibold text-neutral-900 dark:text-white">New Policy</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="label">Name</label>
@@ -149,11 +149,11 @@ export default function Policies() {
           {/* Rules builder */}
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <p className="text-sm font-medium text-gray-300">Rules</p>
+              <p className="text-sm font-medium text-neutral-600 dark:text-neutral-300">Rules</p>
               <button className="btn-ghost text-xs py-1 px-2" onClick={addRule}>+ Add Rule</button>
             </div>
             {rules.map((rule, idx) => (
-              <div key={rule.id} className="grid grid-cols-2 sm:grid-cols-4 gap-2 p-3 bg-gray-800 rounded-lg">
+              <div key={rule.id} className="grid grid-cols-2 sm:grid-cols-4 gap-2 p-3 bg-neutral-100 dark:bg-neutral-800 rounded-lg">
                 <select className="input text-xs" value={rule.type}
                   onChange={e => updateRule(idx, { type: e.target.value as Rule['type'] })}>
                   {RULE_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
@@ -189,16 +189,16 @@ export default function Policies() {
         {/* Policy list */}
         <div className="lg:col-span-3 card p-0 overflow-hidden divide-y divide-gray-800">
           {loading
-            ? <p className="p-5 text-sm text-gray-500">Loading…</p>
+            ? <p className="p-5 text-sm text-neutral-500 dark:text-neutral-500">Loading…</p>
             : policies.length === 0
-              ? <p className="p-5 text-sm text-gray-500">No policies yet.</p>
+              ? <p className="p-5 text-sm text-neutral-500 dark:text-neutral-500">No policies yet.</p>
               : policies.map(p => (
                 <div key={p.id}
                   className={`flex items-center justify-between gap-4 px-5 py-4 cursor-pointer transition-colors ${selected?.id === p.id ? 'bg-gray-800' : 'hover:bg-gray-800/50'}`}
                   onClick={() => selectPolicy(p)}>
                   <div className="min-w-0">
-                    <p className="text-sm font-medium text-white">{p.name}</p>
-                    <p className="text-xs text-gray-500">{p.rules.length} rule{p.rules.length !== 1 ? 's' : ''}</p>
+                    <p className="text-sm font-medium text-neutral-900 dark:text-white">{p.name}</p>
+                    <p className="text-xs text-neutral-500 dark:text-neutral-500">{p.rules.length} rule{p.rules.length !== 1 ? 's' : ''}</p>
                   </div>
                   <div className="flex items-center gap-2 flex-shrink-0">
                     <span className={`badge ${STATUS_COLOR[p.status] ?? ''}`}>{p.status}</span>
@@ -219,30 +219,30 @@ export default function Policies() {
           {selected ? (
             <>
               <div className="card space-y-3">
-                <h2 className="text-sm font-semibold text-white">{selected.name}</h2>
-                {selected.description && <p className="text-xs text-gray-400">{selected.description}</p>}
+                <h2 className="text-sm font-semibold text-neutral-900 dark:text-white">{selected.name}</h2>
+                {selected.description && <p className="text-xs text-neutral-500 dark:text-neutral-400">{selected.description}</p>}
                 <div className="space-y-1.5">
                   {selected.rules.map(r => (
-                    <div key={r.id} className="text-xs bg-gray-800 rounded px-3 py-2">
+                    <div key={r.id} className="text-xs bg-neutral-100 dark:bg-neutral-800 rounded px-3 py-2">
                       <span className={`badge mr-2 ${r.severity === 'error' ? 'bg-red-500/20 text-red-400' : 'bg-yellow-500/20 text-yellow-400'}`}>
                         {r.severity}
                       </span>
-                      <span className="text-gray-300">{r.type}</span>
-                      {r.field && <span className="text-gray-500"> · {r.field}</span>}
-                      <p className="text-gray-500 mt-0.5">{r.message}</p>
+                      <span className="text-neutral-600 dark:text-neutral-300">{r.type}</span>
+                      {r.field && <span className="text-neutral-500 dark:text-neutral-500"> · {r.field}</span>}
+                      <p className="text-neutral-500 dark:text-neutral-500 mt-0.5">{r.message}</p>
                     </div>
                   ))}
                 </div>
               </div>
 
               <div className="card space-y-2">
-                <h2 className="text-sm font-semibold text-gray-300">Recent Evaluations</h2>
+                <h2 className="text-sm font-semibold text-neutral-600 dark:text-neutral-300">Recent Evaluations</h2>
                 {evaluations.length === 0
-                  ? <p className="text-xs text-gray-500">No evaluations yet.</p>
+                  ? <p className="text-xs text-neutral-500 dark:text-neutral-500">No evaluations yet.</p>
                   : evaluations.map(e => (
                     <div key={e.id} className="flex items-start justify-between gap-2 text-xs">
                       <div>
-                        <p className="text-gray-400">{e.node_name ?? 'Manual'}</p>
+                        <p className="text-neutral-500 dark:text-neutral-400">{e.node_name ?? 'Manual'}</p>
                         <p className="text-gray-600">{new Date(e.evaluated_at).toLocaleString()}</p>
                         {e.violations.map((v, i) => (
                           <p key={i} className="text-red-400 mt-0.5">✕ {v.message}</p>
@@ -255,7 +255,7 @@ export default function Policies() {
               </div>
             </>
           ) : (
-            <div className="card text-center py-10 text-sm text-gray-500">
+            <div className="card text-center py-10 text-sm text-neutral-500 dark:text-neutral-500">
               Select a policy to view details
             </div>
           )}

@@ -2,6 +2,7 @@ import { useState, useCallback, useEffect, useRef, createContext, useContext } f
 import { useSearchParams } from 'react-router-dom';
 import { lineageApi, chatApi } from '../lib/api';
 import { useAuth } from '../contexts/AuthContext';
+import { useTheme as useGlobalTheme } from '../contexts/ThemeContext';
 import {
   ReactFlow, Background, Controls,
   useNodesState, useEdgesState,
@@ -11,31 +12,32 @@ import {
 import '@xyflow/react/dist/style.css';
 import dagre from 'dagre';
 
-// ── Theme ──────────────────────────────────────────────────────────────────────
+// ── Theme (synced with global ThemeContext) ────────────────────────────────────
 
 type Theme = 'dark' | 'light';
 
 interface TV {
   bg: string; panel: string; secondary: string; hover: string;
   border: string; text: string; muted: string; faint: string;
-  inputCls: string; rfBg: string; rfDot: string; scrollbar: string;
+  inputCls: string; rfBg: string; rfDot: string;
 }
 
 const THEME: Record<Theme, TV> = {
   dark: {
-    bg: '#030712', panel: '#111827', secondary: '#1f2937', hover: '#1f2937',
-    border: '#1f2937', text: '#f9fafb', muted: '#9ca3af', faint: '#4b5563',
-    inputCls: 'bg-gray-800 border-gray-700 text-gray-200 placeholder-gray-600 focus:border-gray-500',
-    rfBg: '#030712', rfDot: '#1e293b', scrollbar: 'scrollbar-dark',
+    bg: '#0a0a0a', panel: '#111111', secondary: '#1a1a1a', hover: '#1a1a1a',
+    border: '#1a1a1a', text: '#fafafa', muted: '#737373', faint: '#404040',
+    inputCls: 'bg-neutral-900 border-neutral-700 text-neutral-200 placeholder-neutral-600 focus:border-neutral-500',
+    rfBg: '#0a0a0a', rfDot: '#1a1a1a',
   },
   light: {
-    bg: '#ffffff', panel: '#f9fafb', secondary: '#f3f4f6', hover: '#f3f4f6',
-    border: '#e5e7eb', text: '#111827', muted: '#6b7280', faint: '#9ca3af',
-    inputCls: 'bg-white border-gray-300 text-gray-800 placeholder-gray-400 focus:border-blue-400',
-    rfBg: '#f8fafc', rfDot: '#cbd5e1', scrollbar: 'scrollbar-light',
+    bg: '#ffffff', panel: '#fafafa', secondary: '#f5f5f5', hover: '#f5f5f5',
+    border: '#e5e5e5', text: '#0a0a0a', muted: '#737373', faint: '#a3a3a3',
+    inputCls: 'bg-white border-neutral-300 text-neutral-900 placeholder-neutral-400 focus:border-neutral-500',
+    rfBg: '#f9fafb', rfDot: '#e5e5e5',
   },
 };
 
+// Internal context (wraps global theme for components that need T object)
 const ThemeCtx = createContext<{ theme: Theme; T: TV; isDark: boolean }>({
   theme: 'dark', T: THEME.dark, isDark: true,
 });
@@ -49,7 +51,7 @@ const useGraph = () => useContext(GraphCtx);
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
-type Layer = 'raw' | 'source' | 'core' | 'analytics';
+type Layer = string;
 type TestBadge = 'P' | 'F' | 'N' | 'U';
 interface ModelNode  { id: string; name: string; layer: Layer; }
 interface ColumnDef  { name: string; type: string; tests: TestBadge[]; description?: string; }
@@ -209,19 +211,47 @@ const EDGES_RAW: [string, string][] = [
   ['core_orders','analytics_channel_roi'],['core_web_engagement','analytics_channel_roi'],
 ];
 
-// ── Layer colours (both themes) ────────────────────────────────────────────────
+// ── Dynamic layer colours ─────────────────────────────────────────────────────
+// A small neutral palette — assigned round-robin by layer order
+const LAYER_PALETTE_BORDER = ['#525252', '#737373', '#a3a3a3', '#262626', '#d4d4d4'];
+const LAYER_PALETTE_BG_DARK  = ['#1a1a1a', '#111111', '#262626', '#0a0a0a', '#1f1f1f'];
+const LAYER_PALETTE_BG_LIGHT = ['#f5f5f5', '#e5e5e5', '#fafafa', '#ebebeb', '#f0f0f0'];
+const LAYER_PALETTE_TEXT_DARK  = Array(5).fill('#d4d4d4');
+const LAYER_PALETTE_TEXT_LIGHT = Array(5).fill('#171717');
 
-const LAYER_BORDER: Record<Layer, string> = { raw: '#3b82f6', source: '#22c55e', core: '#818cf8', analytics: '#f59e0b' };
-const LAYER_BG: Record<Theme, Record<Layer, string>> = {
-  dark:  { raw: '#1e3a5f', source: '#14532d', core: '#312e81', analytics: '#78350f' },
-  light: { raw: '#dbeafe', source: '#dcfce7', core: '#ede9fe', analytics: '#fef3c7' },
-};
-const LAYER_TEXT: Record<Theme, Record<Layer, string>> = {
-  dark:  { raw: '#e2e8f0', source: '#e2e8f0', core: '#e2e8f0', analytics: '#e2e8f0' },
-  light: { raw: '#1e3a8a', source: '#14532d', core: '#3730a3', analytics: '#78350f' },
-};
-const LAYER_LABEL: Record<Layer, string> = { raw: 'Raw', source: 'Source', core: 'Core', analytics: 'Analytics' };
-const LAYERS: Layer[] = ['raw', 'source', 'core', 'analytics'];
+// Cache layer→index mapping so it's stable within a render cycle
+const layerIndexCache = new Map<string, number>();
+let layerCounter = 0;
+
+function getLayerIndex(layer: string): number {
+  if (!layerIndexCache.has(layer)) {
+    layerIndexCache.set(layer, layerCounter++ % LAYER_PALETTE_BORDER.length);
+  }
+  return layerIndexCache.get(layer)!;
+}
+
+function layerBorder(layer: string): string {
+  return LAYER_PALETTE_BORDER[getLayerIndex(layer)];
+}
+function layerBg(layer: string, theme: Theme): string {
+  const i = getLayerIndex(layer);
+  return theme === 'dark' ? LAYER_PALETTE_BG_DARK[i] : LAYER_PALETTE_BG_LIGHT[i];
+}
+function layerText(layer: string, theme: Theme): string {
+  const i = getLayerIndex(layer);
+  return theme === 'dark' ? LAYER_PALETTE_TEXT_DARK[i] : LAYER_PALETTE_TEXT_LIGHT[i];
+}
+function layerLabel(layer: string): string {
+  return layer.charAt(0).toUpperCase() + layer.slice(1);
+}
+function getUniqueLayers(nodes: ModelNode[]): string[] {
+  const seen = new Set<string>();
+  const order: string[] = [];
+  for (const n of nodes) {
+    if (!seen.has(n.layer)) { seen.add(n.layer); order.push(n.layer); }
+  }
+  return order;
+}
 
 const BADGE_CLS: Record<TestBadge, string> = {
   P: 'bg-blue-100 text-blue-700 border border-blue-300 dark:bg-blue-900 dark:text-blue-300 dark:border-blue-700',
@@ -305,27 +335,27 @@ function getMeta(id: string, nodes: ModelNode[], edgePairs: [string, string][]):
   if (META[id]) return META[id];
   const n = nodes.find(x => x.id === id) ?? STATIC_NODE_MAP.get(id);
   const layer = n?.layer ?? 'raw';
-  const label = id.replace(/^(raw_|src_|core_|analytics_)/, '').replace(/_/g, ' ');
+  const label = id.replace(/^[a-z]+_/, '').replace(/_/g, ' ');
   const upstream = edgePairs.find(([, t]) => t === id)?.[0] ?? 'upstream_model';
   return {
-    description: `${LAYER_LABEL[layer as Layer]}-layer model for ${label}.`,
+    description: `${layerLabel(layer)}-layer model for ${label}.`,
     columns: [
-      { name: `${id.replace(/^(raw_|src_|core_|analytics_)/, '')}_id`, type: 'varchar',   tests: ['P','N','U'], description: 'Primary key' },
+      { name: `${id.replace(/^[a-z]+_/, '')}_id`, type: 'varchar', tests: ['P','N','U'], description: 'Primary key' },
       { name: 'created_at', type: 'timestamp', tests: ['N'], description: 'Record creation timestamp' },
       { name: 'updated_at', type: 'timestamp', tests: [],    description: 'Last update timestamp' },
     ],
-    sql: layer === 'raw' ? `select * from ${id.replace('raw_', '')}` : `select *\nfrom {{ ref('${upstream}') }}`,
+    sql: layer === 'raw' ? `select * from ${id.replace(/^[a-z]+_/, '')}` : `select *\nfrom {{ ref('${upstream}') }}`,
   };
 }
 
 // ── Layer inference from model name ────────────────────────────────────────────
 
-function inferLayer(name: string): Layer {
-  if (name.startsWith('raw_'))       return 'raw';
-  if (name.startsWith('src_'))       return 'source';
-  if (name.startsWith('core_'))      return 'core';
-  if (name.startsWith('analytics_')) return 'analytics';
-  return 'raw';
+function inferLayer(name: string): string {
+  // Extract the first snake_case segment as the layer name
+  const prefix = name.split('_')[0];
+  // Map common short prefixes to full names
+  const map: Record<string, string> = { src: 'source', stg: 'staging', int: 'intermediate', fct: 'fact', dim: 'dimension', mart: 'mart', rpt: 'report' };
+  return map[prefix] ?? prefix ?? 'unknown';
 }
 
 // ── Graph helpers ──────────────────────────────────────────────────────────────
@@ -346,23 +376,24 @@ function getFullLineage(id: string, edgePairs: [string, string][]) {
 const NW = 195, NH = 44;
 
 function buildFlow(modelNodes: ModelNode[], edgePairs: [string, string][], selectedId: string, theme: Theme) {
+  const isDark = theme === 'dark';
   const rfNodes: Node[] = modelNodes.map(n => ({
     id: n.id, type: 'default', position: { x: 0, y: 0 },
-    data: { label: n.name.replace(/^(raw_|src_|core_|analytics_)/, '') },
+    data: { label: n.name.replace(/^[a-z]+_/, '') },
     style: {
-      background: n.id === selectedId ? LAYER_BORDER[n.layer] : LAYER_BG[theme][n.layer],
-      color: n.id === selectedId ? '#ffffff' : LAYER_TEXT[theme][n.layer],
-      border: `2px solid ${LAYER_BORDER[n.layer]}`,
+      background: n.id === selectedId ? (isDark ? '#ffffff' : '#0a0a0a') : layerBg(n.layer, theme),
+      color: n.id === selectedId ? (isDark ? '#0a0a0a' : '#ffffff') : layerText(n.layer, theme),
+      border: `1.5px solid ${n.id === selectedId ? (isDark ? '#ffffff' : '#0a0a0a') : layerBorder(n.layer)}`,
       borderRadius: 8, fontSize: 11, fontWeight: n.id === selectedId ? 700 : 400,
       width: NW, height: NH, display: 'flex', alignItems: 'center',
       justifyContent: 'center', padding: '0 8px', cursor: 'pointer',
-      boxShadow: n.id === selectedId ? `0 0 16px ${LAYER_BORDER[n.layer]}66` : '0 1px 6px rgba(0,0,0,0.15)',
+      boxShadow: n.id === selectedId ? (isDark ? '0 0 0 2px rgba(255,255,255,0.2)' : '0 0 0 2px rgba(0,0,0,0.15)') : '0 1px 3px rgba(0,0,0,0.08)',
     },
   }));
   const rfEdges: Edge[] = edgePairs.map(([s, t], i) => ({
     id: `e${i}`, source: s, target: t,
-    style: { stroke: theme === 'dark' ? '#475569' : '#94a3b8', strokeWidth: 1.5 },
-    markerEnd: { type: MarkerType.ArrowClosed, color: theme === 'dark' ? '#64748b' : '#94a3b8', width: 11, height: 11 },
+    style: { stroke: isDark ? '#404040' : '#d4d4d4', strokeWidth: 1.5 },
+    markerEnd: { type: MarkerType.ArrowClosed, color: isDark ? '#525252' : '#a3a3a3', width: 11, height: 11 },
   }));
   const g = new dagre.graphlib.Graph();
   g.setDefaultEdgeLabel(() => ({}));
@@ -420,7 +451,7 @@ function describeSel(sel: Selector): string {
 function LineageModal({ initialId, onClose, onNavigate }: {
   initialId: string; onClose: () => void; onNavigate: (id: string) => void;
 }) {
-  const { T, theme } = useTheme();
+  const { T, theme, isDark } = useTheme();
   const { nodes: graphNodes, edgePairs } = useGraph();
   const [query, setQuery]     = useState(initialId);
   const [applied, setApplied] = useState<Selector>({ nodeId: initialId, upDepth: 1, downDepth: 1 });
@@ -485,13 +516,13 @@ function LineageModal({ initialId, onClose, onNavigate }: {
         <div className="flex items-center justify-between px-5 py-3 border-b flex-shrink-0" style={{ borderColor: T.border, background: T.secondary }}>
           <div className="flex items-center gap-3">
             <span className="text-sm font-semibold" style={{ color: T.text }}>Lineage Explorer</span>
-            {selNode && <span className="text-xs px-2 py-0.5 rounded" style={{ background: LAYER_BG[theme][selNode.layer], color: LAYER_BORDER[selNode.layer], border: `1px solid ${LAYER_BORDER[selNode.layer]}` }}>{LAYER_LABEL[selNode.layer]}</span>}
+            {selNode && <span className="text-xs px-2 py-0.5 rounded" style={{ background: layerBg(selNode.layer, theme), color: layerBorder(selNode.layer), border: `1px solid ${layerBorder(selNode.layer)}` }}>{layerLabel(selNode.layer)}</span>}
             <span className="text-xs" style={{ color: T.faint }}>{nodes.length} nodes · {edges.length} edges</span>
           </div>
           <div className="flex items-center gap-3">
-            {LAYERS.map(l => (
+            {getUniqueLayers(graphNodes).slice(0, 4).map(l => (
               <span key={l} className="hidden md:flex items-center gap-1.5 text-xs" style={{ color: T.muted }}>
-                <span className="w-2 h-2 rounded-sm" style={{ background: LAYER_BORDER[l] }} />{LAYER_LABEL[l]}
+                <span className="w-2 h-2 rounded-sm" style={{ background: layerBorder(l) }} />{layerLabel(l)}
               </span>
             ))}
             <button onClick={onClose} className="ml-2 hover:opacity-70 transition-opacity" style={{ color: T.muted }}>
@@ -527,9 +558,9 @@ function LineageModal({ initialId, onClose, onNavigate }: {
                     style={{ background: i === focusSug ? T.hover : 'transparent', color: T.text }}
                     onMouseEnter={e => (e.currentTarget.style.background = T.hover)}
                     onMouseLeave={e => (e.currentTarget.style.background = i === focusSug ? T.hover : 'transparent')}>
-                    {n && <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: LAYER_BORDER[n.layer] }} />}
+                    {n && <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: layerBorder(n.layer) }} />}
                     <span className="font-mono">{s}</span>
-                    {n && <span className="ml-auto text-xs" style={{ color: T.faint }}>{LAYER_LABEL[n.layer]}</span>}
+                    {n && <span className="ml-auto text-xs" style={{ color: T.faint }}>{layerLabel(n.layer)}</span>}
                   </button>
                 );
               })}
@@ -546,12 +577,12 @@ function LineageModal({ initialId, onClose, onNavigate }: {
                 onChange={e => updateSuggestions(e.target.value)}
                 onKeyDown={onKeyDown}
                 placeholder="+2core_orders+1   (+ = all · +N = N levels · prefix = upstream · suffix = downstream)"
-                className={`w-full rounded-lg px-3 py-2 text-xs font-mono border focus:outline-none focus:ring-1 focus:ring-indigo-500 ${T.inputCls}`}
+                className={`w-full rounded-lg px-3 py-2 text-xs font-mono border focus:outline-none focus:ring-1 focus:ring-neutral-500 ${T.inputCls}`}
               />
             </div>
             <button onClick={() => applyQuery()}
-              className="px-4 py-2 rounded-lg text-xs font-semibold text-white transition-colors hover:opacity-90"
-              style={{ background: '#4f46e5' }}>
+              className="px-4 py-2 rounded-lg text-xs font-semibold transition-colors hover:opacity-90"
+              style={{ background: isDark ? '#ffffff' : '#0a0a0a', color: isDark ? '#0a0a0a' : '#ffffff' }}>
               Show
             </button>
 
@@ -617,7 +648,7 @@ function LineageModal({ initialId, onClose, onNavigate }: {
             ].map(([q, label]) => (
               <button key={q} onClick={() => { setQuery(q); applyQuery(q); }}
                 className="text-xs font-mono px-2 py-0.5 rounded transition-colors hover:opacity-80"
-                style={{ background: T.panel, color: '#818cf8', border: `1px solid ${T.border}` }}>
+                style={{ background: T.panel, color: T.text, border: `1px solid ${T.border}` }}>
                 {q}
                 <span className="ml-1 font-sans" style={{ color: T.faint }}>({label})</span>
               </button>
@@ -642,7 +673,7 @@ interface ColLineageEntry {
 function ModelDocs({ id, onNavigate, onFocusAI }: {
   id: string; onNavigate: (id: string) => void; onFocusAI: () => void;
 }) {
-  const { T, theme } = useTheme();
+  const { T, theme, isDark } = useTheme();
   const { workspaceId } = useAuth();
   const { nodes: graphNodes, edgePairs } = useGraph();
   const [tab, setTab] = useState<DocTab>('description');
@@ -676,20 +707,20 @@ function ModelDocs({ id, onNavigate, onFocusAI }: {
             <div className="flex items-center gap-2 flex-wrap">
               <h1 className="text-xl font-bold font-mono" style={{ color: T.text }}>{node.name}</h1>
               <span className="text-xs px-2 py-0.5 rounded font-medium"
-                style={{ background: LAYER_BG[theme][node.layer], color: LAYER_BORDER[node.layer], border: `1px solid ${LAYER_BORDER[node.layer]}` }}>
-                {LAYER_LABEL[node.layer]}
+                style={{ background: layerBg(node.layer, theme), color: layerBorder(node.layer), border: `1px solid ${layerBorder(node.layer)}` }}>
+                {layerLabel(node.layer)}
               </span>
               <span className="text-xs" style={{ color: T.faint }}>table</span>
             </div>
             <div className="flex items-center gap-4 mt-1.5 text-xs flex-wrap" style={{ color: T.muted }}>
               {parents.length > 0 && (
                 <span>↑ {parents.length} upstream: {parents.slice(0,2).map(p => (
-                  <button key={p} onClick={() => onNavigate(p)} className="hover:underline ml-1 font-mono" style={{ color: '#818cf8' }}>{p}</button>
+                  <button key={p} onClick={() => onNavigate(p)} className="hover:underline ml-1 font-mono" style={{ color: T.text }}>{p}</button>
                 ))}{parents.length > 2 && ` +${parents.length-2} more`}</span>
               )}
               {children.length > 0 && (
                 <span>↓ {children.length} downstream: {children.slice(0,2).map(c => (
-                  <button key={c} onClick={() => onNavigate(c)} className="hover:underline ml-1 font-mono" style={{ color: '#818cf8' }}>{c}</button>
+                  <button key={c} onClick={() => onNavigate(c)} className="hover:underline ml-1 font-mono" style={{ color: T.text }}>{c}</button>
                 ))}{children.length > 2 && ` +${children.length-2} more`}</span>
               )}
               {parents.length === 0  && <span style={{ color: '#22c55e' }}>● root model</span>}
@@ -703,8 +734,8 @@ function ModelDocs({ id, onNavigate, onFocusAI }: {
             <button key={t} onClick={() => setTab(t)}
               className="px-4 py-2 text-sm font-medium capitalize transition-colors border-b-2"
               style={{
-                color: tab === t ? '#818cf8' : T.muted,
-                borderColor: tab === t ? '#818cf8' : 'transparent',
+                color: tab === t ? T.text : T.muted,
+                borderColor: tab === t ? T.text : 'transparent',
               }}>
               {t}
             </button>
@@ -726,7 +757,7 @@ function ModelDocs({ id, onNavigate, onFocusAI }: {
               <table className="text-xs w-full">
                 <tbody>
                   {[
-                    ['Layer',      LAYER_LABEL[node.layer]],
+                    ['Layer',      layerLabel(node.layer)],
                     ['Columns',    String(meta.columns.length)],
                     ['Upstream',   `${parents.length} direct · ${ancestors.length} total`],
                     ['Downstream', `${children.length} direct · ${descendants.length} total`],
@@ -804,7 +835,7 @@ function ModelDocs({ id, onNavigate, onFocusAI }: {
             </p>
             {lineageLoading ? (
               <div className="flex items-center gap-2 text-sm" style={{ color: T.muted }}>
-                <div className="w-4 h-4 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin" />
+                <div className="w-4 h-4 border-2 border-neutral-400 dark:border-neutral-500 border-t-transparent rounded-full animate-spin" />
                 Loading column lineage…
               </div>
             ) : colLineage.length === 0 ? (
@@ -838,7 +869,7 @@ function ModelDocs({ id, onNavigate, onFocusAI }: {
                           : entry.sourceRefs.map((r, j) => (
                             <span key={j} className="inline-flex items-center gap-1 mr-2">
                               <button onClick={() => onNavigate(r.model)}
-                                className="font-mono hover:underline" style={{ color: '#818cf8' }}>{r.model}</button>
+                                className="font-mono hover:underline" style={{ color: T.text }}>{r.model}</button>
                               <span style={{ color: T.faint }}>.</span>
                               <span className="font-mono" style={{ color: T.text }}>{r.column}</span>
                             </span>
@@ -860,7 +891,7 @@ function ModelDocs({ id, onNavigate, onFocusAI }: {
         <div className="relative group">
           <button onClick={onFocusAI} title="Ask AI"
             className="w-11 h-11 rounded-full shadow-lg flex items-center justify-center transition-transform hover:scale-105 active:scale-95 border"
-            style={{ background: '#4f46e5', borderColor: '#6366f1', color: '#fff' }}>
+            style={{ background: isDark ? '#ffffff' : '#0a0a0a', borderColor: isDark ? '#ffffff' : '#0a0a0a', color: isDark ? '#0a0a0a' : '#ffffff' }}>
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
             </svg>
@@ -872,7 +903,7 @@ function ModelDocs({ id, onNavigate, onFocusAI }: {
         <div className="relative group">
           <button onClick={() => setLineageOpen(true)} title="View Lineage"
             className="w-11 h-11 rounded-full shadow-lg flex items-center justify-center transition-transform hover:scale-105 active:scale-95 border"
-            style={{ background: LAYER_BORDER[node.layer], borderColor: LAYER_BORDER[node.layer], color: '#fff' }}>
+            style={{ background: layerBorder(node.layer), borderColor: layerBorder(node.layer), color: '#fff' }}>
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <circle cx="5" cy="12" r="2"/><circle cx="19" cy="5" r="2"/><circle cx="19" cy="19" r="2"/>
               <line x1="7" y1="12" x2="17" y2="6"/><line x1="7" y1="12" x2="17" y2="18"/>
@@ -909,7 +940,7 @@ function ModelTree({ selected, onSelect, width }: { selected: string | null; onS
           className={`w-full rounded px-2 py-1.5 text-xs border focus:outline-none ${T.inputCls}`} />
       </div>
       <div className="flex-1 overflow-y-auto py-1">
-        {LAYERS.map(layer => {
+        {getUniqueLayers(graphNodes).map(layer => {
           const models = filtered.filter(n => n.layer === layer);
           if (!models.length) return null;
           const isCol = collapsed.has(layer);
@@ -921,8 +952,8 @@ function ModelTree({ selected, onSelect, width }: { selected: string | null; onS
                 onMouseEnter={e => (e.currentTarget.style.background = T.hover)}
                 onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}>
                 <span className="text-xs w-2" style={{ color: T.faint }}>{isCol ? '▶' : '▼'}</span>
-                <span className="w-2 h-2 rounded-sm flex-shrink-0" style={{ background: LAYER_BORDER[layer] }} />
-                <span className="text-xs font-semibold" style={{ color: T.text }}>{LAYER_LABEL[layer]}</span>
+                <span className="w-2 h-2 rounded-sm flex-shrink-0" style={{ background: layerBorder(layer) }} />
+                <span className="text-xs font-semibold" style={{ color: T.text }}>{layerLabel(layer)}</span>
                 <span className="ml-auto text-xs" style={{ color: T.faint }}>{models.length}</span>
               </button>
               {!isCol && models.map(n => (
@@ -932,9 +963,9 @@ function ModelTree({ selected, onSelect, width }: { selected: string | null; onS
                   onMouseEnter={e => { if (selected !== n.id) e.currentTarget.style.background = T.hover; }}
                   onMouseLeave={e => { if (selected !== n.id) e.currentTarget.style.background = 'transparent'; }}>
                   <span className="w-1.5 h-1.5 rounded-full flex-shrink-0"
-                    style={{ background: selected === n.id ? LAYER_BORDER[layer] : T.faint, border: `1px solid ${LAYER_BORDER[layer]}` }} />
+                    style={{ background: selected === n.id ? layerBorder(layer) : T.faint, border: `1px solid ${layerBorder(layer)}` }} />
                   <span className="text-xs truncate" style={{ color: selected === n.id ? T.text : T.muted, fontWeight: selected === n.id ? 600 : 400 }}>
-                    {n.name.replace(/^(raw_|src_|core_|analytics_)/, '')}
+                    {n.name.replace(/^[a-z]+_/, '')}
                   </span>
                 </button>
               ))}
@@ -944,7 +975,7 @@ function ModelTree({ selected, onSelect, width }: { selected: string | null; onS
       </div>
       <div className="px-3 py-2 border-t flex items-center gap-2" style={{ borderColor: T.border }}>
         {graphLoading
-          ? <div className="w-3 h-3 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin" />
+          ? <div className="w-3 h-3 border-2 border-neutral-400 dark:border-neutral-500 border-t-transparent rounded-full animate-spin" />
           : <p className="text-xs" style={{ color: T.faint }}>{graphNodes.length} models</p>
         }
       </div>
@@ -960,7 +991,7 @@ function buildContext(id: string, graphNodes: ModelNode[], edgePairs: [string, s
   const parents  = edgePairs.filter(([,t]) => t === id).map(([s]) => s);
   const children = edgePairs.filter(([s]) => s === id).map(([,t]) => t);
   return [
-    `**Model: \`${id}\`** (${LAYER_LABEL[n.layer]} layer)`,
+    `**Model: \`${id}\`** (${layerLabel(n.layer)} layer)`,
     '',
     parents.length  ? `**Direct upstream (${parents.length}):** ${parents.join(', ')}`   : '**Upstream:** none — root model',
     children.length ? `**Direct downstream (${children.length}):** ${children.join(', ')}` : '**Downstream:** none — leaf model',
@@ -975,7 +1006,7 @@ function buildContext(id: string, graphNodes: ModelNode[], edgePairs: [string, s
 function AiChat({ selectedModelId, open, onToggle }: {
   selectedModelId: string | null; open: boolean; onToggle: () => void;
 }) {
-  const { T } = useTheme();
+  const { T, isDark } = useTheme();
   const { workspaceId } = useAuth();
   const { nodes: graphNodes, edgePairs } = useGraph();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -1029,7 +1060,7 @@ function AiChat({ selectedModelId, open, onToggle }: {
       {/* Expanded panel */}
       {open && (<>
         <div className="px-4 py-3 border-b flex items-center gap-2 flex-shrink-0" style={{ borderColor: T.border }}>
-          <div className="w-2 h-2 rounded-full bg-indigo-400" />
+          <div className="w-2 h-2 rounded-full bg-neutral-400" />
           <p className="text-xs font-semibold flex-1" style={{ color: T.text }}>AI Assistant</p>
           {selectedModelId && (
             <span className="text-xs px-2 py-0.5 rounded truncate max-w-[110px]" style={{ background: T.secondary, color: T.muted }}>{selectedModelId}</span>
@@ -1052,7 +1083,7 @@ function AiChat({ selectedModelId, open, onToggle }: {
           {messages.map((m, i) => (
             <div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
               <div className="max-w-[92%] rounded-lg px-3 py-2 text-xs leading-relaxed whitespace-pre-wrap"
-                style={{ background: m.role === 'user' ? '#4f46e5' : T.secondary, color: m.role === 'user' ? '#fff' : T.text }}>
+                style={{ background: m.role === 'user' ? (isDark ? '#ffffff' : '#0a0a0a') : T.secondary, color: m.role === 'user' ? (isDark ? '#0a0a0a' : '#ffffff') : T.text }}>
                 {m.content}
               </div>
             </div>
@@ -1068,8 +1099,8 @@ function AiChat({ selectedModelId, open, onToggle }: {
               disabled={!selectedModelId || loading}
               className={`flex-1 rounded px-2 py-1.5 text-xs border focus:outline-none disabled:opacity-40 ${T.inputCls}`} />
             <button onClick={send} disabled={!selectedModelId || !input.trim() || loading}
-              className="px-3 py-1.5 rounded text-xs text-white transition-colors disabled:opacity-40"
-              style={{ background: '#4f46e5' }}>
+              className="px-3 py-1.5 rounded text-xs transition-colors disabled:opacity-40"
+              style={{ background: isDark ? '#ffffff' : '#0a0a0a', color: isDark ? '#0a0a0a' : '#ffffff' }}>
               Send
             </button>
           </div>
@@ -1085,8 +1116,9 @@ export default function Lineage() {
   const [searchParams] = useSearchParams();
   const focusParam = searchParams.get('focus');
   const { workspaceId } = useAuth();
+  const { theme: globalTheme } = useGlobalTheme();
+  const theme: Theme = globalTheme === 'dark' ? 'dark' : 'light';
 
-  const [theme, setTheme]       = useState<Theme>('dark');
   const [selectedId, setSelected] = useState<string | null>(focusParam ?? null);
   const [aiOpen, setAiOpen]     = useState(true);
   const [treeWidth, setTreeWidth] = useState(240);
@@ -1117,7 +1149,6 @@ export default function Lineage() {
           setGraphNodes(apiNodes);
           setEdgePairs(apiEdges);
         }
-        // If API returns empty (no nodes yet), keep static ShopMesh demo data
       })
       .catch(() => { /* keep static fallback */ })
       .finally(() => setGraphLoading(false));
@@ -1125,12 +1156,10 @@ export default function Lineage() {
 
   const T = THEME[theme];
 
-  // Sync ?focus= param whenever it changes (e.g. navigated from Findings)
   useEffect(() => {
     if (focusParam) setSelected(focusParam);
   }, [focusParam]);
 
-  // Drag-resize the tree panel
   useEffect(() => {
     const onMove = (e: MouseEvent) => {
       if (!dragging.current) return;
@@ -1144,7 +1173,6 @@ export default function Lineage() {
   }, []);
 
   const handleSelect = useCallback((id: string) => setSelected(id), []);
-
   const focusAI = useCallback(() => { setAiOpen(true); }, []);
 
   return (
@@ -1152,22 +1180,12 @@ export default function Lineage() {
     <GraphCtx.Provider value={{ nodes: graphNodes, edgePairs, loading: graphLoading }}>
       <div className="flex h-full overflow-hidden relative" style={{ background: T.bg }}>
 
-        {/* ── Theme toggle (top-right of the whole page) ── */}
-        <div className="absolute top-3 right-3 z-30" style={{ right: aiOpen ? 300 : 56 }}>
-          <button onClick={() => setTheme(t => t === 'dark' ? 'light' : 'dark')}
-            className="w-8 h-8 rounded-full flex items-center justify-center border transition-all hover:opacity-80 shadow"
-            style={{ background: T.secondary, borderColor: T.border, color: T.muted }}
-            title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}>
-            {theme === 'dark' ? '☀' : '🌙'}
-          </button>
-        </div>
-
         {/* ── Left: Model tree ── */}
         <ModelTree selected={selectedId} onSelect={handleSelect} width={treeWidth} />
 
         {/* ── Drag handle ── */}
         <div
-          className="w-1 flex-shrink-0 cursor-col-resize transition-colors hover:bg-indigo-500/40 active:bg-indigo-500/60"
+          className="w-1 flex-shrink-0 cursor-col-resize transition-colors hover:bg-neutral-500/20 active:bg-neutral-500/30"
           style={{ background: T.border }}
           onMouseDown={e => { dragging.current = true; dragStart.current = { x: e.clientX, w: treeWidth }; document.body.style.cursor = 'col-resize'; }}
         />

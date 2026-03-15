@@ -70,8 +70,8 @@ export default function Connections() {
     <div className="p-8 space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-white">Connections</h1>
-          <p className="text-sm text-gray-400 mt-1">Manage API keys and MCP server connections</p>
+          <h1 className="text-2xl font-bold text-neutral-900 dark:text-white">Connections</h1>
+          <p className="text-sm text-neutral-500 dark:text-neutral-400 mt-1">Manage API keys and MCP server connections</p>
         </div>
         <button className="btn-primary" onClick={() => setShowForm(v => !v)}>
           {showForm ? 'Cancel' : '+ New Connection'}
@@ -80,7 +80,7 @@ export default function Connections() {
 
       {showForm && (
         <div className="card space-y-4">
-          <h2 className="text-sm font-semibold text-white">New Connection</h2>
+          <h2 className="text-sm font-semibold text-neutral-900 dark:text-white">New Connection</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="label">Name</label>
@@ -115,23 +115,23 @@ export default function Connections() {
       )}
 
       {loading
-        ? <p className="text-gray-500 text-sm">Loading…</p>
+        ? <p className="text-neutral-500 dark:text-neutral-500 text-sm">Loading…</p>
         : rows.length === 0
-          ? <div className="card text-center py-12 text-gray-500 text-sm">No connections yet.</div>
+          ? <div className="card text-center py-12 text-neutral-500 dark:text-neutral-500 text-sm">No connections yet.</div>
           : (
             <div className="card divide-y divide-gray-800 p-0 overflow-hidden">
               {rows.map(c => (
                 <div key={c.id} className="flex items-center justify-between gap-4 px-5 py-4">
                   <div className="min-w-0">
-                    <p className="text-sm font-medium text-white">{c.name}</p>
-                    <p className="text-xs text-gray-500">
+                    <p className="text-sm font-medium text-neutral-900 dark:text-white">{c.name}</p>
+                    <p className="text-xs text-neutral-500 dark:text-neutral-500">
                       {c.type}{c.provider ? ` · ${c.provider}` : ''}
                       {c.last_health_check && ` · checked ${new Date(c.last_health_check).toLocaleString()}`}
                     </p>
                   </div>
                   <div className="flex items-center gap-2 flex-shrink-0">
                     {c.health_status && (
-                      <span className={`badge ${HEALTH_COLOR[c.health_status] ?? 'bg-gray-700 text-gray-400'}`}>
+                      <span className={`badge ${HEALTH_COLOR[c.health_status] ?? 'bg-gray-700 text-neutral-500 dark:text-neutral-400'}`}>
                         {c.health_status}
                       </span>
                     )}

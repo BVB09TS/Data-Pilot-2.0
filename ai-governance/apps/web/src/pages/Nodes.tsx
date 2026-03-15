@@ -49,8 +49,8 @@ export default function Nodes() {
     <div className="p-8 space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-white">Nodes</h1>
-          <p className="text-sm text-gray-400 mt-1">AI models and pipeline components</p>
+          <h1 className="text-2xl font-bold text-neutral-900 dark:text-white">Nodes</h1>
+          <p className="text-sm text-neutral-500 dark:text-neutral-400 mt-1">AI models and pipeline components</p>
         </div>
         <button className="btn-primary" onClick={() => setShowForm(v => !v)}>
           {showForm ? 'Cancel' : '+ New Node'}
@@ -59,7 +59,7 @@ export default function Nodes() {
 
       {showForm && (
         <div className="card space-y-4">
-          <h2 className="text-sm font-semibold text-white">New Node</h2>
+          <h2 className="text-sm font-semibold text-neutral-900 dark:text-white">New Node</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="label">Name</label>
@@ -92,16 +92,16 @@ export default function Nodes() {
       )}
 
       {loading
-        ? <p className="text-gray-500 text-sm">Loading…</p>
+        ? <p className="text-neutral-500 dark:text-neutral-500 text-sm">Loading…</p>
         : rows.length === 0
-          ? <div className="card text-center py-12 text-gray-500 text-sm">No nodes yet.</div>
+          ? <div className="card text-center py-12 text-neutral-500 dark:text-neutral-500 text-sm">No nodes yet.</div>
           : (
             <div className="card divide-y divide-gray-800 p-0 overflow-hidden">
               {rows.map(n => (
                 <div key={n.id} className="flex items-center justify-between gap-4 px-5 py-4">
                   <div className="min-w-0">
-                    <p className="text-sm font-medium text-white">{n.name}</p>
-                    <p className="text-xs text-gray-500">
+                    <p className="text-sm font-medium text-neutral-900 dark:text-white">{n.name}</p>
+                    <p className="text-xs text-neutral-500 dark:text-neutral-500">
                       {n.type}{n.description ? ` · ${n.description}` : ''}
                     </p>
                   </div>

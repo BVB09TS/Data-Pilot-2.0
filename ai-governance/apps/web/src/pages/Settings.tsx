@@ -89,22 +89,22 @@ export default function Settings() {
   }
 
   if (loading) {
-    return <div className="p-6 text-gray-400 text-sm">Loading…</div>;
+    return <div className="p-6 text-neutral-500 dark:text-neutral-400 text-sm">Loading…</div>;
   }
 
   return (
     <div className="p-6 max-w-2xl space-y-8">
       <div>
-        <h1 className="text-2xl font-bold text-white">Settings</h1>
-        <p className="text-sm text-gray-400 mt-1">Configure LLM API keys and default project path for this workspace.</p>
+        <h1 className="text-2xl font-bold text-neutral-900 dark:text-white">Settings</h1>
+        <p className="text-sm text-neutral-500 dark:text-neutral-400 mt-1">Configure LLM API keys and default project path for this workspace.</p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
 
         {/* LLM API Keys */}
         <div className="rounded-xl border border-white/10 bg-white/5 p-5 space-y-4">
-          <p className="text-sm font-semibold text-white">LLM API Keys</p>
-          <p className="text-xs text-gray-500">
+          <p className="text-sm font-semibold text-neutral-900 dark:text-white">LLM API Keys</p>
+          <p className="text-xs text-neutral-500 dark:text-neutral-500">
             Keys are stored securely and shown masked after saving. Leave a field blank to keep the existing value.
             Enter a new value to replace it.
           </p>
@@ -137,8 +137,8 @@ export default function Settings() {
 
         {/* Default project path */}
         <div className="rounded-xl border border-white/10 bg-white/5 p-5 space-y-3">
-          <p className="text-sm font-semibold text-white">Default Project Path</p>
-          <p className="text-xs text-gray-500">
+          <p className="text-sm font-semibold text-neutral-900 dark:text-white">Default Project Path</p>
+          <p className="text-xs text-neutral-500 dark:text-neutral-500">
             Pre-fill the dbt project path when triggering audits from the Findings page.
           </p>
           <input
@@ -147,7 +147,7 @@ export default function Settings() {
             value={form.default_project_path}
             onChange={e => set('default_project_path', e.target.value)}
             placeholder="/absolute/path/to/dbt/project"
-            className="w-full rounded-lg bg-white/10 border border-white/10 px-3 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full rounded-lg bg-white/10 border border-white/10 px-3 py-2 text-sm text-neutral-900 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
 
@@ -156,7 +156,7 @@ export default function Settings() {
           <button
             type="submit"
             disabled={saving}
-            className="px-5 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 disabled:opacity-40 text-white text-sm font-medium transition"
+            className="px-5 py-2 rounded-lg bg-neutral-900 dark:bg-white hover:bg-neutral-700 dark:hover:bg-neutral-100 disabled:opacity-40 text-neutral-900 dark:text-white text-sm font-medium transition"
           >
             {saving ? 'Saving…' : 'Save Settings'}
           </button>
@@ -182,7 +182,7 @@ function KeyField({
 
   return (
     <div className="space-y-1">
-      <label htmlFor={id} className="text-xs font-medium text-gray-300">{label}</label>
+      <label htmlFor={id} className="text-xs font-medium text-neutral-600 dark:text-neutral-300">{label}</label>
       <div className="flex gap-2">
         <input
           id={id}
@@ -191,12 +191,12 @@ function KeyField({
           onChange={e => onChange(e.target.value)}
           placeholder={placeholder}
           autoComplete="new-password"
-          className="flex-1 rounded-lg bg-white/10 border border-white/10 px-3 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          className="flex-1 rounded-lg bg-white/10 border border-white/10 px-3 py-2 text-sm text-neutral-900 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-neutral-900 dark:focus:ring-white"
         />
         <button
           type="button"
           onClick={() => setShow(s => !s)}
-          className="px-3 rounded-lg border border-white/10 text-xs text-gray-400 hover:text-white bg-white/5 hover:bg-white/10 transition"
+          className="px-3 rounded-lg border border-white/10 text-xs text-neutral-500 dark:text-neutral-400 hover:text-white bg-white/5 hover:bg-white/10 transition"
           title={show ? 'Hide' : 'Show'}
         >
           {show ? 'Hide' : 'Show'}

@@ -1,11 +1,6 @@
-/**
- * ChatPanel — floating AI assistant panel
- *
- * Opens as a slide-up overlay from the bottom-right corner.
- * Wired to POST /api/workspaces/:workspaceId/chat
- */
 import { useState, useRef, useEffect, FormEvent } from 'react';
 import { useAuth } from '../contexts/AuthContext';
+import { useTheme } from '../contexts/ThemeContext';
 import { chatApi } from '../lib/api';
 
 interface Message {
@@ -15,19 +10,23 @@ interface Message {
 
 export default function ChatPanel() {
   const { workspaceId } = useAuth();
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
+
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
-    { role: 'assistant', content: 'Hi! I\'m DataPilot AI. Ask me about your dbt findings, lineage issues, or data modeling best practices.' },
+    { role: 'assistant', content: "Hi, I'm Voro. Ask me anything about your data lineage, findings, or model quality." },
   ]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
-  // Auto-scroll to bottom on new messages
   useEffect(() => {
     if (open) {
       bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+      setTimeout(() => inputRef.current?.focus(), 100);
     }
   }, [messages, open]);
 
@@ -36,54 +35,60 @@ export default function ChatPanel() {
     const text = input.trim();
     if (!text || loading || !workspaceId) return;
 
-    const userMsg: Message = { role: 'user', content: text };
-    setMessages(prev => [...prev, userMsg]);
+    setMessages(prev => [...prev, { role: 'user', content: text }]);
     setInput('');
     setError(null);
     setLoading(true);
 
     try {
-      const history = messages.slice(-6); // last 6 messages for context
-      const { data } = await chatApi.send(workspaceId, {
-        message: text,
-        history,
-      });
+      const history = messages.slice(-6);
+      const { data } = await chatApi.send(workspaceId, { message: text, history });
       setMessages(prev => [...prev, { role: 'assistant', content: data.reply }]);
     } catch (err: unknown) {
       const raw = (err as { response?: { data?: { error?: string } } })?.response?.data?.error
         ?? 'Failed to get a response.';
-      const msg = raw.toLowerCase().includes('no llm provider') || raw.toLowerCase().includes('not configured')
-        ? '⚙️ AI provider not configured yet. Connect your API key in Settings to enable chat.'
-        : raw;
-      setError(msg);
-      setMessages(prev => prev.slice(0, -1)); // remove the user message we optimistically added
-      setInput(text); // restore input
+      const isNoKey = raw.toLowerCase().includes('no llm') || raw.toLowerCase().includes('not configured');
+      setError(isNoKey
+        ? 'No AI provider configured. Add an API key in Settings to enable chat.'
+        : raw);
+      setMessages(prev => prev.slice(0, -1));
+      setInput(text);
     } finally {
       setLoading(false);
     }
   }
 
   function clearHistory() {
-    setMessages([{ role: 'assistant', content: 'Chat cleared. How can I help?' }]);
+    setMessages([{ role: 'assistant', content: 'Chat cleared. What would you like to explore?' }]);
     setError(null);
   }
 
+  const border = isDark ? '#1a1a1a' : '#e5e5e5';
+  const panelBg = isDark ? '#0a0a0a' : '#ffffff';
+  const headerBg = isDark ? '#111111' : '#fafafa';
+  const msgsBg = isDark ? '#0a0a0a' : '#f9fafb';
+  const inputBg = isDark ? '#111111' : '#ffffff';
+  const textMain = isDark ? '#fafafa' : '#0a0a0a';
+  const textMuted = isDark ? '#737373' : '#a3a3a3';
+  const btnFg = isDark ? '#0a0a0a' : '#ffffff';
+  const btnBg = isDark ? '#ffffff' : '#0a0a0a';
+
   return (
     <>
-      {/* Floating button */}
+      {/* Floating toggle button */}
       <button
         onClick={() => setOpen(o => !o)}
-        className="fixed bottom-5 right-5 z-50 w-12 h-12 rounded-full bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg flex items-center justify-center transition-all duration-200 hover:scale-105"
-        title="DataPilot AI Assistant"
-        aria-label="Open AI chat"
+        style={{ background: btnBg }}
+        className="fixed bottom-5 right-5 z-50 w-11 h-11 rounded-full shadow-lg flex items-center justify-center transition-all duration-200 hover:scale-105 hover:shadow-xl"
+        aria-label="Open Voro AI"
       >
         {open ? (
-          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke={btnFg} strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
           </svg>
         ) : (
-          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke={btnFg} strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round"
               d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
           </svg>
         )}
@@ -91,39 +96,40 @@ export default function ChatPanel() {
 
       {/* Chat panel */}
       {open && (
-        <div className="fixed bottom-20 right-5 z-50 w-80 sm:w-96 flex flex-col rounded-xl shadow-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 overflow-hidden"
-          style={{ height: '480px' }}>
+        <div
+          className="fixed bottom-[72px] right-5 z-50 w-80 sm:w-[360px] flex flex-col rounded-xl shadow-2xl overflow-hidden"
+          style={{ height: '480px', background: panelBg, border: `1px solid ${border}` }}
+        >
           {/* Header */}
-          <div className="flex items-center justify-between px-4 py-3 bg-indigo-600 text-white">
+          <div className="flex items-center justify-between px-4 py-3 border-b" style={{ background: headerBg, borderColor: border }}>
             <div className="flex items-center gap-2">
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                  d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17H3a2 2 0 01-2-2V5a2 2 0 012-2h14a2 2 0 012 2v10a2 2 0 01-2 2h-2" />
-              </svg>
-              <span className="text-sm font-semibold">DataPilot AI</span>
+              <div className="w-6 h-6 rounded-md flex items-center justify-center" style={{ background: btnBg }}>
+                <svg width="12" height="12" viewBox="0 0 16 16" fill="none">
+                  <path d="M3 3L8 13L13 3" stroke={btnFg} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              </div>
+              <span className="text-sm font-semibold" style={{ color: textMain }}>Voro AI</span>
+              <span className="text-[10px] px-1.5 py-0.5 rounded font-medium"
+                style={{ background: isDark ? '#1a1a1a' : '#f0f0f0', color: textMuted }}>
+                beta
+              </span>
             </div>
-            <button
-              onClick={clearHistory}
-              className="text-indigo-200 hover:text-white text-xs transition-colors"
-              title="Clear chat history"
-            >
+            <button onClick={clearHistory} className="text-xs transition-colors hover:opacity-100 opacity-60" style={{ color: textMain }}>
               Clear
             </button>
           </div>
 
           {/* Messages */}
-          <div className="flex-1 overflow-y-auto p-3 space-y-3 bg-gray-50 dark:bg-gray-950">
+          <div className="flex-1 overflow-y-auto p-3 space-y-3" style={{ background: msgsBg }}>
             {messages.map((msg, i) => (
-              <div
-                key={i}
-                className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
-              >
+              <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                 <div
-                  className={`max-w-[85%] rounded-xl px-3 py-2 text-sm leading-relaxed whitespace-pre-wrap ${
+                  className="max-w-[85%] px-3 py-2 text-[13px] leading-relaxed whitespace-pre-wrap"
+                  style={
                     msg.role === 'user'
-                      ? 'bg-indigo-600 text-white rounded-br-none'
-                      : 'bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 rounded-bl-none border border-gray-200 dark:border-gray-700'
-                  }`}
+                      ? { background: btnBg, color: btnFg, borderRadius: '12px 12px 2px 12px' }
+                      : { background: isDark ? '#1a1a1a' : '#ffffff', color: textMain, border: `1px solid ${border}`, borderRadius: '12px 12px 12px 2px' }
+                  }
                 >
                   {msg.content}
                 </div>
@@ -132,42 +138,48 @@ export default function ChatPanel() {
 
             {loading && (
               <div className="flex justify-start">
-                <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl rounded-bl-none px-3 py-2">
-                  <div className="flex gap-1 items-center h-4">
-                    <span className="w-1.5 h-1.5 bg-indigo-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-                    <span className="w-1.5 h-1.5 bg-indigo-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-                    <span className="w-1.5 h-1.5 bg-indigo-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                <div className="px-3 py-2.5 rounded-xl" style={{ background: isDark ? '#1a1a1a' : '#ffffff', border: `1px solid ${border}` }}>
+                  <div className="flex gap-1 items-center">
+                    {[0, 150, 300].map(delay => (
+                      <span key={delay} className="w-1.5 h-1.5 rounded-full animate-bounce"
+                        style={{ background: textMuted, animationDelay: `${delay}ms` }} />
+                    ))}
                   </div>
                 </div>
               </div>
             )}
 
             {error && (
-              <div className="text-xs text-red-500 dark:text-red-400 px-1">{error}</div>
+              <div className="text-xs px-3 py-2 rounded-lg"
+                style={{ background: isDark ? '#1a0000' : '#fff5f5', color: '#ef4444', border: '1px solid #fca5a5' }}>
+                {error}
+              </div>
             )}
 
             <div ref={bottomRef} />
           </div>
 
           {/* Input */}
-          <form onSubmit={handleSubmit} className="p-3 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
-            <div className="flex gap-2">
+          <form onSubmit={handleSubmit} className="p-3 border-t" style={{ background: inputBg, borderColor: border }}>
+            <div className="flex gap-2 items-center">
               <input
+                ref={inputRef}
                 type="text"
                 value={input}
                 onChange={e => setInput(e.target.value)}
                 placeholder="Ask about findings, lineage, SQL…"
                 disabled={loading}
-                className="flex-1 text-sm px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:opacity-50"
+                className="flex-1 text-[13px] px-3 py-2 rounded-lg border outline-none transition-colors disabled:opacity-50"
+                style={{ background: isDark ? '#0a0a0a' : '#f9fafb', borderColor: border, color: textMain }}
               />
               <button
                 type="submit"
                 disabled={!input.trim() || loading}
-                className="px-3 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white disabled:opacity-40 transition-colors"
-                title="Send message"
+                className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 transition-all disabled:opacity-30 hover:opacity-80"
+                style={{ background: btnBg }}
               >
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke={btnFg} strokeWidth={2.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
                 </svg>
               </button>
             </div>

@@ -15,7 +15,7 @@ interface AuditEvent {
 }
 
 const RESOURCE_COLORS: Record<string, string> = {
-  connections:  'bg-indigo-500/20 text-indigo-400',
+  connections:  'bg-indigo-500/20 text-neutral-700 dark:text-neutral-300',
   nodes:        'bg-purple-500/20 text-purple-400',
   edges:        'bg-blue-500/20 text-blue-400',
   runs:         'bg-cyan-500/20 text-cyan-400',
@@ -50,8 +50,8 @@ export default function AuditLog() {
   return (
     <div className="p-8 space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-white">Audit Log</h1>
-        <p className="text-sm text-gray-400 mt-1">
+        <h1 className="text-2xl font-bold text-neutral-900 dark:text-white">Audit Log</h1>
+        <p className="text-sm text-neutral-500 dark:text-neutral-400 mt-1">
           Immutable record of all workspace mutations · {total} total events
         </p>
       </div>
@@ -75,20 +75,20 @@ export default function AuditLog() {
       {/* Event list */}
       <div className="card p-0 overflow-hidden divide-y divide-gray-800">
         {loading
-          ? <p className="p-5 text-sm text-gray-500">Loading…</p>
+          ? <p className="p-5 text-sm text-neutral-500 dark:text-neutral-500">Loading…</p>
           : events.length === 0
-            ? <p className="p-5 text-sm text-gray-500">No events found.</p>
+            ? <p className="p-5 text-sm text-neutral-500 dark:text-neutral-500">No events found.</p>
             : events.map(e => (
               <div key={e.id}>
                 <button
                   className="w-full text-left flex items-center gap-4 px-5 py-3 hover:bg-gray-800/50 transition-colors"
                   onClick={() => setExpanded(expanded === e.id ? null : e.id)}
                 >
-                  <span className={`badge flex-shrink-0 ${RESOURCE_COLORS[e.resource_type] ?? 'bg-gray-700 text-gray-400'}`}>
+                  <span className={`badge flex-shrink-0 ${RESOURCE_COLORS[e.resource_type] ?? 'bg-gray-700 text-neutral-500 dark:text-neutral-400'}`}>
                     {e.resource_type}
                   </span>
-                  <span className="text-sm text-white font-mono flex-1 truncate">{e.action}</span>
-                  <span className="text-xs text-gray-500 flex-shrink-0">
+                  <span className="text-sm text-neutral-900 dark:text-white font-mono flex-1 truncate">{e.action}</span>
+                  <span className="text-xs text-neutral-500 dark:text-neutral-500 flex-shrink-0">
                     {e.user_name ?? e.user_email ?? 'system'}
                   </span>
                   <span className="text-xs text-gray-600 flex-shrink-0 hidden sm:block">
@@ -98,14 +98,14 @@ export default function AuditLog() {
 
                 {expanded === e.id && (
                   <div className="px-5 pb-4 bg-gray-900/50 space-y-2 text-xs">
-                    <div className="grid grid-cols-2 gap-x-8 gap-y-1 text-gray-400">
+                    <div className="grid grid-cols-2 gap-x-8 gap-y-1 text-neutral-500 dark:text-neutral-400">
                       <div><span className="text-gray-600">Resource ID: </span>{e.resource_id ?? '—'}</div>
                       <div><span className="text-gray-600">IP: </span>{e.ip ?? '—'}</div>
                       <div><span className="text-gray-600">User: </span>{e.user_email ?? '—'}</div>
                       <div><span className="text-gray-600">Time: </span>{new Date(e.created_at).toISOString()}</div>
                     </div>
                     {e.meta && Object.keys(e.meta).length > 0 && (
-                      <pre className="bg-gray-950 rounded p-3 text-gray-400 overflow-x-auto text-xs">
+                      <pre className="bg-gray-950 rounded p-3 text-neutral-500 dark:text-neutral-400 overflow-x-auto text-xs">
                         {JSON.stringify(e.meta, null, 2)}
                       </pre>
                     )}
@@ -118,7 +118,7 @@ export default function AuditLog() {
 
       {/* Pagination */}
       {total > PAGE_SIZE && (
-        <div className="flex items-center justify-between text-sm text-gray-400">
+        <div className="flex items-center justify-between text-sm text-neutral-500 dark:text-neutral-400">
           <span>Showing {offset + 1}–{Math.min(offset + PAGE_SIZE, total)} of {total}</span>
           <div className="flex gap-2">
             <button className="btn-ghost text-xs" disabled={offset === 0}

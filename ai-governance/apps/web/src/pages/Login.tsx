@@ -11,7 +11,7 @@ const SSO_PROVIDERS = [
     id: 'gitlab',
     label: 'Continue with GitLab',
     href: '/auth/gitlab',
-    className: 'bg-[#FC6D26] hover:bg-[#e55e18] text-white border-transparent',
+    className: 'bg-[#FC6D26] hover:bg-[#e55e18] text-neutral-900 dark:text-white border-transparent',
     icon: (
       <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
         <path d="M22.65 14.39L12 22.13 1.35 14.39a.84.84 0 0 1-.3-.94l1.22-3.78 2.44-7.51A.42.42 0 0 1 4.82 2a.43.43 0 0 1 .58 0 .42.42 0 0 1 .11.18l2.44 7.49h8.1l2.44-7.51A.42.42 0 0 1 18.6 2a.43.43 0 0 1 .58 0 .42.42 0 0 1 .11.18l2.44 7.51L23 13.45a.84.84 0 0 1-.35.94z" />
@@ -22,7 +22,7 @@ const SSO_PROVIDERS = [
     id: 'github',
     label: 'Continue with GitHub',
     href: '/auth/github',
-    className: 'bg-gray-800 hover:bg-gray-700 text-white border-transparent dark:bg-gray-700 dark:hover:bg-gray-600',
+    className: 'bg-neutral-100 dark:bg-neutral-800 hover:bg-gray-700 text-neutral-900 dark:text-white border-transparent dark:bg-gray-700 dark:hover:bg-gray-600',
     icon: (
       <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
         <path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0 1 12 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z" />
@@ -51,7 +51,7 @@ function ThemeToggle() {
   return (
     <button
       onClick={toggleTheme}
-      className="p-2 rounded-lg text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+      className="p-2 rounded-lg text-neutral-500 dark:text-neutral-400 hover:text-gray-600 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-neutral-100 dark:bg-neutral-800 transition-colors"
       title={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
     >
       {theme === 'dark' ? (
@@ -118,45 +118,38 @@ export default function Login() {
     <div className="min-h-screen flex bg-white dark:bg-gray-950 transition-colors duration-200">
 
       {/* ── Left branding panel (desktop only) ─────────────────────────────── */}
-      <div className="hidden lg:flex flex-col justify-between w-[45%] bg-gray-950 dark:bg-gray-900 border-r border-white/10 p-12 relative overflow-hidden">
-        {/* Background glow */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute -top-32 -left-32 w-96 h-96 bg-indigo-600/20 rounded-full blur-3xl" />
-          <div className="absolute bottom-0 right-0 w-80 h-80 bg-violet-600/10 rounded-full blur-3xl" />
-        </div>
-
+      <div className="hidden lg:flex flex-col justify-between w-[45%] bg-neutral-950 border-r border-neutral-800 p-12 relative overflow-hidden">
         {/* Logo */}
-        <Link to="/" className="relative flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center shadow-lg shadow-indigo-500/30">
-            <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+        <Link to="/" className="relative flex items-center gap-2.5">
+          <div className="w-8 h-8 rounded-lg bg-white flex items-center justify-center">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M3 3L8 13L13 3" stroke="#0a0a0a" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
           </div>
-          <span className="text-white font-semibold text-lg">AI Governance</span>
+          <span className="text-white font-bold text-sm tracking-tight">Voro</span>
         </Link>
 
         {/* Testimonial */}
         <div className="relative">
-          <div className="text-5xl text-indigo-400/30 font-serif leading-none mb-4">"</div>
+          <div className="text-5xl text-neutral-700 font-serif leading-none mb-4">"</div>
           <blockquote className="text-xl font-medium text-white leading-relaxed mb-6">
-            DataPilot found 7 dead models costing us $4,200/month on Snowflake. Paid for itself in the first audit.
+            Voro found 7 dead models costing us $4,200/month on Snowflake. Paid for itself in the first audit.
           </blockquote>
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center text-white font-bold text-sm shadow">
+            <div className="w-9 h-9 rounded-full bg-white flex items-center justify-center font-bold text-sm text-neutral-900">
               RV
             </div>
             <div>
               <p className="text-white font-medium text-sm">Rishi V.</p>
-              <p className="text-gray-500 text-sm">Senior Data Engineer, Acme Corp</p>
+              <p className="text-neutral-500 text-sm">Senior Data Engineer, Acme Corp</p>
             </div>
           </div>
         </div>
 
-        {/* Integration logos strip */}
+        {/* Integrations */}
         <div className="relative flex items-center gap-6">
           {['dbt', 'Snowflake', 'GitLab', 'Azure', 'GitHub'].map(t => (
-            <span key={t} className="text-gray-600 text-xs font-medium tracking-wide">{t}</span>
+            <span key={t} className="text-neutral-600 text-xs font-medium tracking-wide">{t}</span>
           ))}
         </div>
       </div>
@@ -167,13 +160,12 @@ export default function Login() {
         <div className="flex items-center justify-between px-6 py-4">
           {/* Mobile logo */}
           <Link to="/" className="flex items-center gap-2 lg:hidden">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center">
-              <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                  d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+            <div className="w-7 h-7 rounded-lg bg-neutral-900 dark:bg-white flex items-center justify-center">
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+                <path d="M3 3L8 13L13 3" stroke="white" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className="dark:stroke-neutral-900"/>
               </svg>
             </div>
-            <span className="text-gray-900 dark:text-white font-semibold">AI Governance</span>
+            <span className="text-neutral-900 dark:text-white font-bold text-sm">Voro</span>
           </Link>
           <div className="hidden lg:block" />
           <ThemeToggle />
@@ -185,11 +177,11 @@ export default function Login() {
             <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-1">
               {mode === 'signin' ? 'Welcome back' : 'Create your account'}
             </h1>
-            <p className="text-gray-500 dark:text-gray-400 text-sm mb-8">
+            <p className="text-neutral-500 dark:text-neutral-500 dark:text-neutral-500 dark:text-neutral-400 text-sm mb-8">
               {mode === 'signin' ? "Don't have an account? " : 'Already have an account? '}
               <button
                 onClick={() => setMode(m => m === 'signin' ? 'signup' : 'signin')}
-                className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 dark:hover:text-indigo-300 font-medium transition-colors"
+                className="text-neutral-900 dark:text-white dark:text-neutral-700 dark:text-neutral-300 hover:text-neutral-600 dark:hover:text-neutral-300 underline underline-offset-2 font-medium transition-colors"
               >
                 {mode === 'signin' ? 'Sign up free' : 'Sign in'}
               </button>
@@ -219,7 +211,7 @@ export default function Login() {
             {/* Divider */}
             <div className="flex items-center gap-4 mb-6">
               <div className="flex-1 h-px bg-gray-200 dark:bg-white/10" />
-              <span className="text-gray-400 dark:text-gray-600 text-xs">or continue with email</span>
+              <span className="text-neutral-500 dark:text-neutral-400 dark:text-gray-600 text-xs">or continue with email</span>
               <div className="flex-1 h-px bg-gray-200 dark:bg-white/10" />
             </div>
 
@@ -227,7 +219,7 @@ export default function Login() {
             <form onSubmit={handleEmailSubmit} className="space-y-4">
               {mode === 'signup' && (
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-400 mb-1.5">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-neutral-500 dark:text-neutral-400 mb-1.5">
                     Full name
                   </label>
                   <input
@@ -235,12 +227,12 @@ export default function Login() {
                     value={name}
                     onChange={e => setName(e.target.value)}
                     placeholder="Your name"
-                    className="w-full bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-white/10 rounded-xl px-4 py-3 text-gray-900 dark:text-white text-sm placeholder-gray-400 dark:placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-colors"
+                    className="w-full bg-gray-50 dark:bg-white dark:bg-neutral-900 border border-gray-200 dark:border-white/10 rounded-xl px-4 py-3 text-gray-900 dark:text-white text-sm placeholder-gray-400 dark:placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-neutral-900 dark:focus:ring-white focus:border-transparent transition-colors"
                   />
                 </div>
               )}
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-400 mb-1.5">
+                <label className="block text-sm font-medium text-gray-700 dark:text-neutral-500 dark:text-neutral-400 mb-1.5">
                   Email
                 </label>
                 <input
@@ -249,16 +241,16 @@ export default function Login() {
                   onChange={e => setEmail(e.target.value)}
                   placeholder="you@company.com"
                   required
-                  className="w-full bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-white/10 rounded-xl px-4 py-3 text-gray-900 dark:text-white text-sm placeholder-gray-400 dark:placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-colors"
+                  className="w-full bg-gray-50 dark:bg-white dark:bg-neutral-900 border border-gray-200 dark:border-white/10 rounded-xl px-4 py-3 text-gray-900 dark:text-white text-sm placeholder-gray-400 dark:placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-neutral-900 dark:focus:ring-white focus:border-transparent transition-colors"
                 />
               </div>
               <div>
                 <div className="flex items-center justify-between mb-1.5">
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-400">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-neutral-500 dark:text-neutral-400">
                     Password
                   </label>
                   {mode === 'signin' && (
-                    <button type="button" className="text-xs text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 dark:hover:text-indigo-300 transition-colors">
+                    <button type="button" className="text-xs text-neutral-900 dark:text-white dark:text-neutral-700 dark:text-neutral-300 hover:text-neutral-600 dark:hover:text-neutral-300 underline underline-offset-2 transition-colors">
                       Forgot password?
                     </button>
                   )}
@@ -269,7 +261,7 @@ export default function Login() {
                   onChange={e => setPassword(e.target.value)}
                   placeholder="••••••••"
                   required
-                  className="w-full bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-white/10 rounded-xl px-4 py-3 text-gray-900 dark:text-white text-sm placeholder-gray-400 dark:placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-colors"
+                  className="w-full bg-gray-50 dark:bg-white dark:bg-neutral-900 border border-gray-200 dark:border-white/10 rounded-xl px-4 py-3 text-gray-900 dark:text-white text-sm placeholder-gray-400 dark:placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-neutral-900 dark:focus:ring-white focus:border-transparent transition-colors"
                 />
               </div>
 
@@ -280,7 +272,7 @@ export default function Login() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-indigo-600 hover:bg-indigo-500 disabled:opacity-60 text-white py-3 rounded-xl font-semibold text-sm transition-colors shadow-lg shadow-indigo-500/20"
+                className="w-full bg-neutral-900 dark:bg-white hover:bg-neutral-700 dark:hover:bg-neutral-100 disabled:opacity-60 text-white dark:text-neutral-900 py-3 rounded-xl font-semibold text-sm transition-colors"
               >
                 {loading ? 'Please wait…' : mode === 'signin' ? 'Sign in' : 'Create account'}
               </button>
@@ -292,9 +284,9 @@ export default function Login() {
                 <button
                   onClick={devLogin}
                   disabled={loading}
-                  className="w-full flex items-center justify-center gap-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 text-xs transition-colors py-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-900"
+                  className="w-full flex items-center justify-center gap-2 text-neutral-500 dark:text-neutral-400 hover:text-gray-600 dark:hover:text-neutral-600 dark:text-neutral-300 text-xs transition-colors py-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-900"
                 >
-                  <span className="font-mono bg-gray-100 dark:bg-gray-900 border border-gray-200 dark:border-white/10 px-2 py-0.5 rounded text-gray-500 dark:text-gray-500">
+                  <span className="font-mono bg-gray-100 dark:bg-white dark:bg-neutral-900 border border-gray-200 dark:border-white/10 px-2 py-0.5 rounded text-neutral-500 dark:text-neutral-500 dark:text-neutral-500 dark:text-neutral-500">
                     DEV
                   </span>
                   {loading ? 'Signing in…' : 'Quick dev login — skip OAuth'}
@@ -302,13 +294,13 @@ export default function Login() {
               </div>
             )}
 
-            <p className="text-center text-gray-400 dark:text-gray-600 text-xs mt-6">
+            <p className="text-center text-neutral-500 dark:text-neutral-400 dark:text-gray-600 text-xs mt-6">
               By continuing you agree to our{' '}
-              <Link to="/terms" className="text-gray-500 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition-colors underline underline-offset-2">
+              <Link to="/terms" className="text-neutral-500 dark:text-neutral-500 dark:text-neutral-500 dark:text-neutral-500 hover:text-gray-700 dark:hover:text-neutral-600 dark:text-neutral-300 transition-colors underline underline-offset-2">
                 Terms
               </Link>
               {' '}and{' '}
-              <Link to="/privacy" className="text-gray-500 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition-colors underline underline-offset-2">
+              <Link to="/privacy" className="text-neutral-500 dark:text-neutral-500 dark:text-neutral-500 dark:text-neutral-500 hover:text-gray-700 dark:hover:text-neutral-600 dark:text-neutral-300 transition-colors underline underline-offset-2">
                 Privacy Policy
               </Link>.
             </p>

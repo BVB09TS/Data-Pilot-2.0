@@ -4,36 +4,78 @@
 
 @layer base {
   html { @apply h-full; }
-  body { @apply h-full bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100 antialiased transition-colors duration-200; }
+  body {
+    @apply h-full antialiased transition-colors duration-150;
+    background-color: #ffffff;
+    color: #0a0a0a;
+  }
+  .dark body, body.dark {
+    background-color: #0a0a0a;
+    color: #fafafa;
+  }
   #root { @apply h-full; }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 4px; height: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: #d4d4d4; border-radius: 9999px; }
+  ::-webkit-scrollbar-thumb:hover { background: #a3a3a3; }
+  .dark ::-webkit-scrollbar-thumb { background: #262626; }
+  .dark ::-webkit-scrollbar-thumb:hover { background: #404040; }
 }
 
 @layer components {
+  /* ── Buttons ── */
   .btn {
     @apply inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium
-           transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-950;
+           transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-offset-1
+           disabled:opacity-40 disabled:cursor-not-allowed select-none;
   }
   .btn-primary {
-    @apply btn bg-indigo-600 hover:bg-indigo-500 text-white focus:ring-indigo-500;
+    @apply btn bg-neutral-900 hover:bg-neutral-700 text-white focus:ring-neutral-900 dark:bg-white dark:hover:bg-neutral-100 dark:text-neutral-900 dark:focus:ring-white;
   }
   .btn-ghost {
-    @apply btn bg-transparent hover:bg-gray-800 text-gray-300 hover:text-white focus:ring-gray-600;
+    @apply btn border border-neutral-200 hover:bg-neutral-100 text-neutral-700 focus:ring-neutral-300
+           dark:border-neutral-800 dark:hover:bg-neutral-800 dark:text-neutral-300 dark:focus:ring-neutral-600;
   }
   .btn-danger {
-    @apply btn bg-red-600 hover:bg-red-500 text-white focus:ring-red-500;
+    @apply btn bg-red-600 hover:bg-red-700 text-white focus:ring-red-500;
   }
+
+  /* ── Cards ── */
   .card {
-    @apply bg-gray-900 border border-gray-800 rounded-xl p-5;
+    @apply rounded-xl p-5 border border-neutral-200 bg-white dark:bg-neutral-900 dark:border-neutral-800;
   }
-  .badge {
-    @apply inline-flex items-center px-2 py-0.5 rounded text-xs font-medium;
-  }
+
+  /* ── Inputs ── */
   .input {
-    @apply w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm
-           text-gray-100 placeholder-gray-500
-           focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent;
+    @apply w-full rounded-lg px-3 py-2 text-sm border border-neutral-200 bg-white text-neutral-900
+           placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-neutral-900
+           focus:border-transparent transition-colors duration-150
+           dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100
+           dark:placeholder-neutral-500 dark:focus:ring-white;
   }
+
+  /* ── Labels ── */
   .label {
-    @apply block text-sm font-medium text-gray-400 mb-1;
+    @apply block text-xs font-medium mb-1.5 text-neutral-500 dark:text-neutral-400;
   }
+
+  /* ── Badges ── */
+  .badge {
+    @apply inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium;
+  }
+
+  /* ── Status badges ── */
+  .status-success { @apply badge bg-emerald-50 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-400; }
+  .status-error   { @apply badge bg-red-50 text-red-700 dark:bg-red-950 dark:text-red-400; }
+  .status-warning { @apply badge bg-amber-50 text-amber-700 dark:bg-amber-950 dark:text-amber-400; }
+  .status-info    { @apply badge bg-blue-50 text-blue-700 dark:bg-blue-950 dark:text-blue-400; }
+  .status-neutral { @apply badge bg-neutral-100 text-neutral-600 dark:bg-neutral-800 dark:text-neutral-400; }
+
+  /* ── Severity badges ── */
+  .sev-critical { @apply badge bg-red-50 text-red-700 border border-red-200 dark:bg-red-950 dark:text-red-400 dark:border-red-900; }
+  .sev-high     { @apply badge bg-orange-50 text-orange-700 border border-orange-200 dark:bg-orange-950 dark:text-orange-400 dark:border-orange-900; }
+  .sev-medium   { @apply badge bg-amber-50 text-amber-700 border border-amber-200 dark:bg-amber-950 dark:text-amber-400 dark:border-amber-900; }
+  .sev-low      { @apply badge bg-blue-50 text-blue-700 border border-blue-200 dark:bg-blue-950 dark:text-blue-400 dark:border-blue-900; }
 }

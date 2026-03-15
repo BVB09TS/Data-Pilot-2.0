@@ -76,8 +76,8 @@ export default function Edges() {
     <div className="p-8 space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-white">Edges</h1>
-          <p className="text-sm text-gray-400 mt-1">Connections between nodes in your pipeline</p>
+          <h1 className="text-2xl font-bold text-neutral-900 dark:text-white">Edges</h1>
+          <p className="text-sm text-neutral-500 dark:text-neutral-400 mt-1">Connections between nodes in your pipeline</p>
         </div>
         <button className="btn-primary" onClick={() => { setShowForm(v => !v); setError(null); }}>
           {showForm ? 'Cancel' : '+ New Edge'}
@@ -86,7 +86,7 @@ export default function Edges() {
 
       {showForm && (
         <div className="card space-y-4">
-          <h2 className="text-sm font-semibold text-white">New Edge</h2>
+          <h2 className="text-sm font-semibold text-neutral-900 dark:text-white">New Edge</h2>
           {nodes.length < 2 && (
             <p className="text-xs text-amber-400">You need at least 2 nodes to create an edge.</p>
           )}
@@ -128,21 +128,21 @@ export default function Edges() {
       )}
 
       {loading
-        ? <p className="text-gray-500 text-sm">Loading…</p>
+        ? <p className="text-neutral-500 dark:text-neutral-500 text-sm">Loading…</p>
         : edges.length === 0
-          ? <div className="card text-center py-12 text-gray-500 text-sm">No edges yet.</div>
+          ? <div className="card text-center py-12 text-neutral-500 dark:text-neutral-500 text-sm">No edges yet.</div>
           : (
             <div className="card divide-y divide-gray-800 p-0 overflow-hidden">
               {edges.map(e => (
                 <div key={e.id} className="flex items-center justify-between gap-4 px-5 py-4">
                   <div className="flex items-center gap-3 min-w-0">
-                    <span className="text-sm font-medium text-white truncate">{e.source_name}</span>
-                    <svg className="w-4 h-4 text-gray-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <span className="text-sm font-medium text-neutral-900 dark:text-white truncate">{e.source_name}</span>
+                    <svg className="w-4 h-4 text-neutral-500 dark:text-neutral-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
                     </svg>
-                    <span className="text-sm font-medium text-white truncate">{e.target_name}</span>
+                    <span className="text-sm font-medium text-neutral-900 dark:text-white truncate">{e.target_name}</span>
                     {e.label && (
-                      <span className="text-xs text-gray-400 bg-gray-800 px-2 py-0.5 rounded-full flex-shrink-0">
+                      <span className="text-xs text-neutral-500 dark:text-neutral-400 bg-neutral-100 dark:bg-neutral-800 px-2 py-0.5 rounded-full flex-shrink-0">
                         {e.label}
                       </span>
                     )}

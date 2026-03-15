@@ -19,7 +19,7 @@ const STATUS_COLOR: Record<string, string> = {
   running:   'bg-blue-500/20 text-blue-400',
   success:   'bg-green-500/20 text-green-400',
   failed:    'bg-red-500/20 text-red-400',
-  cancelled: 'bg-gray-500/20 text-gray-400',
+  cancelled: 'bg-gray-500/20 text-neutral-500 dark:text-neutral-400',
 };
 
 const NEXT_STATUS: Record<string, string[]> = {
@@ -71,8 +71,8 @@ export default function Runs() {
     <div className="p-8 space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-white">Runs</h1>
-          <p className="text-sm text-gray-400 mt-1">Pipeline execution history</p>
+          <h1 className="text-2xl font-bold text-neutral-900 dark:text-white">Runs</h1>
+          <p className="text-sm text-neutral-500 dark:text-neutral-400 mt-1">Pipeline execution history</p>
         </div>
         <button className="btn-primary" onClick={createRun}>+ New Run</button>
       </div>
@@ -81,9 +81,9 @@ export default function Runs() {
         {/* Run list */}
         <div className="lg:col-span-3 card p-0 overflow-hidden divide-y divide-gray-800">
           {loading
-            ? <p className="p-5 text-sm text-gray-500">Loading…</p>
+            ? <p className="p-5 text-sm text-neutral-500 dark:text-neutral-500">Loading…</p>
             : rows.length === 0
-              ? <p className="p-5 text-sm text-gray-500">No runs yet.</p>
+              ? <p className="p-5 text-sm text-neutral-500 dark:text-neutral-500">No runs yet.</p>
               : rows.map(r => (
                 <button
                   key={r.id}
@@ -93,10 +93,10 @@ export default function Runs() {
                   }`}
                 >
                   <div className="min-w-0">
-                    <p className="text-sm font-medium text-white truncate">
+                    <p className="text-sm font-medium text-neutral-900 dark:text-white truncate">
                       {r.node_name ?? 'Unattached'}
                     </p>
-                    <p className="text-xs text-gray-500">{new Date(r.created_at).toLocaleString()}</p>
+                    <p className="text-xs text-neutral-500 dark:text-neutral-500">{new Date(r.created_at).toLocaleString()}</p>
                   </div>
                   <span className={`badge flex-shrink-0 ${STATUS_COLOR[r.status] ?? ''}`}>{r.status}</span>
                 </button>
@@ -110,14 +110,14 @@ export default function Runs() {
             <>
               <div className="card space-y-3">
                 <div className="flex items-center justify-between">
-                  <h2 className="text-sm font-semibold text-white">Run detail</h2>
+                  <h2 className="text-sm font-semibold text-neutral-900 dark:text-white">Run detail</h2>
                   <span className={`badge ${STATUS_COLOR[selectedRun.status] ?? ''}`}>{selectedRun.status}</span>
                 </div>
                 <dl className="text-xs space-y-1.5">
-                  <div className="flex justify-between"><dt className="text-gray-500">Node</dt><dd className="text-gray-300">{selectedRun.node_name ?? '—'}</dd></div>
-                  <div className="flex justify-between"><dt className="text-gray-500">Environment</dt><dd className="text-gray-300">{selectedRun.environment_name ?? '—'}</dd></div>
-                  <div className="flex justify-between"><dt className="text-gray-500">Started</dt><dd className="text-gray-300">{selectedRun.started_at ? new Date(selectedRun.started_at).toLocaleString() : '—'}</dd></div>
-                  <div className="flex justify-between"><dt className="text-gray-500">Finished</dt><dd className="text-gray-300">{selectedRun.finished_at ? new Date(selectedRun.finished_at).toLocaleString() : '—'}</dd></div>
+                  <div className="flex justify-between"><dt className="text-neutral-500 dark:text-neutral-500">Node</dt><dd className="text-neutral-600 dark:text-neutral-300">{selectedRun.node_name ?? '—'}</dd></div>
+                  <div className="flex justify-between"><dt className="text-neutral-500 dark:text-neutral-500">Environment</dt><dd className="text-neutral-600 dark:text-neutral-300">{selectedRun.environment_name ?? '—'}</dd></div>
+                  <div className="flex justify-between"><dt className="text-neutral-500 dark:text-neutral-500">Started</dt><dd className="text-neutral-600 dark:text-neutral-300">{selectedRun.started_at ? new Date(selectedRun.started_at).toLocaleString() : '—'}</dd></div>
+                  <div className="flex justify-between"><dt className="text-neutral-500 dark:text-neutral-500">Finished</dt><dd className="text-neutral-600 dark:text-neutral-300">{selectedRun.finished_at ? new Date(selectedRun.finished_at).toLocaleString() : '—'}</dd></div>
                 </dl>
                 {NEXT_STATUS[selectedRun.status] && (
                   <div className="flex gap-2 pt-1">
@@ -133,7 +133,7 @@ export default function Runs() {
               </div>
 
               <div className="card space-y-2">
-                <h2 className="text-sm font-semibold text-gray-300">Logs ({logs.length})</h2>
+                <h2 className="text-sm font-semibold text-neutral-600 dark:text-neutral-300">Logs ({logs.length})</h2>
                 <div className="bg-gray-950 rounded-lg p-3 max-h-64 overflow-y-auto font-mono text-xs space-y-1">
                   {logs.length === 0
                     ? <p className="text-gray-600">No logs.</p>
@@ -141,7 +141,7 @@ export default function Runs() {
                       <div key={i} className={
                         l.level === 'error' ? 'text-red-400'
                         : l.level === 'warn' ? 'text-yellow-400'
-                        : 'text-gray-400'
+                        : 'text-neutral-500 dark:text-neutral-400'
                       }>
                         <span className="text-gray-600">{new Date(l.ts).toLocaleTimeString()} </span>
                         {l.message}
@@ -152,7 +152,7 @@ export default function Runs() {
               </div>
             </>
           ) : (
-            <div className="card text-center py-10 text-sm text-gray-500">
+            <div className="card text-center py-10 text-sm text-neutral-500 dark:text-neutral-500">
               Select a run to view details
             </div>
           )}
