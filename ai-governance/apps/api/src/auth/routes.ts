@@ -33,7 +33,12 @@ function issueSessionCookie(res: Response, userId: string): void {
 
 // ── GitHub ────────────────────────────────────────────────────────────────────
 
-router.get('/github', passport.authenticate('github', { scope: ['user:email'] }));
+router.get('/github', (req: Request, res: Response, next: NextFunction) => {
+  if (!process.env.GITHUB_CLIENT_ID) {
+    return res.redirect(`${FRONTEND_URL}/login?error=provider_disabled`);
+  }
+  passport.authenticate('github', { scope: ['user:email'] })(req, res, next);
+});
 
 router.get(
   '/github/callback',
@@ -49,7 +54,12 @@ router.get(
 
 // ── Google ────────────────────────────────────────────────────────────────────
 
-router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
+router.get('/google', (req: Request, res: Response, next: NextFunction) => {
+  if (!process.env.GOOGLE_CLIENT_ID) {
+    return res.redirect(`${FRONTEND_URL}/login?error=provider_disabled`);
+  }
+  passport.authenticate('google', { scope: ['profile', 'email'] })(req, res, next);
+});
 
 router.get(
   '/google/callback',

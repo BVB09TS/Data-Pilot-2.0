@@ -50,8 +50,11 @@ export default function ChatPanel() {
       });
       setMessages(prev => [...prev, { role: 'assistant', content: data.reply }]);
     } catch (err: unknown) {
-      const msg = (err as { response?: { data?: { error?: string } } })?.response?.data?.error
-        ?? 'Failed to get a response. Check your LLM API keys.';
+      const raw = (err as { response?: { data?: { error?: string } } })?.response?.data?.error
+        ?? 'Failed to get a response.';
+      const msg = raw.toLowerCase().includes('no llm provider') || raw.toLowerCase().includes('not configured')
+        ? '⚙️ AI provider not configured yet. Connect your API key in Settings to enable chat.'
+        : raw;
       setError(msg);
       setMessages(prev => prev.slice(0, -1)); // remove the user message we optimistically added
       setInput(text); // restore input
