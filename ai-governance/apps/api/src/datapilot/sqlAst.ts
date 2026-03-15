@@ -9,7 +9,7 @@
  * we return null so callers can fall back to regex.
  */
 
-import { Parser } from 'node-sql-parser';
+import Parser from 'node-sql-parser';
 
 const sqlParser = new Parser();
 
