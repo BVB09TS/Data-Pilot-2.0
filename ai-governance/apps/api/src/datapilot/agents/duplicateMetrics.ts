@@ -5,6 +5,7 @@
  */
 
 import { llmCall, parseJsonResponse } from '../llmGateway.js';
+import { fingerprintSQL, extractAggregateExpressions } from '../sqlAst.js';
 import type { ParsedModel, ParsedProject } from '../parser.js';
 import type { AgentFinding } from './types.js';
 
@@ -36,9 +37,25 @@ export async function analyzeDuplicateMetrics(project: ParsedProject): Promise<A
 
   if (groups.size === 0) return [];
 
-  // Give LLM the full model data — let it discover patterns, not just confirm our keyword groups
-  const modelData = metricCandidates
-    .map(m => `Model: ${m.name}\nSQL:\n${m.sql.slice(0, 500)}`)
+  // AST pre-filter: skip models with identical SQL fingerprints (same logic, just aliases differ)
+  // Only pass models with at least one aggregate expression to the LLM
+  const dedupedCandidates = metricCandidates.filter(m => extractAggregateExpressions(m.sql).length > 0
+    || /\b(SUM|COUNT|AVG|MIN|MAX)\s*\(/i.test(m.sql));
+
+  // Build SQL fingerprints — models with identical fingerprints are exact copies, not duplicates
+  const fingerprints = new Map(dedupedCandidates.map(m => [m.name, fingerprintSQL(m.sql)]));
+  const uniqueByFingerprint = dedupedCandidates.filter((m, i, arr) =>
+    arr.findIndex(other => other.name !== m.name && fingerprints.get(other.name) === fingerprints.get(m.name)) === i
+  );
+
+  const finalCandidates = uniqueByFingerprint.length >= 2 ? uniqueByFingerprint : metricCandidates;
+
+  // Give LLM the full model data with AST-extracted aggregates highlighted
+  const modelData = finalCandidates
+    .map(m => {
+      const aggExprs = extractAggregateExpressions(m.sql);
+      return `Model: ${m.name}${aggExprs.length ? `\nAggregate columns: ${aggExprs.join(', ')}` : ''}\nSQL:\n${m.sql.slice(0, 500)}`;
+    })
     .join('\n\n---\n\n');
 
   const prompt = `You are a senior analytics engineer auditing a dbt project for duplicate metric definitions.

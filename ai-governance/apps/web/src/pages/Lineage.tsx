@@ -1,5 +1,7 @@
 import { useState, useCallback, useEffect, useRef, createContext, useContext } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import { lineageApi } from '../lib/api';
+import { useAuth } from '../contexts/AuthContext';
 import {
   ReactFlow, Background, Controls,
   useNodesState, useEdgesState,
@@ -611,13 +613,31 @@ function LineageModal({ initialId, onClose, onNavigate }: {
 
 // ── Model Documentation ────────────────────────────────────────────────────────
 
-type DocTab = 'description' | 'columns' | 'sql';
+type DocTab = 'description' | 'columns' | 'sql' | 'lineage';
+
+interface ColLineageEntry {
+  output: string;
+  exprType: string;
+  sourceRefs: { model: string; column: string }[];
+}
 
 function ModelDocs({ id, onNavigate, onFocusAI }: {
   id: string; onNavigate: (id: string) => void; onFocusAI: () => void;
 }) {
   const { T, theme } = useTheme();
+  const { workspaceId } = useAuth();
   const [tab, setTab] = useState<DocTab>('description');
+  const [colLineage, setColLineage] = useState<ColLineageEntry[]>([]);
+  const [lineageLoading, setLineageLoading] = useState(false);
+
+  useEffect(() => {
+    if (tab !== 'lineage' || !workspaceId) return;
+    setLineageLoading(true);
+    lineageApi.columns(workspaceId, id)
+      .then(r => setColLineage((r.data.column_lineage as ColLineageEntry[]) ?? []))
+      .catch(() => setColLineage([]))
+      .finally(() => setLineageLoading(false));
+  }, [tab, id, workspaceId]);
   const [lineageOpen, setLineageOpen] = useState(false);
 
   const node = NODE_MAP.get(id);
@@ -660,7 +680,7 @@ function ModelDocs({ id, onNavigate, onFocusAI }: {
         </div>
         {/* Tabs */}
         <div className="flex gap-0 mt-4">
-          {(['description','columns','sql'] as DocTab[]).map(t => (
+          {(['description','columns','sql','lineage'] as DocTab[]).map(t => (
             <button key={t} onClick={() => setTab(t)}
               className="px-4 py-2 text-sm font-medium capitalize transition-colors border-b-2"
               style={{
@@ -754,6 +774,63 @@ function ModelDocs({ id, onNavigate, onFocusAI }: {
                 {meta.sql}
               </pre>
             </div>
+          </div>
+        )}
+
+        {tab === 'lineage' && (
+          <div className="max-w-3xl">
+            <p className="text-xs mb-4" style={{ color: T.faint }}>
+              Column-level lineage shows which upstream model columns feed each output column.
+              Only available after running an audit with <span className="font-mono">datapilot audit</span>.
+            </p>
+            {lineageLoading ? (
+              <div className="flex items-center gap-2 text-sm" style={{ color: T.muted }}>
+                <div className="w-4 h-4 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin" />
+                Loading column lineage…
+              </div>
+            ) : colLineage.length === 0 ? (
+              <div className="rounded-xl border p-6 text-center" style={{ borderColor: T.border }}>
+                <p className="text-sm" style={{ color: T.muted }}>No column lineage available for this model.</p>
+                <p className="text-xs mt-1" style={{ color: T.faint }}>Run an audit to generate AST-based column lineage.</p>
+              </div>
+            ) : (
+              <table className="w-full text-xs border-collapse">
+                <thead>
+                  <tr className="border-b text-left" style={{ borderColor: T.border }}>
+                    {['Output Column', 'Type', 'Source Columns'].map(h => (
+                      <th key={h} className="pb-2 pr-6 font-medium uppercase tracking-wide" style={{ color: T.faint }}>{h}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {colLineage.map((entry, i) => (
+                    <tr key={i} className="border-b" style={{ borderColor: T.border }}>
+                      <td className="py-2.5 pr-6 font-mono font-semibold" style={{ color: T.text }}>{entry.output}</td>
+                      <td className="py-2.5 pr-6">
+                        <span className="px-1.5 py-0.5 rounded text-[10px] font-mono"
+                          style={{ background: entry.exprType === 'aggr_func' ? '#fef3c7' : entry.exprType === 'column_ref' ? '#ede9fe' : '#f1f5f9',
+                                   color:      entry.exprType === 'aggr_func' ? '#92400e' : entry.exprType === 'column_ref' ? '#5b21b6' : '#475569' }}>
+                          {entry.exprType === 'aggr_func' ? 'aggregate' : entry.exprType === 'column_ref' ? 'pass-through' : entry.exprType}
+                        </span>
+                      </td>
+                      <td className="py-2.5" style={{ color: T.muted }}>
+                        {entry.sourceRefs.length === 0
+                          ? <span style={{ color: T.faint }}>expression / literal</span>
+                          : entry.sourceRefs.map((r, j) => (
+                            <span key={j} className="inline-flex items-center gap-1 mr-2">
+                              <button onClick={() => onNavigate(r.model)}
+                                className="font-mono hover:underline" style={{ color: '#818cf8' }}>{r.model}</button>
+                              <span style={{ color: T.faint }}>.</span>
+                              <span className="font-mono" style={{ color: T.text }}>{r.column}</span>
+                            </span>
+                          ))
+                        }
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
           </div>
         )}
       </div>

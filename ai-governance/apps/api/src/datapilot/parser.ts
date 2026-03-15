@@ -10,6 +10,7 @@
 import fs from 'fs/promises';
 import path from 'path';
 import { pool } from '../db/pool.js';
+import { extractColumnLineage } from './sqlAst.js';
 
 // ── Types mirroring dbt manifest.json ────────────────────────────────────────
 
@@ -260,7 +261,18 @@ async function persistNodes(
           m.name,
           m.resourceType,
           m.description,
-          JSON.stringify({ uniqueId: m.uniqueId, filePath: m.filePath, sql: m.sql, columns: m.columns, tags: m.tags, meta: m.meta }),
+          JSON.stringify({
+            uniqueId: m.uniqueId,
+            filePath: m.filePath,
+            sql: m.sql,
+            columns: m.columns,
+            tags: m.tags,
+            meta: m.meta,
+            columnLineage: extractColumnLineage(
+              m.sql,
+              m.dependsOn.map(dep => dep.split('.').pop() ?? dep),
+            ),
+          }),
           JSON.stringify(m.config),
         ],
       );

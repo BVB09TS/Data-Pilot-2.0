@@ -146,4 +146,35 @@ router.get('/descendants/:nodeId', async (req: Request, res: Response): Promise<
   res.json({ data: { node_id: nodeId, descendants: nodes } });
 });
 
+// ── GET /api/workspaces/:workspaceId/lineage/columns/:nodeId ──────────────────
+// Returns column-level lineage for a node (stored in node metadata during audit).
+
+router.get('/columns/:nodeId', async (req: Request, res: Response): Promise<void> => {
+  const { workspaceId, nodeId } = req.params;
+  if (!await assertWorkspaceAccess(req.userId!, workspaceId)) {
+    res.status(403).json({ error: 'Forbidden', code: 'WORKSPACE_ACCESS_DENIED' });
+    return;
+  }
+
+  const r = await pool.query<{ name: string; metadata: Record<string, unknown> }>(
+    `SELECT name, metadata FROM nodes WHERE id = $1 AND workspace_id = $2`,
+    [nodeId, workspaceId],
+  );
+
+  if (r.rows.length === 0) {
+    res.status(404).json({ error: 'Node not found' });
+    return;
+  }
+
+  const { name, metadata } = r.rows[0];
+  const columnLineage = (metadata?.columnLineage as unknown[]) ?? [];
+
+  res.json({
+    node_id: nodeId,
+    model_name: name,
+    column_lineage: columnLineage,
+    has_lineage: columnLineage.length > 0,
+  });
+});
+
 export default router;

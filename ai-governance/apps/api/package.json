@@ -28,6 +28,7 @@
     "passport-github2": "^0.1.12",
     "passport-gitlab2": "^5.0.0",
     "passport-google-oauth20": "^2.0.0",
+    "node-sql-parser": "^5.4.0",
     "pg": "^8.11.0"
   },
   "devDependencies": {

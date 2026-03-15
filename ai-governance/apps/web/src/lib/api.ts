@@ -53,6 +53,7 @@ export const lineageApi = {
   manifest:    (wid: string) => api.get(`/workspaces/${wid}/lineage/manifest`),
   ancestors:   (wid: string, nodeId: string) => api.get(`/workspaces/${wid}/lineage/ancestors/${nodeId}`),
   descendants: (wid: string, nodeId: string) => api.get(`/workspaces/${wid}/lineage/descendants/${nodeId}`),
+  columns:     (wid: string, nodeId: string) => api.get(`/workspaces/${wid}/lineage/columns/${nodeId}`),
 };
 
 export const runsApi = {

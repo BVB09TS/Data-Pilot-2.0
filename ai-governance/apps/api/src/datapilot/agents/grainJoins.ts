@@ -12,20 +12,26 @@
  */
 
 import { llmCall, parseJsonResponse } from '../llmGateway.js';
+import { inferGrain, analyzeSQL } from '../sqlAst.js';
 import type { ParsedProject, ParsedModel } from '../parser.js';
 import type { AgentFinding } from './types.js';
 
-const AGGREGATE_FUNCTIONS = /\b(SUM|COUNT|AVG|MIN|MAX|STDDEV|VARIANCE|PERCENTILE|APPROX_COUNT)\s*\(/i;
-const GROUP_BY = /\bGROUP\s+BY\b/i;
-const DATE_TRUNC = /\b(DATE_TRUNC|TO_DATE|DATEADD|DATEDIFF)\b/i;
-
 type Grain = 'aggregate' | 'transaction' | 'unknown';
 
-function inferGrain(model: ParsedModel): Grain {
-  const sql = model.sql;
-  if (!sql) return 'unknown';
-  const hasAgg = AGGREGATE_FUNCTIONS.test(sql) || GROUP_BY.test(sql);
-  return hasAgg ? 'aggregate' : 'transaction';
+const DATE_TRUNC = /\b(DATE_TRUNC|TO_DATE|DATEADD|DATEDIFF)\b/i;
+
+function inferModelGrain(model: ParsedModel): Grain {
+  return inferGrain(model.sql);
+}
+
+/** AST-based: detect if model's JOIN conditions mix grains at the join predicate level */
+function hasDateTruncCrossGrain(model: ParsedModel): boolean {
+  const summary = analyzeSQL(model.sql);
+  if (summary) {
+    // If join count >= 1 and any column alias involves a date trunc pattern
+    return summary.hasJoins && DATE_TRUNC.test(model.sql);
+  }
+  return DATE_TRUNC.test(model.sql) && /\bJOIN\b/i.test(model.sql);
 }
 
 export async function analyzeGrainJoins(project: ParsedProject): Promise<AgentFinding[]> {
@@ -50,12 +56,12 @@ export async function analyzeGrainJoins(project: ParsedProject): Promise<AgentFi
 
     if (upstreams.length < 2) return false;
 
-    const grains = upstreams.map(inferGrain);
+    const grains = upstreams.map(inferModelGrain);
     const hasAggregate = grains.includes('aggregate');
     const hasTransaction = grains.includes('transaction');
 
     // Also flag if the join itself contains date_trunc suggesting cross-grain date join
-    const hasCrossGrainDateJoin = DATE_TRUNC.test(m.sql) && /\bJOIN\b/i.test(m.sql);
+    const hasCrossGrainDateJoin = hasDateTruncCrossGrain(m);
 
     return (hasAggregate && hasTransaction) || hasCrossGrainDateJoin;
   });
@@ -66,7 +72,7 @@ export async function analyzeGrainJoins(project: ParsedProject): Promise<AgentFi
   const modelContext = suspicious.map(m => {
     const upstreams = m.dependsOn.map(dep => {
       const u = modelById.get(dep) ?? modelByName.get(dep.split('.').pop() ?? '');
-      return u ? `${u.name} (grain: ${inferGrain(u)})` : dep.split('.').pop();
+      return u ? `${u.name} (grain: ${inferModelGrain(u)})` : dep.split('.').pop();
     });
     return `
 Model: ${m.name}
@@ -132,7 +138,7 @@ ${modelContext}`;
           confidence: f.confidence,
           grainAnalysis: src?.dependsOn.map(dep => {
             const u = modelById.get(dep) ?? modelByName.get(dep.split('.').pop() ?? '');
-            return { name: u?.name ?? dep, grain: u ? inferGrain(u) : 'unknown' };
+            return { name: u?.name ?? dep, grain: u ? inferModelGrain(u) : 'unknown' };
           }),
         },
         cost_usd: response.cost_usd / Math.max(parsed.findings.length, 1),
