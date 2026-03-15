@@ -60,7 +60,7 @@ const plans = [
     period: 'contact us',
     desc: 'For large data platforms with complex governance requirements.',
     cta: 'Talk to us',
-    ctaLink: 'mailto:hello@datapilot.dev',
+    ctaLink: 'mailto:hello@voro.dev',
     highlight: false,
     features: [
       'Unlimited projects',
@@ -89,7 +89,7 @@ const faqs = [
     a: 'The Free tier uses a shared Groq key (Llama 3.3 70B). Team and Enterprise can bring their own keys for Anthropic, OpenAI, or Groq.',
   },
   {
-    q: 'Is DataPilot open source?',
+    q: 'Is VORO open source?',
     a: 'The core audit engine is open source (MIT). The web dashboard and enterprise integrations are proprietary.',
   },
   {
@@ -123,12 +123,12 @@ export function PricingPage() {
               key={plan.name}
               className={`relative rounded-2xl border p-8 flex flex-col gap-6 ${
                 plan.highlight
-                  ? 'bg-blue-600/10 border-blue-500/40 ring-1 ring-blue-500/30'
+                  ? 'bg-white/5 border-white/20 ring-1 ring-white/10'
                   : 'bg-gray-900/60 border-white/10'
               }`}
             >
               {plan.badge && (
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-blue-600 text-white text-xs font-semibold px-4 py-1 rounded-full">
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-white text-black text-xs font-semibold px-4 py-1 rounded-full">
                   {plan.badge}
                 </div>
               )}
@@ -146,7 +146,7 @@ export function PricingPage() {
                 to={plan.ctaLink}
                 className={`block text-center py-3 rounded-xl font-semibold text-sm transition-colors ${
                   plan.highlight
-                    ? 'bg-blue-600 hover:bg-blue-500 text-white'
+                    ? 'bg-white hover:bg-neutral-100 text-black'
                     : 'bg-white/10 hover:bg-white/15 text-white'
                 }`}
               >

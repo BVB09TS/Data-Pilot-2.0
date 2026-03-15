@@ -3,7 +3,7 @@ import { createCipheriv, createDecipheriv, randomBytes, scryptSync } from 'crypt
 const ALGORITHM = 'aes-256-gcm';
 const IV_LENGTH = 12;   // GCM standard
 const TAG_LENGTH = 16;
-const SALT = 'datapilot-ai-governance'; // fixed salt — key derivation only
+const SALT = 'voro-ai-governance'; // fixed salt — key derivation only
 
 function getKey(): Buffer {
   const secret = process.env.SERVER_SECRET;

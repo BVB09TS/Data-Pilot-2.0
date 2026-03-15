@@ -67,7 +67,7 @@ router.post('/audit', async (req: Request, res: Response): Promise<void> => {
       environmentId: environment_id,
       queryHistory: query_history,
     }).catch(err => {
-      console.error('[DataPilot] Pipeline failed:', err);
+      console.error('[VORO] Pipeline failed:', err);
     });
   });
 

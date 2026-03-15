@@ -52,7 +52,7 @@ export default function Layout() {
                 <path d="M3 3L8 13L13 3" stroke={isDark ? '#0a0a0a' : '#ffffff'} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>
             </div>
-            <span className="text-sm font-bold tracking-tight text-neutral-900 dark:text-white">Voro</span>
+            <span className="text-sm font-bold tracking-tight text-neutral-900 dark:text-white">VORO</span>
           </div>
         </div>
 

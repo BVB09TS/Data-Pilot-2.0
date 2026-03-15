@@ -37,7 +37,7 @@ const features = [
       </svg>
     ),
     title: 'Governance Policies',
-    desc: 'Define your team's standards once. DataPilot enforces them automatically on every audit and pull request.',
+    desc: 'Define your team\'s standards once. VORO enforces them automatically on every audit and pull request.',
   },
   {
     icon: (
@@ -81,12 +81,12 @@ const steps = [
   {
     step: '01',
     title: 'Connect your data project',
-    desc: 'Point DataPilot at your project directory or connect via API. Parsing happens in seconds — no agents to install.',
+    desc: 'Point VORO at your project directory or connect via API. Parsing happens in seconds — no agents to install.',
   },
   {
     step: '02',
     title: 'Run the audit',
-    desc: 'DataPilot builds a lineage DAG, runs 8 specialist AI agents in parallel, and scores every model and source.',
+    desc: 'VORO builds a lineage DAG, runs 8 specialist AI agents in parallel, and scores every model and source.',
   },
   {
     step: '03',
@@ -118,34 +118,29 @@ export function LandingPage() {
 
       {/* Hero */}
       <section className="relative pt-32 pb-24 px-6 overflow-hidden">
-        {/* Background glow */}
-        <div className="absolute inset-0 flex items-start justify-center pointer-events-none">
-          <div className="w-[800px] h-[400px] bg-blue-600/10 rounded-full blur-3xl mt-16" />
-        </div>
-
         <div className="relative max-w-5xl mx-auto text-center">
           <div className="inline-flex items-center gap-2 bg-white/5 border border-white/10 rounded-full px-4 py-1.5 mb-8">
-            <span className="w-1.5 h-1.5 bg-blue-400 rounded-full animate-pulse" />
-            <span className="text-gray-400 text-sm">DataPilot 2.0 — now with multi-provider AI routing</span>
+            <span className="w-1.5 h-1.5 bg-white/60 rounded-full" />
+            <span className="text-gray-400 text-sm">VORO — AI governance for modern data platforms</span>
           </div>
 
           <h1 className="text-5xl md:text-7xl font-bold tracking-tight mb-6 leading-[1.1]">
             AI governance for your
             <br />
-            <span className="bg-gradient-to-r from-blue-400 via-indigo-400 to-violet-500 bg-clip-text text-transparent">
+            <span className="text-white">
               entire data platform
             </span>
           </h1>
 
           <p className="text-xl text-gray-400 max-w-2xl mx-auto mb-10 leading-relaxed">
-            DataPilot connects to your data sources, builds a complete lineage graph, and deploys
+            VORO connects to your data sources, builds a complete lineage graph, and deploys
             8 specialist AI agents to surface quality issues, cost waste, and governance risks — automatically.
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link
               to="/login"
-              className="bg-blue-600 hover:bg-blue-500 text-white px-8 py-3.5 rounded-xl font-semibold text-base transition-all hover:scale-[1.02] shadow-lg shadow-blue-600/20"
+              className="bg-white hover:bg-neutral-100 text-black px-8 py-3.5 rounded-xl font-semibold text-base transition-all hover:scale-[1.02]"
             >
               Get started free
             </Link>
@@ -153,7 +148,7 @@ export function LandingPage() {
               to="/docs"
               className="text-gray-400 hover:text-white px-8 py-3.5 rounded-xl font-medium text-base border border-white/10 hover:border-white/20 transition-all"
             >
-              Read the docs →
+              Read the docs
             </Link>
           </div>
 
@@ -163,28 +158,28 @@ export function LandingPage() {
               <div className="w-3 h-3 rounded-full bg-red-500/60" />
               <div className="w-3 h-3 rounded-full bg-yellow-500/60" />
               <div className="w-3 h-3 rounded-full bg-green-500/60" />
-              <span className="ml-4 text-gray-500 text-xs font-mono">datapilot audit --project ./my_project --output ./output</span>
+              <span className="ml-4 text-gray-500 text-xs font-mono">voro audit --project ./my_project --output ./output</span>
             </div>
             <div className="p-6 font-mono text-sm space-y-2">
               <p className="text-gray-500">  Parsing project — 84 models, 4 layers, 217 dependencies...</p>
-              <p className="text-green-400">✓ Lineage DAG built — 84 nodes, 217 edges</p>
-              <p className="text-blue-400">  Launching 8 AI audit agents in parallel...</p>
+              <p className="text-green-400">  Lineage DAG built — 84 nodes, 217 edges</p>
+              <p className="text-gray-400">  Launching 8 AI audit agents in parallel...</p>
               <div className="pl-4 space-y-1 text-gray-500">
-                <p>→ dead_models       7 detected</p>
-                <p>→ orphaned_models   6 detected</p>
-                <p>→ broken_refs       2 detected</p>
-                <p>→ grain_joins       1 detected</p>
-                <p>→ missing_tests     4 detected</p>
-                <p>→ duplicate_metrics 1 detected</p>
+                <p>  dead_models       7 detected</p>
+                <p>  orphaned_models   6 detected</p>
+                <p>  broken_refs       2 detected</p>
+                <p>  grain_joins       1 detected</p>
+                <p>  missing_tests     4 detected</p>
+                <p>  duplicate_metrics 1 detected</p>
               </div>
               <div className="pt-3 flex flex-wrap gap-4">
-                <span className="text-red-400 font-semibold">● 3 Critical</span>
-                <span className="text-orange-400 font-semibold">● 8 High</span>
-                <span className="text-yellow-400 font-semibold">● 10 Medium</span>
-                <span className="text-blue-400 font-semibold">● 3 Low</span>
+                <span className="text-red-400 font-semibold">3 Critical</span>
+                <span className="text-orange-400 font-semibold">8 High</span>
+                <span className="text-yellow-400 font-semibold">10 Medium</span>
+                <span className="text-gray-400 font-semibold">3 Low</span>
               </div>
               <p className="text-gray-500">  Estimated wasted compute: <span className="text-white">$1,840/month</span></p>
-              <p className="text-green-400 font-semibold">✓ Report saved → output/datapilot_report.html</p>
+              <p className="text-green-400">  Report saved — output/voro_report.html</p>
             </div>
           </div>
         </div>
@@ -217,9 +212,9 @@ export function LandingPage() {
             {features.map(f => (
               <div
                 key={f.title}
-                className="group bg-white/[0.03] border border-white/[0.08] rounded-xl p-5 hover:border-blue-500/25 hover:bg-white/[0.05] transition-all duration-200"
+                className="group bg-white/[0.03] border border-white/[0.08] rounded-xl p-5 hover:border-white/20 hover:bg-white/[0.05] transition-all duration-200"
               >
-                <div className="w-9 h-9 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center mb-4 text-blue-400 group-hover:bg-blue-500/10 group-hover:border-blue-500/20 transition-colors">
+                <div className="w-9 h-9 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center mb-4 text-white/60 group-hover:bg-white/10 group-hover:text-white transition-colors">
                   {f.icon}
                 </div>
                 <h3 className="text-white font-semibold mb-2 text-sm">{f.title}</h3>
@@ -277,9 +272,7 @@ export function LandingPage() {
           <h2 className="text-5xl font-bold mb-6 tracking-tight leading-tight">
             Ready to govern your
             <br />
-            <span className="bg-gradient-to-r from-blue-400 to-violet-500 bg-clip-text text-transparent">
-              data platform?
-            </span>
+            data platform?
           </h2>
           <p className="text-gray-400 text-lg mb-10 leading-relaxed">
             Free to start. Connect your project in minutes. No credit card required.
@@ -287,7 +280,7 @@ export function LandingPage() {
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link
               to="/login"
-              className="inline-block bg-blue-600 hover:bg-blue-500 text-white px-10 py-4 rounded-xl font-semibold text-base transition-all hover:scale-[1.02] shadow-lg shadow-blue-600/20"
+              className="inline-block bg-white hover:bg-neutral-100 text-black px-10 py-4 rounded-xl font-semibold text-base transition-all hover:scale-[1.02]"
             >
               Get started free
             </Link>
@@ -295,7 +288,7 @@ export function LandingPage() {
               to="/docs"
               className="text-gray-400 hover:text-white text-base font-medium transition-colors"
             >
-              Read the docs →
+              Read the docs
             </Link>
           </div>
         </div>

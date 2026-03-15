@@ -16,11 +16,10 @@ export function PublicNavbar() {
       <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
         {/* Logo */}
         <Link to="/" className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-violet-600 flex items-center justify-center">
-            <span className="text-white font-bold text-sm">DP</span>
+          <div className="w-8 h-8 rounded-lg bg-white flex items-center justify-center">
+            <span className="text-black font-bold text-sm">V</span>
           </div>
-          <span className="text-white font-semibold text-lg">DataPilot</span>
-          <span className="text-xs bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded-full border border-blue-500/30">2.0</span>
+          <span className="text-white font-semibold text-lg tracking-tight">VORO</span>
         </Link>
 
         {/* Desktop links */}
@@ -47,7 +46,7 @@ export function PublicNavbar() {
           </Link>
           <Link
             to="/login"
-            className="text-sm bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-lg transition-colors font-medium"
+            className="text-sm bg-white hover:bg-neutral-100 text-black px-4 py-2 rounded-lg transition-colors font-medium"
           >
             Get started free
           </Link>
@@ -80,7 +79,7 @@ export function PublicNavbar() {
               {l.label}
             </Link>
           ))}
-          <Link to="/login" onClick={() => setMenuOpen(false)} className="text-sm bg-blue-600 text-white px-4 py-2 rounded-lg text-center">
+          <Link to="/login" onClick={() => setMenuOpen(false)} className="text-sm bg-white text-black px-4 py-2 rounded-lg text-center font-medium">
             Get started free
           </Link>
         </div>

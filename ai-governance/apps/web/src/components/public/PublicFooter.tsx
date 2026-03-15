@@ -8,10 +8,10 @@ export function PublicFooter() {
           {/* Brand */}
           <div className="col-span-2 md:col-span-1">
             <div className="flex items-center gap-2 mb-4">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-violet-600 flex items-center justify-center">
-                <span className="text-white font-bold text-sm">DP</span>
+              <div className="w-8 h-8 rounded-lg bg-white flex items-center justify-center">
+                <span className="text-black font-bold text-sm">V</span>
               </div>
-              <span className="text-white font-semibold">DataPilot</span>
+              <span className="text-white font-semibold tracking-tight">VORO</span>
             </div>
             <p className="text-gray-500 text-sm leading-relaxed">
               AI-powered governance for modern data platforms. Find problems before they cost you.
@@ -75,7 +75,7 @@ export function PublicFooter() {
         </div>
 
         <div className="border-t border-white/10 pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
-          <p className="text-gray-600 text-sm">© 2026 DataPilot. All rights reserved.</p>
+          <p className="text-gray-600 text-sm">© 2026 VORO. All rights reserved.</p>
           <p className="text-gray-600 text-sm">Built for data teams who care about quality.</p>
         </div>
       </div>

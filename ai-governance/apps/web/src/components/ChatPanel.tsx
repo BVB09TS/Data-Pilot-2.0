@@ -15,7 +15,7 @@ export default function ChatPanel() {
 
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
-    { role: 'assistant', content: "Hi, I'm Voro. Ask me anything about your data lineage, findings, or model quality." },
+    { role: 'assistant', content: "Hi, I'm VORO. Ask me anything about your data lineage, findings, or model quality." },
   ]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
@@ -80,7 +80,7 @@ export default function ChatPanel() {
         onClick={() => setOpen(o => !o)}
         style={{ background: btnBg }}
         className="fixed bottom-5 right-5 z-50 w-11 h-11 rounded-full shadow-lg flex items-center justify-center transition-all duration-200 hover:scale-105 hover:shadow-xl"
-        aria-label="Open Voro AI"
+        aria-label="Open VORO AI"
       >
         {open ? (
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke={btnFg} strokeWidth={2}>
@@ -108,7 +108,7 @@ export default function ChatPanel() {
                   <path d="M3 3L8 13L13 3" stroke={btnFg} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
               </div>
-              <span className="text-sm font-semibold" style={{ color: textMain }}>Voro AI</span>
+              <span className="text-sm font-semibold" style={{ color: textMain }}>VORO AI</span>
               <span className="text-[10px] px-1.5 py-0.5 rounded font-medium"
                 style={{ background: isDark ? '#1a1a1a' : '#f0f0f0', color: textMuted }}>
                 beta

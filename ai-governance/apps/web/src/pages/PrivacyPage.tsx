@@ -15,7 +15,7 @@ const sections = [
     title: '2. How We Use Your Information',
     content: `We use the information we collect to:
 
-• Provide, operate, and improve DataPilot.
+• Provide, operate, and improve VORO.
 • Send you audit results, alerts, and product updates.
 • Respond to your support requests.
 • Monitor the security and reliability of our service.
@@ -29,11 +29,11 @@ We do not sell your personal data to third parties.`,
 
 • Service providers: We use infrastructure providers (cloud hosting, analytics) who process data on our behalf under strict data processing agreements.
 • LLM providers: When you trigger an audit, anonymised model metadata (names, types, lineage relationships) may be sent to your configured LLM provider (Groq, Anthropic, or OpenAI) to generate findings. Raw SQL and column values are never sent.
-• Legal requirements: We may disclose data if required by law or to protect the rights, property, or safety of DataPilot, our users, or the public.`,
+• Legal requirements: We may disclose data if required by law or to protect the rights, property, or safety of VORO, our users, or the public.`,
   },
   {
     title: '4. Data Retention',
-    content: `We retain your account data for as long as your account is active. Audit reports and findings are retained for 90 days by default, configurable per plan. You may request deletion of your account and all associated data at any time by contacting privacy@datapilot.dev.`,
+    content: `We retain your account data for as long as your account is active. Audit reports and findings are retained for 90 days by default, configurable per plan. You may request deletion of your account and all associated data at any time by contacting privacy@voro.dev.`,
   },
   {
     title: '5. Security',
@@ -49,7 +49,7 @@ We do not sell your personal data to third parties.`,
 • Object to or restrict certain processing.
 • Data portability.
 
-To exercise these rights, contact privacy@datapilot.dev.`,
+To exercise these rights, contact privacy@voro.dev.`,
   },
   {
     title: '7. Cookies',
@@ -57,11 +57,11 @@ To exercise these rights, contact privacy@datapilot.dev.`,
   },
   {
     title: '8. Changes to This Policy',
-    content: `We may update this policy from time to time. We will notify you of significant changes via email or a prominent notice in the product. Your continued use of DataPilot after changes constitutes acceptance of the updated policy.`,
+    content: `We may update this policy from time to time. We will notify you of significant changes via email or a prominent notice in the product. Your continued use of VORO after changes constitutes acceptance of the updated policy.`,
   },
   {
     title: '9. Contact',
-    content: `If you have questions about this privacy policy, contact us at privacy@datapilot.dev.`,
+    content: `If you have questions about this privacy policy, contact us at privacy@voro.dev.`,
   },
 ]
 
@@ -77,7 +77,7 @@ export function PrivacyPage() {
         </div>
 
         <p className="text-gray-300 mb-10 leading-relaxed">
-          DataPilot ("we", "us", or "our") is committed to protecting your privacy.
+          VORO ("we", "us", or "our") is committed to protecting your privacy.
           This policy explains how we collect, use, and share information when you use our service.
         </p>
 

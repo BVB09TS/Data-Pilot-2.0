@@ -141,7 +141,7 @@ export async function runPipeline(opts: PipelineOptions): Promise<PipelineResult
         allFindings.push(...result.value);
       } else {
         const msg = result.reason instanceof Error ? result.reason.message : String(result.reason);
-        console.error(`[DataPilot] Agent "${name}" failed: ${msg}`);
+        console.error(`[VORO] Agent "${name}" failed: ${msg}`);
         agentErrors.push(`${name}: ${msg}`);
       }
     }

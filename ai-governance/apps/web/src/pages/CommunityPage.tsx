@@ -13,7 +13,7 @@ const channels = [
     action: 'View on GitHub',
     href: 'https://github.com',
     color: 'text-white',
-    bg: 'bg-gray-800 hover:bg-gray-700',
+    bg: 'bg-white/10 hover:bg-white/15 border border-white/10',
   },
   {
     icon: (
@@ -22,11 +22,11 @@ const channels = [
       </svg>
     ),
     name: 'Discord',
-    desc: 'Real-time chat with the DataPilot community and core team.',
+    desc: 'Real-time chat with the VORO community and core team.',
     action: 'Join Discord',
     href: '#',
     color: 'text-white',
-    bg: 'bg-indigo-600 hover:bg-indigo-500',
+    bg: 'bg-white/10 hover:bg-white/15 border border-white/10',
   },
   {
     icon: (
@@ -35,28 +35,60 @@ const channels = [
       </svg>
     ),
     name: 'dbt Slack',
-    desc: 'Find us in the #datapilot channel on the official dbt community Slack.',
+    desc: 'Find us in the #voro channel on the official dbt community Slack.',
     action: 'Join dbt Slack',
     href: '#',
     color: 'text-white',
-    bg: 'bg-green-700 hover:bg-green-600',
+    bg: 'bg-white/10 hover:bg-white/15 border border-white/10',
   },
 ]
 
 const contributors = [
-  { initials: 'RV', name: 'Rishi V.', role: 'Core maintainer', color: 'from-blue-500 to-violet-600' },
-  { initials: 'AM', name: 'Amira M.', role: 'Data engineering', color: 'from-emerald-500 to-cyan-600' },
-  { initials: 'JP', name: 'Jonas P.', role: 'Frontend', color: 'from-orange-500 to-pink-600' },
-  { initials: 'SC', name: 'Sara C.', role: 'Integrations', color: 'from-violet-500 to-blue-600' },
-  { initials: 'TK', name: 'Tom K.', role: 'ML & agents', color: 'from-yellow-500 to-orange-600' },
-  { initials: '+', name: 'You?', role: 'Open for contributions', color: 'from-gray-700 to-gray-600' },
+  { initials: 'RV', name: 'Rishi V.', role: 'Core maintainer' },
+  { initials: 'AM', name: 'Amira M.', role: 'Data engineering' },
+  { initials: 'JP', name: 'Jonas P.', role: 'Frontend' },
+  { initials: 'SC', name: 'Sara C.', role: 'Integrations' },
+  { initials: 'TK', name: 'Tom K.', role: 'ML & agents' },
+  { initials: '+', name: 'You?', role: 'Open for contributions' },
 ]
 
 const ways = [
-  { icon: '🐛', title: 'Report bugs', desc: 'Open an issue on GitHub with a reproduction case.' },
-  { icon: '💡', title: 'Suggest features', desc: 'Start a GitHub Discussion with your idea and use case.' },
-  { icon: '📝', title: 'Improve docs', desc: 'Fix typos, add examples, or write new guides.' },
-  { icon: '🔌', title: 'Build integrations', desc: 'Add support for new tools by subclassing BaseIntegration.' },
+  {
+    icon: (
+      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.75}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+      </svg>
+    ),
+    title: 'Report bugs',
+    desc: 'Open an issue on GitHub with a reproduction case.',
+  },
+  {
+    icon: (
+      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.75}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+      </svg>
+    ),
+    title: 'Suggest features',
+    desc: 'Start a GitHub Discussion with your idea and use case.',
+  },
+  {
+    icon: (
+      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.75}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+      </svg>
+    ),
+    title: 'Improve docs',
+    desc: 'Fix typos, add examples, or write new guides.',
+  },
+  {
+    icon: (
+      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.75}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M11 4a2 2 0 114 0v1a1 1 0 001 1h3a1 1 0 011 1v3a1 1 0 01-1 1h-1a2 2 0 100 4h1a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1v-1a2 2 0 10-4 0v1a1 1 0 01-1 1H7a1 1 0 01-1-1v-3a1 1 0 00-1-1H4a2 2 0 110-4h1a1 1 0 001-1V7a1 1 0 011-1h3a1 1 0 001-1V4z" />
+      </svg>
+    ),
+    title: 'Build integrations',
+    desc: 'Add support for new tools by subclassing BaseIntegration.',
+  },
 ]
 
 export function CommunityPage() {
@@ -69,7 +101,7 @@ export function CommunityPage() {
         <div className="max-w-3xl mx-auto">
           <h1 className="text-5xl font-bold mb-6">Built by data engineers,<br />for data engineers.</h1>
           <p className="text-xl text-gray-400 leading-relaxed">
-            DataPilot is open source and community-driven. Join the conversation, contribute code,
+            VORO is open source and community-driven. Join the conversation, contribute code,
             or just share what you've built.
           </p>
         </div>
@@ -108,7 +140,7 @@ export function CommunityPage() {
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
             {contributors.map(c => (
               <div key={c.name} className="text-center">
-                <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${c.color} flex items-center justify-center text-white font-bold text-lg mx-auto mb-3`}>
+                <div className="w-14 h-14 rounded-2xl bg-white/10 border border-white/10 flex items-center justify-center text-white font-bold text-lg mx-auto mb-3">
                   {c.initials}
                 </div>
                 <p className="text-white text-sm font-medium">{c.name}</p>
@@ -126,7 +158,9 @@ export function CommunityPage() {
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             {ways.map(w => (
               <div key={w.title} className="bg-gray-900 border border-white/10 rounded-xl p-6">
-                <div className="text-3xl mb-4">{w.icon}</div>
+                <div className="w-9 h-9 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center mb-4 text-white/60">
+                  {w.icon}
+                </div>
                 <h3 className="text-white font-semibold mb-2">{w.title}</h3>
                 <p className="text-gray-400 text-sm leading-relaxed">{w.desc}</p>
               </div>

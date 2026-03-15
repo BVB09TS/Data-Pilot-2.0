@@ -88,7 +88,7 @@ export default function Login() {
   async function devLogin() {
     setLoading(true);
     await api.post('/auth/dev-login').catch(() => {});
-    localStorage.setItem('datapilot_dev_user', JSON.stringify({
+    localStorage.setItem('voro_dev_user', JSON.stringify({
       id: 'dev',
       name: 'Dev User',
       email: 'dev@localhost',
@@ -126,14 +126,14 @@ export default function Login() {
               <path d="M3 3L8 13L13 3" stroke="#0a0a0a" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
           </div>
-          <span className="text-white font-bold text-sm tracking-tight">Voro</span>
+          <span className="text-white font-bold text-sm tracking-tight">VORO</span>
         </Link>
 
         {/* Testimonial */}
         <div className="relative">
           <div className="text-5xl text-neutral-700 font-serif leading-none mb-4">"</div>
           <blockquote className="text-xl font-medium text-white leading-relaxed mb-6">
-            Voro found 7 dead models costing us $4,200/month on Snowflake. Paid for itself in the first audit.
+            VORO found 7 dead models costing us $4,200/month on Snowflake. Paid for itself in the first audit.
           </blockquote>
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-full bg-white flex items-center justify-center font-bold text-sm text-neutral-900">
@@ -165,7 +165,7 @@ export default function Login() {
                 <path d="M3 3L8 13L13 3" stroke="white" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className="dark:stroke-neutral-900"/>
               </svg>
             </div>
-            <span className="text-neutral-900 dark:text-white font-bold text-sm">Voro</span>
+            <span className="text-neutral-900 dark:text-white font-bold text-sm">VORO</span>
           </Link>
           <div className="hidden lg:block" />
           <ThemeToggle />

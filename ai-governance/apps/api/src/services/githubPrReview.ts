@@ -304,11 +304,11 @@ export function formatPRComment(result: PRReviewResult): string {
   const { findings, stats, summary } = result;
 
   const header = stats.auto_approved
-    ? `## ✅ DataPilot Review — Auto-Approved\n\n${summary}`
-    : `## 🤖 DataPilot PR Review\n\n${summary}`;
+    ? `## VORO Review — Auto-Approved\n\n${summary}`
+    : `## VORO PR Review\n\n${summary}`;
 
   if (findings.length === 0) {
-    return `${header}\n\n_No issues found. This PR follows all governance policies._\n\n---\n*Powered by [DataPilot](https://datapilot.ai)*`;
+    return `${header}\n\n_No issues found. This PR follows all governance policies._\n\n---\n*Powered by [VORO](https://voro.dev)*`;
   }
 
   const statsLine = [
@@ -341,7 +341,7 @@ export function formatPRComment(result: PRReviewResult): string {
     findingBlocks.join('\n\n---\n\n'),
     '',
     '---',
-    '*Powered by [DataPilot](https://datapilot.ai) · Comment `Accept` on any suggestion to auto-apply it*',
+    '*Powered by [VORO](https://voro.dev) · Comment `Accept` on any suggestion to auto-apply it*',
   ].join('\n');
 }
 
@@ -368,7 +368,7 @@ export async function runPRReview(
 
   if (dbtFiles.length === 0) {
     return {
-      summary: `No dbt model files changed in this PR (${allFiles.length} file${allFiles.length !== 1 ? 's' : ''} total). Skipping DataPilot review.`,
+      summary: `No dbt model files changed in this PR (${allFiles.length} file${allFiles.length !== 1 ? 's' : ''} total). Skipping VORO review.`,
       findings: [],
       stats: { files_changed: allFiles.length, dbt_files: 0, critical: 0, high: 0, medium: 0, low: 0, auto_approved: true },
     };

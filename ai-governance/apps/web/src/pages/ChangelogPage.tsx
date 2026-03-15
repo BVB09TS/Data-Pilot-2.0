@@ -6,8 +6,8 @@ const releases = [
     version: '2.0.1',
     date: 'March 2026',
     tag: 'Latest',
-    tagColor: 'bg-blue-500/15 text-blue-400 border-blue-500/25',
-    dotColor: 'bg-blue-500',
+    tagColor: 'bg-white/10 text-white border-white/20',
+    dotColor: 'bg-white',
     summary: 'Patch: workspace settings, chat panel improvements, and policy evaluation fixes.',
     changes: {
       added: [
@@ -30,8 +30,8 @@ const releases = [
     version: '2.0.0',
     date: 'February 2026',
     tag: 'Major release',
-    tagColor: 'bg-violet-500/15 text-violet-400 border-violet-500/25',
-    dotColor: 'bg-violet-500',
+    tagColor: 'bg-white/10 text-white/70 border-white/15',
+    dotColor: 'bg-gray-400',
     summary: 'Full platform rewrite. New TypeScript governance API, React dashboard, 8 specialist AI agents, and enterprise integrations.',
     changes: {
       added: [
@@ -119,7 +119,7 @@ const releases = [
 const tagStyles: Record<string, { label: string; cls: string }> = {
   added:   { label: 'Added',   cls: 'text-emerald-400' },
   changed: { label: 'Changed', cls: 'text-yellow-400' },
-  fixed:   { label: 'Fixed',   cls: 'text-blue-400' },
+  fixed:   { label: 'Fixed',   cls: 'text-gray-400' },
 }
 
 export function ChangelogPage() {
@@ -131,7 +131,7 @@ export function ChangelogPage() {
         {/* Header */}
         <div className="mb-16">
           <h1 className="text-4xl font-bold mb-3 tracking-tight">Changelog</h1>
-          <p className="text-gray-400">Every DataPilot release, documented. Always up to date.</p>
+          <p className="text-gray-400">Every VORO release, documented. Always up to date.</p>
         </div>
 
         {/* Timeline */}
